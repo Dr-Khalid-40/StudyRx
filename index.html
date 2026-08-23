@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyRx</title>
+<script>(function(){try{var t=localStorage.getItem('srx_theme')||'dark';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1712">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="StudyRx">
+<script>
+window.addEventListener("load",()=>{
+  if("serviceWorker" in navigator && location.protocol!=="file:"){
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  }
+});
+</script>
+<style>
+:root{
+  --bg0:#060d0a; --bg1:#0a1712; --bg2:#0e2019; --glass:rgba(20,40,32,.55); --glass2:rgba(20,40,32,.85); --line:rgba(120,255,190,.14);
+  --ink:#eafff4; --muted:#8fb3a5; --faint:#587466; --paper:#0e1a15;
+  --emerald:#22ffb0; --emeraldD:#0f7a4f; --gold:#ffcb47; --rose:#ff5d8f;
+  --r:16px; --rs:11px;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.35);
+  --shadow-md:0 8px 26px rgba(0,0,0,.4);
+  --shadow-glow:0 0 22px rgba(34,255,176,.25);
+}
+html[data-theme="light"]{
+  --bg0:#f2f7f3; --bg1:#ffffff; --bg2:#eef6ee; --glass:rgba(255,255,255,.78); --glass2:rgba(255,255,255,.94); --line:rgba(15,90,60,.16);
+  --ink:#0d2818; --muted:#4f6e5c; --faint:#7c9484; --paper:#ffffff;
+  --shadow-sm:0 2px 8px rgba(15,90,60,.08); --shadow-md:0 8px 26px rgba(15,90,60,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",-apple-system,sans-serif; color:var(--ink); font-size:14px; line-height:1.5;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(34,255,176,.09), transparent 42%),
+    radial-gradient(circle at 90% 10%, rgba(180,144,255,.07), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(41,211,255,.05), transparent 45%),
+    var(--bg0);
+  min-height:100vh; -webkit-font-smoothing:antialiased; transition:background .4s;
+}
+.brandfont{font-family:"Fraunces",serif}
+.numfont{font-family:"Space Grotesk",monospace}
+a{color:inherit}
+button{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+
+/* ============ layout shell ============ */
+.app{display:flex;min-height:100vh}
+.rail{width:78px;flex-shrink:0;padding:18px 0;display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:var(--bg1);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:60}
+.rail .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--emerald),var(--emeraldD));
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:#04140d;font-size:17px;margin-bottom:16px;
+  box-shadow:0 0 18px rgba(34,255,176,.5);flex-shrink:0}
+.railbtn{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--faint);border:none;background:none;position:relative;transition:all .18s;flex-shrink:0}
+.railbtn svg{width:20px;height:20px}
+.railbtn:hover{color:var(--ink);background:rgba(255,255,255,.05)}
+.railbtn.on{color:var(--emerald);background:rgba(34,255,176,.12);box-shadow:0 0 14px rgba(34,255,176,.3)}
+.railsep{width:30px;height:1px;background:var(--line);margin:8px 0}
+.railsub{width:44px;height:44px;border-radius:13px;flex-shrink:0}
+
+.main{flex:1;min-width:0}
+.topbar{position:sticky;top:0;z-index:50;background:var(--glass2);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:12px 22px;flex-wrap:wrap}
+.search{flex:1;min-width:140px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+  padding:9px 14px;color:var(--muted);font-size:13px}
+.pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid var(--line);
+  border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.streakflame{color:var(--gold);text-shadow:0 0 8px rgba(255,203,71,.8)}
+.toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);
+  cursor:pointer;color:var(--ink);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.profcorner{display:flex;align-items:center;gap:9px;cursor:pointer;padding:5px 10px 5px 5px;border-radius:30px;
+  border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;
+  font-size:12.5px;color:#04140d;background:linear-gradient(135deg,var(--emerald),var(--gold));flex-shrink:0;
+  box-shadow:0 0 0 2px var(--bg1),0 0 10px rgba(34,255,176,.5)}
+.profname{font-size:12.5px;font-weight:700;line-height:1.2}
+.profrank{font-size:10.5px;color:var(--muted)}
+
+.content{padding:22px 24px 60px;max-width:1220px;margin:0 auto}
+.pg{display:none;animation:fadeUp .35s ease}
+.pg.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+.pgslide-l{animation:slideL .3s ease}
+.pgslide-r{animation:slideR .3s ease}
+@keyframes slideL{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideR{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+
+.pagehd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.pagehd h2{font-family:"Fraunces",serif;font-size:21px;font-weight:700}
+.pagehd p{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+/* ============ glass card + 3D tilt ============ */
+.card{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(14px);
+  padding:20px;position:relative;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .25s,transform .25s}
+.card.tilt3d{transform-style:preserve-3d;will-change:transform}
+.card.tilt3d:hover{box-shadow:var(--shadow-md),var(--shadow-glow)}
+.cardhd{font-family:"Fraunces",serif;font-weight:700;font-size:13.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* ============ buttons (raised / pressable) ============ */
+.btn{padding:10px 17px;border-radius:11px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;
+  display:inline-flex;align-items:center;gap:7px;transition:all .14s;
+  box-shadow:0 3px 0 rgba(0,0,0,.25),0 4px 12px rgba(0,0,0,.25);}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.2)}
+.bt{background:linear-gradient(135deg,var(--emerald),var(--emeraldD));color:#04140d}
+.bo{background:rgba(255,255,255,.04);color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.bo:active{transform:translateY(1px)}
+.br{background:linear-gradient(135deg,#ff5d8f,#b3244f);color:#fff}
+.bg{background:linear-gradient(135deg,var(--gold),#c9962c);color:#221900}
+.bsm{padding:7px 12px;font-size:12px}
+.bxs{padding:5px 9px;font-size:11px;border-radius:8px}
+.btn-row{display:flex;gap:9px;flex-wrap:wrap}
+.iconbtn{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.03);
+  color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.iconbtn:hover{color:var(--ink);border-color:var(--emerald);box-shadow:0 0 10px rgba(34,255,176,.25)}
+
+/* ============ forms ============ */
+label{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:11px;background:rgba(255,255,255,.03);
+  color:var(--ink);font-size:13.5px;font-family:inherit;outline:none;transition:all .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--emerald);box-shadow:0 0 0 3px rgba(34,255,176,.14)}
+.fg{margin-bottom:12px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+
+/* ============ hover-glow rows (lists/grids) ============ */
+.row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.02);margin-bottom:8px;cursor:pointer;transition:all .18s;position:relative}
+.row:hover,.row.sel{transform:translateY(-1px);border-color:var(--rc,var(--emerald));
+  box-shadow:0 0 0 1px var(--rc,var(--emerald)) inset,0 6px 18px color-mix(in srgb, var(--rc,var(--emerald)) 25%, transparent)}
+.row .rowmain{flex:1;min-width:0}
+.rowtitle{font-weight:700;font-size:13.5px}
+.rowsub{font-size:11.5px;color:var(--muted);margin-top:1px}
+
+/* ============ tabs (phase switcher) ============ */
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:18px;padding-bottom:4px}
+.tab{padding:9px 15px;border-radius:11px;border:1.5px solid var(--line);background:rgba(255,255,255,.02);
+  color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s}
+.tab:hover{color:var(--ink)}
+.tab.on{color:#04140d;background:linear-gradient(135deg,var(--emerald),var(--emeraldD));border-color:transparent;
+  box-shadow:0 0 14px rgba(34,255,176,.4)}
+
+/* ============ status pills (topics) ============ */
+.statpill{display:inline-flex;padding:4px 10px;border-radius:20px;font-size:10.5px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--line);color:var(--muted);transition:all .15s}
+.statpill[data-s="todo"].on{background:rgba(255,255,255,.08);color:var(--ink);border-color:var(--faint)}
+.statpill[data-s="reading"].on{background:rgba(41,211,255,.16);color:#29d3ff;border-color:#29d3ff}
+.statpill[data-s="revised"].on{background:rgba(255,203,71,.16);color:var(--gold);border-color:var(--gold)}
+.statpill[data-s="mastered"].on{background:rgba(34,255,176,.18);color:var(--emerald);border-color:var(--emerald);box-shadow:0 0 8px rgba(34,255,176,.4)}
+
+/* ============ empty state ============ */
+.empty{text-align:center;padding:34px 20px;color:var(--faint);font-size:13px}
+.empty svg{width:42px;height:42px;margin-bottom:10px;opacity:.5}
+
+/* ============ dashboard grid ============ */
+.dgrid{display:grid;grid-template-columns:330px 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:900px){.dgrid{grid-template-columns:1fr}}
+.stack{display:flex;flex-direction:column;gap:18px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:620px){.row2{grid-template-columns:1fr}}
+
+/* rank hero (3D hex) */
+.rankcard{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;perspective:900px}
+.hex3d{width:158px;height:158px;position:relative;display:flex;align-items:center;justify-content:center;
+  transform-style:preserve-3d;transition:transform .15s ease-out}
+.hex3d svg{position:absolute;inset:0;filter:drop-shadow(0 10px 18px rgba(0,0,0,.4)) drop-shadow(0 0 22px rgba(34,255,176,.5))}
+.hexring{stroke-dasharray:452;transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)}
+.hexlevel{font-size:32px;font-weight:700;position:relative;z-index:2}
+.ranktitle{font-size:15px;font-weight:700}
+.ranksub{font-size:11.5px;color:var(--muted)}
+.xpbar{width:100%;height:8px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:2px}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--emeraldD),var(--emerald));box-shadow:0 0 10px rgba(34,255,176,.7);border-radius:6px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.ecg{width:100%;height:24px;margin-top:4px;opacity:.85}
+.ecg path{stroke:var(--emerald);stroke-width:1.6;fill:none;filter:drop-shadow(0 0 4px rgba(34,255,176,.7));
+  stroke-dasharray:300;stroke-dashoffset:300;animation:pulse 3.2s linear infinite}
+@keyframes pulse{to{stroke-dashoffset:0}}
+
+.cdnum{font-size:38px;font-weight:700;line-height:1}
+.cdlabel{font-size:11.5px;color:var(--muted);margin-top:4px}
+.streakbig{display:flex;align-items:center;gap:14px}
+.flameicon{font-size:34px}
+.streaknum{font-size:28px;font-weight:700}
+
+.subjgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:14px}
+.ring{width:60px;height:60px;margin:0 auto 6px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6}
+.ring .bg{stroke:rgba(255,255,255,.08)}
+.subjname{font-size:10.5px;text-align:center;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subjpct{font-size:13px;font-weight:700;text-align:center}
+
+/* pomodoro */
+.pomowrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px}
+.pomoring{width:220px;height:220px;position:relative}
+.pomoring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pomoring circle{fill:none;stroke-width:10}
+.pomotime{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.pomotime .t{font-size:40px;font-weight:700}
+.pomotime .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* toast */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);
+  background:var(--glass2);backdrop-filter:blur(10px);border:1px solid var(--line);color:var(--ink);padding:12px 22px;
+  border-radius:24px;font-size:13px;font-weight:600;z-index:9999;transition:transform .3s;box-shadow:var(--shadow-md)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+
+/* level-up overlay */
+#levelup{position:fixed;inset:0;background:rgba(4,10,8,.82);backdrop-filter:blur(6px);z-index:9998;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center}
+#levelup.on{display:flex;animation:fadeUp .3s ease}
+#levelup .badge{width:150px;height:150px;filter:drop-shadow(0 0 40px rgba(34,255,176,.7))}
+#levelup h2{font-family:"Fraunces",serif;font-size:30px;color:var(--emerald)}
+#levelup p{color:var(--muted);font-size:13.5px}
+
+/* auth screen */
+.authwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.authcard{width:100%;max-width:380px;background:var(--glass2);border:1px solid var(--line);border-radius:20px;
+  padding:32px 28px;backdrop-filter:blur(16px);box-shadow:var(--shadow-md)}
+.authlogo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--emerald),var(--emeraldD));
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:#04140d;font-size:22px;margin:0 auto 14px;
+  box-shadow:0 0 22px rgba(34,255,176,.5)}
+.authtitle{text-align:center;font-family:"Fraunces",serif;font-size:22px;font-weight:700}
+.authsub{text-align:center;font-size:12px;color:var(--muted);margin-top:3px;margin-bottom:22px}
+.authtoggle{display:flex;background:rgba(255,255,255,.04);border-radius:11px;padding:3px;margin-bottom:18px}
+.authtoggle button{flex:1;padding:9px;border:none;border-radius:9px;background:none;font-weight:700;font-size:12.5px;
+  cursor:pointer;color:var(--muted);font-family:inherit;transition:all .15s}
+.authtoggle button.on{background:linear-gradient(135deg,var(--emerald),var(--emeraldD));color:#04140d}
+.autherr{font-size:12px;color:var(--rose);margin-top:8px;min-height:16px}
+
+/* config warning banner */
+.cfgwarn{background:rgba(255,93,143,.12);border:1px solid rgba(255,93,143,.4);color:#ff5d8f;border-radius:12px;
+  padding:12px 16px;font-size:12.5px;margin-bottom:16px;line-height:1.6}
+.cfgwarn code{background:rgba(0,0,0,.25);padding:1px 6px;border-radius:5px;font-size:11.5px}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="authwrap" style="display:none">
+  <div class="authcard">
+    <div class="authlogo">Rx</div>
+    <div class="authtitle brandfont">StudyRx</div>
+    <div class="authsub">Your prescription for the professional exams</div>
+    <div id="cfgWarnBox"></div>
+    <div class="authtoggle">
+      <button id="authT-in" class="on">Log in</button>
+      <button id="authT-up">Sign up</button>
+    </div>
+    <div class="fg"><label>Email</label><input id="a_email" type="email" placeholder="you@example.com"></div>
+    <div class="fg"><label>Password</label><input id="a_pass" type="password" placeholder="At least 6 characters"></div>
+    <button class="btn bt" id="a_go" style="width:100%;justify-content:center">Log in</button>
+    <div class="autherr" id="a_err"></div>
+  </div>
+</div>
+
+<div class="app" id="appShell" style="display:none">
+  <div class="rail">
+    <div class="logo">Rx</div>
+    <button class="railbtn on" data-p="dash" title="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+    <button class="railbtn" data-p="curric" title="Curriculum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h9a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-9a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h9z"/></svg></button>
+    <button class="railbtn" data-p="routine" title="Routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
+    <button class="railbtn" data-p="pomo" title="Pomodoro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></button>
+    <div class="railsep"></div>
+    <button class="railbtn" data-p="set" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
+    <div id="subjRail" style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="search">Search topics, drugs, mnemonics… (coming soon)</div>
+      <div class="pill"><span class="streakflame" id="topStreakIco">&#9679;</span><span id="topStreak">0-day streak</span></div>
+      <div class="pill numfont" id="topXP">Lvl 1 · 0 XP</div>
+      <button class="toggle" id="themeToggle">&#9789;</button>
+      <div class="profcorner" id="profCorner">
+        <div class="avatar" id="profAvatar">?</div>
+        <div>
+          <div class="profname" id="profName">Student</div>
+          <div class="profrank" id="profRankSm">Fresher</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="pg on" id="pg-dash">
+        <div class="pagehd"><div><h2 class="brandfont">Dashboard</h2><p>Your whole study picture, at a glance</p></div></div>
+        <div class="dgrid">
+          <div class="card tilt3d rankcard" id="rankHero">
+            <div class="hex3d" id="hexEl">
+              <svg viewBox="0 0 160 160">
+                <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0f7a4f"/><stop offset="100%" stop-color="#22ffb0"/></linearGradient></defs>
+                <polygon points="80,6 148,44 148,116 80,154 12,116 12,44" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.1)" stroke-width="2"/>
+                <circle cx="80" cy="80" r="66" stroke="rgba(255,255,255,.08)" stroke-width="8" fill="none"/>
+                <circle class="hexring" id="hexRing" cx="80" cy="80" r="66" stroke="url(#hg)" stroke-width="8" fill="none" stroke-linecap="round" transform="rotate(-90 80 80)"/>
+              </svg>
+              <div class="hexlevel numfont" id="hexLevel">1</div>
+            </div>
+            <div class="ranktitle" id="rankTitle">Fresher</div>
+            <div class="ranksub" id="rankSub">100 XP to Medical Novice</div>
+            <div class="xpbar"><div class="xpfill" id="xpFill" style="width:0%"></div></div>
+            <svg class="ecg" viewBox="0 0 300 24"><path d="M0 12 H60 L70 3 L80 21 L90 12 H140 L150 5 L160 19 L170 12 H300"/></svg>
+          </div>
+
+          <div class="stack">
+            <div class="row2">
+              <div class="card tilt3d">
+                <div class="cardhd">Nearest exam</div>
+                <div class="cdnum" id="cdNum" style="color:var(--emerald)">—</div>
+                <div class="cdlabel" id="cdLabel">Set an exam date in Curriculum</div>
+              </div>
+              <div class="card tilt3d">
+                <div class="cardhd">Streak</div>
+                <div class="streakbig">
+                  <div class="flameicon">🔥</div>
+                  <div><div class="streaknum numfont" id="streakBig">0</div><div class="cdlabel">days in a row</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card tilt3d">
+              <div class="cardhd">Subject progress</div>
+              <div class="subjgrid" id="subjRings"></div>
+            </div>
+            <div class="card tilt3d">
+              <div class="cardhd">Today's routine</div>
+              <div id="dashRoutine"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CURRICULUM -->
+      <div class="pg" id="pg-curric">
+        <div class="pagehd">
+          <div><h2 class="brandfont">Curriculum</h2><p>Phase → Subject → Chapter → Topic — fully yours to edit</p></div>
+          <button class="btn bt bsm" id="addPhaseBtn">+ Add phase</button>
+        </div>
+        <div class="tabs" id="phaseTabs"></div>
+        <div id="phaseBody"></div>
+      </div>
+
+      <!-- ROUTINE -->
+      <div class="pg" id="pg-routine">
+        <div class="pagehd"><div><h2 class="brandfont">Routine</h2><p>Plan your day, tag priority, link a topic</p></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Add a task</div>
+          <div class="g3" style="margin-bottom:10px">
+            <div><label>Title</label><input id="rt_title" placeholder="e.g. Revise cranial nerves"></div>
+            <div><label>Date</label><input id="rt_date" type="date"></div>
+            <div><label>Priority</label><select id="rt_pri"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option></select></div>
+          </div>
+          <div class="g2" style="margin-bottom:12px">
+            <div><label>Link to topic (optional)</label><select id="rt_topic"><option value="">— none —</option></select></div>
+            <div><label>Time (optional)</label><input id="rt_time" type="time"></div>
+          </div>
+          <button class="btn bt" id="rt_add">+ Add task</button>
+        </div>
+        <div class="card">
+          <div class="cardhd">Upcoming tasks</div>
+          <div id="routineList"></div>
+        </div>
+      </div>
+
+      <!-- POMODORO -->
+      <div class="pg" id="pg-pomo">
+        <div class="pagehd"><div><h2 class="brandfont">Pomodoro</h2><p>Focused sessions, logged straight to your XP and streak</p></div></div>
+        <div class="card">
+          <div class="pomowrap">
+            <div class="g2" style="width:100%;max-width:360px">
+              <div><label>Linked topic (optional)</label><select id="pm_topic"><option value="">— none —</option></select></div>
+              <div><label>Session length</label><select id="pm_len"><option value="25">25 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="15">15 min</option></select></div>
+            </div>
+            <div class="pomoring">
+              <svg viewBox="0 0 220 220">
+                <circle cx="110" cy="110" r="96" stroke="rgba(255,255,255,.08)" fill="none"/>
+                <circle id="pmRing" cx="110" cy="110" r="96" stroke="var(--emerald)" fill="none" stroke-linecap="round"
+                  stroke-dasharray="603" stroke-dashoffset="0" style="filter:drop-shadow(0 0 10px rgba(34,255,176,.6));transition:stroke-dashoffset 1s linear"/>
+              </svg>
+              <div class="pomotime"><div class="t numfont" id="pmTime">25:00</div><div class="l" id="pmState">Ready</div></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn bt" id="pm_start">▶ Start</button>
+              <button class="btn bo" id="pm_pause" style="display:none">⏸ Pause</button>
+              <button class="btn bo" id="pm_reset">↺ Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="pg" id="pg-set">
+        <div class="pagehd"><div><h2 class="brandfont">Settings</h2><p>Your profile, appearance, and account</p></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Profile</div>
+          <div class="g2" style="margin-bottom:12px">
+            <div><label>Display name</label><input id="s_name" placeholder="Your name"></div>
+            <div><label>Email</label><input id="s_email" disabled></div>
+          </div>
+          <button class="btn bt bsm" id="s_save">Save</button>
+        </div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Appearance</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Use the moon/sun icon in the top bar anytime — this just confirms your current mode.</p>
+          <div class="btn-row"><button class="btn bo bsm" id="s_dark">🌙 Dark</button><button class="btn bo bsm" id="s_light">☀️ Light</button></div>
+        </div>
+        <div class="card">
+          <div class="cardhd">Account</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Google Drive connection for your PDF library arrives in a later update.</p>
+          <button class="btn br bsm" id="s_logout">Log out</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="levelup">
+  <svg class="badge" viewBox="0 0 160 160">
+    <defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffcb47"/><stop offset="100%" stop-color="#22ffb0"/></linearGradient></defs>
+    <polygon points="80,6 148,44 148,116 80,154 12,116 12,44" fill="rgba(255,255,255,.06)" stroke="url(#lg2)" stroke-width="4"/>
+  </svg>
+  <h2 id="luTitle">Rank up!</h2>
+  <p id="luSub">You are now a Medical Novice</p>
+  <button class="btn bt" onclick="document.getElementById('levelup').classList.remove('on')">Continue</button>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — fill these in before this app will actually work.
+   ============================================================ */
+const SUPABASE_URL = "https://benpysehgmjligfayapa.supabase.co";       // Project Settings → API → Project URL
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlbnB5c2VoZ21qbGlnZmF5YXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MjQ0NDQsImV4cCI6MjEwMzAwMDQ0NH0.GSjJyGM0_A_qfvzpvyiUt895K_rUcq2KgmA1odU_nEA";       // Project Settings → API → anon public key
+const GOOGLE_CLIENT_ID = "214365170761-evmrnh579b05p6dpm1vkno7ltv174i1e.apps.googleusercontent.com"; // used from Stage 4 onward
+
+const CONFIG_OK = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
+if(!CONFIG_OK){
+  document.getElementById("cfgWarnBox").innerHTML = '<div class="cfgwarn">This is a template — open the file and replace <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> near the bottom with the values from your new StudyRx Supabase project (Settings → API), then run <code>setup.sql</code> once in that project\'s SQL editor.</div>';
+}
+const sb = CONFIG_OK ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* ============ RANKS ============ */
+const RANKS = [
+  {n:"Fresher",xp:0},{n:"Medical Novice",xp:100},{n:"PreClinical Scholar",xp:250},
+  {n:"Clinical Apprentice",xp:500},{n:"Clinical Warrior",xp:900},{n:"Diagnostician",xp:1400},
+  {n:"Junior Clinician",xp:2100},{n:"Senior Clinician",xp:3000},{n:"Master Clinician",xp:4200},
+  {n:"Consultant",xp:5800},{n:"Senior Consultant",xp:7800},{n:"Master of Medicine",xp:10200},
+  {n:"The Physician",xp:13200},{n:"Grand Physician",xp:17000},{n:"The Legend",xp:22000}
+];
+function rankFor(xp){let r=RANKS[0];for(const x of RANKS){if(xp>=x.xp)r=x;else break}return r}
+function nextRank(xp){for(const x of RANKS){if(x.xp>xp)return x}return null}
+function levelFor(xp){return Math.floor(xp/100)+1}
+
+/* ============ SUBJECT COLORS ============ */
+const SUBJECT_COLORS = {
+  "anatomy":"#29d3ff","physiology":"#b490ff","biochemistry":"#ffcb47",
+  "forensic medicine":"#8b5cf6","pharmacology":"#22e0c9",
+  "community medicine":"#38bdf8","pathology":"#ff5d8f","microbiology":"#baff29",
+  "medicine":"#34d399","surgery":"#ff6a3d","obstetrics & gynaecology":"#f472b6"
+};
+const COLOR_ROTATION = ["#29d3ff","#b490ff","#ffcb47","#ff5d8f","#baff29","#22e0c9","#ff6a3d","#f472b6","#38bdf8","#8b5cf6"];
+function colorFor(name,fallbackIdx){
+  const k=(name||"").trim().toLowerCase();
+  if(SUBJECT_COLORS[k])return SUBJECT_COLORS[k];
+  return COLOR_ROTATION[(fallbackIdx||0)%COLOR_ROTATION.length];
+}
+
+const DEFAULT_PHASES = [
+  {name:"1st Professional (Phase 1)",type:"undergrad",subjects:["Anatomy","Biochemistry","Physiology"]},
+  {name:"2nd Professional (Phase 2)",type:"undergrad",subjects:["Forensic Medicine","Pharmacology"]},
+  {name:"3rd Professional (Phase 3)",type:"undergrad",subjects:["Community Medicine","Pathology","Microbiology"]},
+  {name:"Final Professional (Phase 4)",type:"undergrad",subjects:["Medicine","Surgery","Obstetrics & Gynaecology"]}
+];
+
+/* ============ STORAGE (local cache + cloud) ============ */
+const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const svLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+let USER=null;
+let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[])};
+
+let cloudTimer=null;
+function sv(type,val){
+  DB[type]=val; svLocal(K[type],val);
+  if(!sb||!USER)return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>pushType(type),1200);
+}
+async function pushType(type){
+  if(!sb||!USER)return;
+  try{
+    await sb.from("studyrx_data").upsert({id:USER.id+"_"+type,user_id:USER.id,type,payload:DB[type],updated_at:new Date().toISOString()});
+  }catch(e){console.warn("sync failed",e)}
+}
+async function pullAll(){
+  if(!sb||!USER)return;
+  try{
+    const {data,error} = await sb.from("studyrx_data").select("type,payload").eq("user_id",USER.id);
+    if(error||!data)return;
+    data.forEach(row=>{ DB[row.type]=row.payload; svLocal(K[row.type],row.payload) });
+  }catch(e){console.warn("pull failed",e)}
+}
+
+/* ============ TOAST ============ */
+let tT;
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("on"),2200)}
+
+/* ============ AUTH ============ */
+let authMode="in";
+$("authT-in").onclick=()=>{authMode="in";$("authT-in").classList.add("on");$("authT-up").classList.remove("on");$("a_go").textContent="Log in"};
+$("authT-up").onclick=()=>{authMode="up";$("authT-up").classList.add("on");$("authT-in").classList.remove("on");$("a_go").textContent="Sign up"};
+$("a_go").onclick=async()=>{
+  if(!CONFIG_OK){$("a_err").textContent="Fill in your Supabase URL/key in the code first.";return}
+  const email=$("a_email").value.trim(), pass=$("a_pass").value;
+  if(!email||!pass){$("a_err").textContent="Enter an email and password.";return}
+  $("a_err").textContent="";
+  try{
+    if(authMode==="up"){
+      const {data,error}=await sb.auth.signUp({email,password:pass});
+      if(error)throw error;
+      toast("Account created — you're in.");
+    }else{
+      const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+      if(error)throw error;
+    }
+  }catch(e){$("a_err").textContent=e.message||"Something went wrong."}
+};
+async function boot(){
+  if(!sb){ $("authScreen").style.display="flex"; return }
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){ onLogin(session.user) } else { $("authScreen").style.display="flex" }
+  sb.auth.onAuthStateChange((event,session)=>{
+    if(event==="SIGNED_IN" && session) onLogin(session.user);
+    if(event==="SIGNED_OUT"){ USER=null; $("appShell").style.display="none"; $("authScreen").style.display="flex" }
+  });
+}
+async function onLogin(user){
+  USER=user;
+  $("authScreen").style.display="none";
+  $("appShell").style.display="flex";
+  await pullAll();
+  if(!DB.phases||!DB.phases.length){
+    DB.phases = DEFAULT_PHASES.map(p=>({
+      id:uid(),name:p.name,type:p.type,
+      subjects:p.subjects.map((s,i)=>({id:uid(),name:s,color:colorFor(s,i),chapters:[]}))
+    }));
+    sv("phases",DB.phases);
+  }
+  if(!DB.profile.name) DB.profile.name = (user.email||"Student").split("@")[0];
+  $("s_email").value=user.email||"";
+  renderAll();
+}
+$("s_logout").onclick=()=>{ if(sb) sb.auth.signOut(); };
+
+/* ============ NAV ============ */
+document.querySelectorAll(".railbtn[data-p]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".railbtn[data-p]").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".pg").forEach(x=>x.classList.remove("on","pgslide-l","pgslide-r"));
+  b.classList.add("on");
+  const target=$("pg-"+b.dataset.p);
+  target.classList.add("on","pgslide-r");
+  window.scrollTo({top:0,behavior:"smooth"});
+  renderPage(b.dataset.p);
+});
+function renderPage(p){
+  if(p==="dash")renderDash();
+  if(p==="curric")renderCurric();
+  if(p==="routine")renderRoutine();
+  if(p==="pomo")fillTopicSelect($("pm_topic"));
+  if(p==="set"){$("s_name").value=DB.profile.name||""}
+}
+function renderAll(){ renderSidebarSubjects(); renderDash(); renderCurric(); renderRoutine(); updateTopbar(); fillTopicSelect($("rt_topic")); fillTopicSelect($("pm_topic")); }
+
+/* ============ SIDEBAR SUBJECT ICONS ============ */
+function allSubjects(){
+  const out=[];
+  (DB.phases||[]).forEach(ph=>(ph.subjects||[]).forEach(s=>out.push(Object.assign({phaseId:ph.id,phaseName:ph.name},s))));
+  return out;
+}
+function allTopics(){
+  const out=[];
+  (DB.phases||[]).forEach(ph=>(ph.subjects||[]).forEach(s=>(s.chapters||[]).forEach(c=>(c.topics||[]).forEach(t=>
+    out.push(Object.assign({subjectId:s.id,subjectName:s.name,subjectColor:s.color,chapterId:c.id,chapterName:c.name},t))
+  ))));
+  return out;
+}
+function renderSidebarSubjects(){
+  const el=$("subjRail");
+  el.innerHTML = allSubjects().slice(0,8).map(s=>
+    `<button class="railsub iconbtn" style="color:${s.color};border-color:${s.color}55" title="${esc(s.name)}">${esc(s.name.slice(0,2).toUpperCase())}</button>`
+  ).join("");
+}
+
+/* ============ 3D TILT ============ */
+document.addEventListener("pointermove",e=>{
+  document.querySelectorAll(".tilt3d").forEach(card=>{
+    const r=card.getBoundingClientRect();
+    if(e.clientX<r.left-40||e.clientX>r.right+40||e.clientY<r.top-40||e.clientY>r.bottom+40)return;
+    const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    const rx=(py-.5)*-8, ry=(px-.5)*8;
+    card.style.transform=`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    const hex=card.querySelector("#hexEl");
+    if(hex) hex.style.transform=`rotateX(${rx*1.4}deg) rotateY(${ry*1.4}deg)`;
+  });
+});
+document.addEventListener("pointerleave",()=>{
+  document.querySelectorAll(".tilt3d").forEach(c=>c.style.transform="");
+  const hex=$("hexEl"); if(hex) hex.style.transform="";
+},true);
+
+/* ============ XP / RANK / STREAK ENGINE ============ */
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function addXP(amount,reason){
+  const prevXP=DB.profile.xp||0;
+  const prevRank=rankFor(prevXP);
+  let bonus=0;
+  const today=todayStr();
+  if(DB.profile.lastActive!==today){
+    const y=new Date();y.setDate(y.getDate()-1);
+    const yStr=y.toISOString().slice(0,10);
+    DB.profile.streak = (DB.profile.lastActive===yStr) ? (DB.profile.streak||0)+1 : 1;
+    DB.profile.lastActive=today;
+    bonus=5;
+  }
+  const total=amount+bonus;
+  DB.profile.xp=prevXP+total;
+  DB.xplog=DB.xplog||[];
+  DB.xplog.unshift({id:uid(),amount:total,reason,ts:Date.now()});
+  DB.xplog=DB.xplog.slice(0,200);
+  sv("profile",DB.profile); sv("xplog",DB.xplog);
+  const newRank=rankFor(DB.profile.xp);
+  updateTopbar();
+  if(newRank.n!==prevRank.n){
+    $("luTitle").textContent="Rank up!";
+    $("luSub").textContent="You are now a "+newRank.n;
+    $("levelup").classList.add("on");
+  } else {
+    toast("+"+total+" XP — "+reason);
+  }
+  if($("pg-dash").classList.contains("on")) renderDash();
+}
+
+function updateTopbar(){
+  const xp=DB.profile.xp||0, lvl=levelFor(xp), rank=rankFor(xp);
+  $("topXP").textContent="Lvl "+lvl+" · "+xp+" XP";
+  $("topStreak").textContent=(DB.profile.streak||0)+"-day streak";
+  $("profName").textContent=DB.profile.name||"Student";
+  $("profRankSm").textContent=rank.n;
+  $("profAvatar").textContent=(DB.profile.name||"S").slice(0,1).toUpperCase();
+}
+
+/* ============ DASHBOARD ============ */
+function renderDash(){
+  const xp=DB.profile.xp||0, lvl=levelFor(xp), rank=rankFor(xp), nr=nextRank(xp);
+  $("hexLevel").textContent=lvl;
+  $("rankTitle").textContent=rank.n;
+  $("rankSub").textContent = nr ? (nr.xp-xp)+" XP to "+nr.n : "Maximum rank reached";
+  const span = nr ? (nr.xp-rank.xp) : 1;
+  const into = nr ? (xp-rank.xp) : 1;
+  const pct = Math.min(100, Math.round((into/span)*100));
+  $("xpFill").style.width=pct+"%";
+  const ringLen=452; $("hexRing").style.strokeDashoffset = ringLen - (ringLen*pct/100);
+  $("streakBig").textContent=DB.profile.streak||0;
+
+  const topics=allTopics();
+  const subs=allSubjects();
+  $("subjRings").innerHTML = subs.length ? subs.map(s=>{
+    const st=topics.filter(t=>t.subjectId===s.id);
+    const done=st.filter(t=>t.status==="mastered"||t.status==="revised").length;
+    const pctS=st.length?Math.round(done/st.length*100):0;
+    const circ=163;
+    return `<div><div class="ring"><svg><circle class="bg" cx="30" cy="30" r="26"/>
+      <circle cx="30" cy="30" r="26" stroke="${s.color}" stroke-dasharray="${circ}" stroke-dashoffset="${circ-(circ*pctS/100)}" stroke-linecap="round"/></svg></div>
+      <div class="subjpct" style="color:${s.color}">${pctS}%</div><div class="subjname">${esc(s.name)}</div></div>`;
+  }).join("") : '<div class="empty">Add subjects in Curriculum to see progress here</div>';
+
+  // nearest exam
+  let nearest=null;
+  (DB.phases||[]).forEach(ph=>{ if(ph.examDate){ const d=new Date(ph.examDate+"T00:00"); if(!nearest||d<nearest.date) nearest={date:d,name:ph.name} } });
+  if(nearest){
+    const days=Math.ceil((nearest.date-new Date())/86400000);
+    $("cdNum").textContent = days>=0 ? days : "0";
+    $("cdLabel").textContent = days>=0 ? "days to "+nearest.name : nearest.name+" has passed";
+  } else { $("cdNum").textContent="—"; $("cdLabel").textContent="Set an exam date in Curriculum"; }
+
+  const today=todayStr();
+  const todays=(DB.routine||[]).filter(r=>r.date===today && !r.done).slice(0,5);
+  $("dashRoutine").innerHTML = todays.length ? todays.map(r=>routineRowHTML(r)).join("") :
+    '<div class="empty">Nothing scheduled for today — add a task in Routine</div>';
+  wireRoutineRows("dashRoutine");
+}
+
+/* ============ CURRICULUM ============ */
+let activePhase=null;
+$("addPhaseBtn").onclick=()=>{
+  const name=prompt("Name this phase (e.g. 'FCPS Part 1' or a custom phase):");
+  if(!name||!name.trim())return;
+  const ph={id:uid(),name:name.trim(),type:"custom",subjects:[]};
+  DB.phases=DB.phases||[]; DB.phases.push(ph); sv("phases",DB.phases);
+  activePhase=ph.id; renderCurric(); renderSidebarSubjects();
+};
+function renderCurric(){
+  const phases=DB.phases||[];
+  if(!activePhase && phases.length) activePhase=phases[0].id;
+  $("phaseTabs").innerHTML = phases.map(p=>`<button class="tab ${p.id===activePhase?'on':''}" data-id="${p.id}">${esc(p.name)}</button>`).join("");
+  $("phaseTabs").querySelectorAll(".tab").forEach(b=>b.onclick=()=>{activePhase=b.dataset.id;renderCurric()});
+  const ph=phases.find(p=>p.id===activePhase);
+  if(!ph){ $("phaseBody").innerHTML='<div class="empty">No phases yet — click "Add phase" to start.</div>'; return }
+  let html=`<div class="card" style="margin-bottom:16px">
+    <div class="cardhd">${esc(ph.name)}
+      <button class="iconbtn" style="margin-left:auto" data-editphase="${ph.id}">✎</button>
+      <button class="iconbtn" data-delphase="${ph.id}">🗑</button>
+    </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div><label>Exam date (optional)</label><input type="date" value="${ph.examDate||''}" data-examdate="${ph.id}"></div>
+    </div>
+    <div class="btn-row" style="margin-bottom:6px"><input placeholder="New subject name" id="newSubjName_${ph.id}" style="max-width:220px"><button class="btn bt bsm" data-addsubj="${ph.id}">+ Add subject</button></div>
+  </div>`;
+  (ph.subjects||[]).forEach(s=>{ html += subjectBlockHTML(s); });
+  $("phaseBody").innerHTML = html;
+
+  $("phaseBody").querySelectorAll("[data-examdate]").forEach(inp=>inp.onchange=()=>{
+    ph.examDate=inp.value; sv("phases",DB.phases); toast("Exam date saved");
+  });
+  $("phaseBody").querySelectorAll("[data-addsubj]").forEach(b=>b.onclick=()=>{
+    const inp=$("newSubjName_"+b.dataset.addsubj); const name=inp.value.trim(); if(!name)return;
+    ph.subjects=ph.subjects||[]; ph.subjects.push({id:uid(),name,color:colorFor(name,ph.subjects.length),chapters:[]});
+    sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
+  });
+  $("phaseBody").querySelectorAll("[data-delphase]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Delete this whole phase and everything in it?"))return;
+    DB.phases=DB.phases.filter(p=>p.id!==b.dataset.delphase); if(activePhase===b.dataset.delphase)activePhase=null;
+    sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
+  });
+  $("phaseBody").querySelectorAll("[data-editphase]").forEach(b=>b.onclick=()=>{
+    const nn=prompt("Rename phase:",ph.name); if(!nn||!nn.trim())return;
+    ph.name=nn.trim(); sv("phases",DB.phases); renderCurric();
+  });
+  wireSubjectBlocks(ph);
+}
+function subjectBlockHTML(s){
+  const chapters=s.chapters||[];
+  return `<div class="card" style="margin-bottom:14px;border-left:3px solid ${s.color}">
+    <div class="cardhd" style="color:${s.color}">${esc(s.name)}
+      <button class="iconbtn" style="margin-left:auto" data-delsubj="${s.id}">🗑</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:10px"><input placeholder="New chapter name" id="newChap_${s.id}" style="max-width:220px"><button class="btn bo bsm" data-addchap="${s.id}">+ Add chapter</button></div>
+    ${chapters.map(c=>chapterBlockHTML(s,c)).join("") || '<div class="empty" style="padding:14px">No chapters yet</div>'}
+  </div>`;
+}
+function chapterBlockHTML(s,c){
+  const topics=c.topics||[];
+  return `<div style="margin-bottom:12px;padding-left:2px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <b style="font-size:12.5px">${esc(c.name)}</b>
+      <button class="iconbtn bxs" data-delchap="${s.id}|${c.id}" style="width:24px;height:24px">🗑</button>
+      <div style="flex:1"></div>
+      <input placeholder="New topic" id="newTop_${c.id}" style="max-width:170px;padding:6px 10px;font-size:12px">
+      <button class="btn bo bxs" data-addtop="${s.id}|${c.id}">+ Topic</button>
+    </div>
+    ${topics.map(t=>topicRowHTML(s,c,t)).join("")}
+  </div>`;
+}
+function topicRowHTML(s,c,t){
+  const st=t.status||"todo";
+  return `<div class="row" style="--rc:${s.color}" data-static="1">
+    <div class="rowmain"><div class="rowtitle">${esc(t.name)}</div></div>
+    <div class="btn-row" style="gap:5px">
+      <span class="statpill" data-s="todo" data-topic="${s.id}|${c.id}|${t.id}" style="${st==='todo'?'':''}">${st==='todo'?'●':'To-do'}</span>
+      <span class="statpill" data-s="reading" data-topic="${s.id}|${c.id}|${t.id}">Reading</span>
+      <span class="statpill" data-s="revised" data-topic="${s.id}|${c.id}|${t.id}">Revised</span>
+      <span class="statpill" data-s="mastered" data-topic="${s.id}|${c.id}|${t.id}">Mastered</span>
+    </div>
+    <button class="iconbtn" data-deltop="${s.id}|${c.id}|${t.id}" style="width:26px;height:26px">✕</button>
+  </div>`;
+}
+function findSCT(sid,cid,tid){
+  const ph=DB.phases.find(p=>p.subjects.some(s=>s.id===sid));
+  const s=ph.subjects.find(x=>x.id===sid);
+  const c=s.chapters.find(x=>x.id===cid);
+  const t=tid?c.topics.find(x=>x.id===tid):null;
+  return {ph,s,c,t};
+}
+function wireSubjectBlocks(ph){
+  $("phaseBody").querySelectorAll("[data-delsubj]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Delete this subject and all its chapters/topics?"))return;
+    ph.subjects=ph.subjects.filter(s=>s.id!==b.dataset.delsubj); sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
+  });
+  $("phaseBody").querySelectorAll("[data-addchap]").forEach(b=>b.onclick=()=>{
+    const s=ph.subjects.find(x=>x.id===b.dataset.addchap);
+    const inp=$("newChap_"+s.id); const name=inp.value.trim(); if(!name)return;
+    s.chapters=s.chapters||[]; s.chapters.push({id:uid(),name,topics:[]});
+    sv("phases",DB.phases); renderCurric();
+  });
+  $("phaseBody").querySelectorAll("[data-delchap]").forEach(b=>b.onclick=()=>{
+    const [sid,cid]=b.dataset.delchap.split("|");
+    const s=ph.subjects.find(x=>x.id===sid);
+    if(!confirm("Delete this chapter and its topics?"))return;
+    s.chapters=s.chapters.filter(c=>c.id!==cid); sv("phases",DB.phases); renderCurric();
+  });
+  $("phaseBody").querySelectorAll("[data-addtop]").forEach(b=>b.onclick=()=>{
+    const [sid,cid]=b.dataset.addtop.split("|");
+    const s=ph.subjects.find(x=>x.id===sid); const c=s.chapters.find(x=>x.id===cid);
+    const inp=$("newTop_"+cid); const name=inp.value.trim(); if(!name)return;
+    c.topics=c.topics||[]; c.topics.push({id:uid(),name,status:"todo",xpAwarded:0});
+    sv("phases",DB.phases); renderCurric(); fillTopicSelect($("rt_topic")); fillTopicSelect($("pm_topic"));
+  });
+  $("phaseBody").querySelectorAll("[data-deltop]").forEach(b=>b.onclick=()=>{
+    const [sid,cid,tid]=b.dataset.deltop.split("|");
+    const s=ph.subjects.find(x=>x.id===sid); const c=s.chapters.find(x=>x.id===cid);
+    c.topics=c.topics.filter(t=>t.id!==tid); sv("phases",DB.phases); renderCurric();
+  });
+  $("phaseBody").querySelectorAll(".statpill").forEach(el=>{
+    const [sid,cid,tid]=el.dataset.topic.split("|");
+    const {t}=findSCT(sid,cid,tid);
+    if(t.status===el.dataset.s) el.classList.add("on");
+    el.textContent = el.dataset.s==="todo"?"To-do":el.dataset.s.charAt(0).toUpperCase()+el.dataset.s.slice(1);
+    el.onclick=()=>{
+      t.status=el.dataset.s;
+      const XP_MAP={reading:0,revised:10,mastered:30};
+      const need=XP_MAP[t.status]||0;
+      if(need>(t.xpAwarded||0)){
+        addXP(need-(t.xpAwarded||0), t.name+" → "+t.status);
+        t.xpAwarded=need;
+      }
+      sv("phases",DB.phases); renderCurric(); if($("pg-dash").classList.contains("on"))renderDash();
+    };
+  });
+}
+
+/* ============ ROUTINE ============ */
+function fillTopicSelect(sel){
+  if(!sel)return;
+  const topics=allTopics();
+  sel.innerHTML='<option value="">— none —</option>'+topics.map(t=>`<option value="${t.id}">${esc(t.subjectName)} — ${esc(t.name)}</option>`).join("");
+}
+$("rt_add").onclick=()=>{
+  const title=$("rt_title").value.trim();
+  if(!title){toast("Enter a task title");return}
+  DB.routine=DB.routine||[];
+  DB.routine.push({id:uid(),title,date:$("rt_date").value||todayStr(),pri:$("rt_pri").value,time:$("rt_time").value,topicId:$("rt_topic").value||null,done:false});
+  sv("routine",DB.routine);
+  $("rt_title").value="";$("rt_time").value="";
+  renderRoutine(); toast("Task added");
+};
+function routineRowHTML(r){
+  const priColor={high:"#ff5d8f",med:"#ffcb47",low:"#8fb3a5"}[r.pri]||"#8fb3a5";
+  return `<div class="row" style="--rc:${priColor}">
+    <div class="rowmain">
+      <div class="rowtitle" style="${r.done?'text-decoration:line-through;opacity:.5':''}">${esc(r.title)}</div>
+      <div class="rowsub">${esc(r.date)}${r.time?" · "+esc(r.time):""} · <span style="color:${priColor}">${r.pri} priority</span></div>
+    </div>
+    <button class="iconbtn" data-donetask="${r.id}" style="color:${r.done?'var(--emerald)':''}">✓</button>
+    <button class="iconbtn" data-deltask="${r.id}">✕</button>
+  </div>`;
+}
+function wireRoutineRows(containerId){
+  const el=$(containerId);
+  el.querySelectorAll("[data-donetask]").forEach(b=>b.onclick=()=>{
+    const r=DB.routine.find(x=>x.id===b.dataset.donetask);
+    if(!r.done){ r.done=true; addXP(5,"Completed: "+r.title); } else { r.done=false; }
+    sv("routine",DB.routine); renderRoutine(); if($("pg-dash").classList.contains("on"))renderDash();
+  });
+  el.querySelectorAll("[data-deltask]").forEach(b=>b.onclick=()=>{
+    DB.routine=DB.routine.filter(x=>x.id!==b.dataset.deltask); sv("routine",DB.routine); renderRoutine(); renderDash();
+  });
+}
+function renderRoutine(){
+  fillTopicSelect($("rt_topic"));
+  const list=[...(DB.routine||[])].sort((a,b)=>(a.date+((a.time)||"00:00")).localeCompare(b.date+((b.time)||"00:00")));
+  $("routineList").innerHTML = list.length ? list.map(routineRowHTML).join("") : '<div class="empty">No tasks yet — add one above</div>';
+  wireRoutineRows("routineList");
+}
+
+/* ============ POMODORO ============ */
+let pmSecondsTotal=25*60, pmSecondsLeft=25*60, pmInterval=null, pmRunning=false;
+const PM_RING_LEN=603;
+function pmRender(){
+  const m=Math.floor(pmSecondsLeft/60), s=pmSecondsLeft%60;
+  $("pmTime").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  const pct=1-(pmSecondsLeft/pmSecondsTotal);
+  $("pmRing").style.strokeDashoffset = PM_RING_LEN - (PM_RING_LEN*pct);
+}
+$("pm_len").onchange=()=>{ pmSecondsTotal=+$("pm_len").value*60; pmSecondsLeft=pmSecondsTotal; pmRender(); };
+$("pm_start").onclick=()=>{
+  if(pmRunning)return; pmRunning=true;
+  $("pm_start").style.display="none"; $("pm_pause").style.display="inline-flex"; $("pmState").textContent="Focusing…";
+  pmInterval=setInterval(()=>{
+    pmSecondsLeft--; pmRender();
+    if(pmSecondsLeft<=0){
+      clearInterval(pmInterval); pmRunning=false;
+      $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Done!";
+      const mins=Math.round(pmSecondsTotal/60);
+      addXP(Math.max(3,Math.round(mins/2)),"Pomodoro session ("+mins+" min)");
+      pmSecondsLeft=pmSecondsTotal; pmRender();
+      toast("Session complete — nice work");
+    }
+  },1000);
+};
+$("pm_pause").onclick=()=>{ clearInterval(pmInterval); pmRunning=false; $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Paused"; };
+$("pm_reset").onclick=()=>{ clearInterval(pmInterval); pmRunning=false; pmSecondsLeft=pmSecondsTotal; $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Ready"; pmRender(); };
+pmRender();
+
+/* ============ SETTINGS ============ */
+$("s_save").onclick=()=>{ DB.profile.name=$("s_name").value.trim()||DB.profile.name; sv("profile",DB.profile); updateTopbar(); toast("Saved"); };
+$("s_dark").onclick=()=>applyTheme("dark");
+$("s_light").onclick=()=>applyTheme("light");
+
+/* ============ THEME ============ */
+function applyTheme(t){ document.documentElement.setAttribute("data-theme",t); try{localStorage.setItem("srx_theme",t)}catch(e){} $("themeToggle").textContent=t==="dark"?"☀️":"🌙"; }
+$("themeToggle").onclick=()=>{ const cur=document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light"; applyTheme(cur==="dark"?"light":"dark"); };
+applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light");
+
+/* ============ INIT ============ */
+$("rt_date").value=todayStr();
+boot();
+</script>
+</body>
+</html>
