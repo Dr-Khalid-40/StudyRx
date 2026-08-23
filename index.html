@@ -139,6 +139,16 @@ select option{background:var(--paper);color:var(--ink)}
   box-shadow:var(--shadow-md);transition:transform .2s}
 .flashcard:hover{box-shadow:var(--shadow-md),var(--shadow-glow)}
 .flashmeta{font-size:11px;color:var(--faint);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px}
+.heatmap{display:flex;gap:3px;overflow-x:auto;padding-bottom:4px}
+.heatmap-col{display:flex;flex-direction:column;gap:3px}
+.heatmap-cell{width:12px;height:12px;border-radius:3px}
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.chart-bar-label{width:130px;font-size:11.5px;color:var(--muted);flex-shrink:0;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-bar-track{flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:8px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.chart-bar-val{width:40px;text-align:right;font-size:12px;font-weight:700}
+.linkchip{cursor:pointer}
+.linkchip:hover{border-color:var(--emerald)!important;color:var(--emerald)}
 .fg{margin-bottom:12px}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
 .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
@@ -282,6 +292,8 @@ select option{background:var(--paper);color:var(--ink)}
     <button class="railbtn" data-p="flash" title="Flashcards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="7" width="14" height="10" rx="2"/><path d="M3 11h2M19 11h2M3 15h2M19 15h2"/></svg></button>
     <button class="railbtn" data-p="notes" title="Notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></button>
     <button class="railbtn" data-p="mnem" title="Mnemonics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg></button>
+    <button class="railbtn" data-p="qbank" title="Question Bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></button>
+    <button class="railbtn" data-p="ana" title="Analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
     <div class="railsep"></div>
     <button class="railbtn" data-p="set" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
     <div id="subjRail" style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>
@@ -471,6 +483,41 @@ select option{background:var(--paper);color:var(--ink)}
         </div>
       </div>
 
+      <!-- QUESTION BANK -->
+      <div class="pg" id="pg-qbank">
+        <div class="pagehd"><div><h2 class="brandfont">Question Bank</h2><p>Log practice sessions — weak areas surface automatically</p></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Log a session</div>
+          <div class="g3" style="margin-bottom:10px">
+            <div><label>Subject</label><select id="qb_subj"></select></div>
+            <div><label>Topic (optional)</label><select id="qb_topic"><option value="">— none —</option></select></div>
+            <div><label>Date</label><input id="qb_date" type="date"></div>
+          </div>
+          <div class="g2" style="margin-bottom:12px">
+            <div><label>Total questions</label><input id="qb_total" type="number" placeholder="e.g. 20"></div>
+            <div><label>Correct</label><input id="qb_correct" type="number" placeholder="e.g. 14"></div>
+          </div>
+          <button class="btn bt" id="qb_add">+ Log session</button>
+        </div>
+        <div class="row2">
+          <div class="card"><div class="cardhd">⚠️ Weak areas <span class="chip">under 60%</span></div><div id="qb_weak"></div></div>
+          <div class="card"><div class="cardhd">Recent sessions</div><div id="qb_list"></div></div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="pg" id="pg-ana">
+        <div class="pagehd"><div><h2 class="brandfont">Analytics</h2><p>Your study patterns, subject by subject</p></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Study activity — last 12 weeks</div>
+          <div class="heatmap" id="heatmapEl"></div>
+        </div>
+        <div class="row2">
+          <div class="card"><div class="cardhd">Subject completion</div><div id="anaSubjBars"></div></div>
+          <div class="card"><div class="cardhd">Weak areas (question bank)</div><div id="anaWeak"></div></div>
+        </div>
+      </div>
+
       <!-- SETTINGS -->
       <div class="pg" id="pg-set">
         <div class="pagehd"><div><h2 class="brandfont">Settings</h2><p>Your profile, appearance, and account</p></div></div>
@@ -577,7 +624,7 @@ const DEFAULT_PHASES = [
 ];
 
 /* ============ STORAGE (local cache + cloud) ============ */
-const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog",flashcards:"srx_flashcards",notes:"srx_notes",mnemonics:"srx_mnemonics"};
+const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog",flashcards:"srx_flashcards",notes:"srx_notes",mnemonics:"srx_mnemonics",qbank:"srx_qbank"};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -586,7 +633,7 @@ const svLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
 let USER=null;
 let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[]),
-  flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[])};
+  flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[]),qbank:ld(K.qbank,[])};
 
 let cloudTimer=null;
 function sv(type,val){
@@ -679,6 +726,8 @@ function renderPage(p){
   if(p==="flash"){fillTopicSelect($("fc_topic"));renderFlashcards()}
   if(p==="notes"){fillTopicSelect($("nt_topic"));renderNotes()}
   if(p==="mnem"){fillSubjectSelect($("mn_subj"));renderMnemonics()}
+  if(p==="qbank"){fillSubjectSelect($("qb_subj"));fillTopicSelect($("qb_topic"));renderQBank()}
+  if(p==="ana")renderAnalytics();
   if(p==="set"){$("s_name").value=DB.profile.name||""}
 }
 function renderAll(){
@@ -891,16 +940,38 @@ function chapterBlockHTML(s,c){
 }
 function topicRowHTML(s,c,t){
   const st=t.status||"todo";
+  const expanded=expandedTopics.has(t.id);
+  const related=(t.relatedIds||[]).map(rid=>allTopics().find(x=>x.id===rid)).filter(Boolean);
   return `<div class="row" style="--rc:${s.color}" data-static="1">
     <div style="color:${s.color}">${subjIcon(s.name,15)}</div>
     <div class="rowmain"><div class="rowtitle">${esc(t.name)}</div></div>
     <div class="btn-row" style="gap:5px">
-      <span class="statpill" data-s="todo" data-topic="${s.id}|${c.id}|${t.id}" style="${st==='todo'?'':''}">${st==='todo'?'●':'To-do'}</span>
+      <span class="statpill" data-s="todo" data-topic="${s.id}|${c.id}|${t.id}">${st==='todo'?'●':'To-do'}</span>
       <span class="statpill" data-s="reading" data-topic="${s.id}|${c.id}|${t.id}">Reading</span>
       <span class="statpill" data-s="revised" data-topic="${s.id}|${c.id}|${t.id}">Revised</span>
       <span class="statpill" data-s="mastered" data-topic="${s.id}|${c.id}|${t.id}">Mastered</span>
     </div>
+    <button class="iconbtn" data-linktoggle="${t.id}" title="Related topics">🔗${related.length?' '+related.length:''}</button>
     <button class="iconbtn" data-deltop="${s.id}|${c.id}|${t.id}" style="width:26px;height:26px">✕</button>
+  </div>
+  ${expanded?linkPanelHTML(s,c,t,related):""}`;
+}
+function linkPanelHTML(s,c,t,related){
+  const others=allTopics().filter(x=>x.id!==t.id && !(t.relatedIds||[]).includes(x.id));
+  const suggested=suggestRelated(t,others);
+  return `<div class="row" style="--rc:${s.color};background:rgba(255,255,255,.02);flex-direction:column;align-items:stretch;gap:8px;margin-top:-4px;margin-bottom:8px">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Related topics</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${related.length?related.map(r=>`<span class="chip" style="border-color:${r.subjectColor}55">${subjIcon(r.subjectName,12)} ${esc(r.subjectName)} — ${esc(r.name)}
+        <span data-unlink="${t.id}|${r.id}" style="cursor:pointer;margin-left:4px">✕</span></span>`).join(""):'<span style="font-size:12px;color:var(--faint)">None linked yet</span>'}
+    </div>
+    ${suggested.length?`<div style="font-size:11px;color:var(--muted)">Suggested by name match — tap to link</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${suggested.map(o=>`<button class="chip linkchip" style="border-color:${o.subjectColor}66" data-quicklink="${t.id}|${o.id}">${subjIcon(o.subjectName,12)} ${esc(o.subjectName)} — ${esc(o.name)} +</button>`).join("")}</div>`:""}
+    <div style="display:flex;gap:8px">
+      <select id="linkSel_${t.id}" style="flex:1"><option value="">Link any topic from anywhere in the curriculum…</option>
+        ${others.map(o=>`<option value="${o.id}">${esc(o.subjectName)} — ${esc(o.name)}</option>`).join("")}</select>
+      <button class="btn bo bsm" data-addlink="${t.id}">Link</button>
+    </div>
   </div>`;
 }
 function findSCT(sid,cid,tid){
@@ -910,6 +981,30 @@ function findSCT(sid,cid,tid){
   const t=tid?c.topics.find(x=>x.id===tid):null;
   return {ph,s,c,t};
 }
+function findSCTAny(tid){
+  for(const ph of DB.phases||[]){
+    for(const s of ph.subjects||[]){
+      for(const c of s.chapters||[]){
+        const t=(c.topics||[]).find(x=>x.id===tid);
+        if(t) return {ph,s,c,t};
+      }
+    }
+  }
+  return {};
+}
+function linkTopics(aId,bId){
+  const {t:a}=findSCTAny(aId), {t:b}=findSCTAny(bId);
+  if(!a||!b||aId===bId)return;
+  a.relatedIds=a.relatedIds||[]; if(!a.relatedIds.includes(bId)) a.relatedIds.push(bId);
+  b.relatedIds=b.relatedIds||[]; if(!b.relatedIds.includes(aId)) b.relatedIds.push(aId);
+  sv("phases",DB.phases); renderCurric();
+}
+function suggestRelated(t,others){
+  const words=(t.name||"").toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>3);
+  if(!words.length)return[];
+  return others.filter(o=>{ const on=o.name.toLowerCase(); return words.some(w=>on.includes(w)); }).slice(0,5);
+}
+let expandedTopics=new Set();
 function wireSubjectBlocks(ph){
   $("phaseBody").querySelectorAll("[data-subjexam]").forEach(inp=>inp.onchange=()=>{
     const s=ph.subjects.find(x=>x.id===inp.dataset.subjexam);
@@ -943,6 +1038,25 @@ function wireSubjectBlocks(ph){
     const [sid,cid,tid]=b.dataset.deltop.split("|");
     const s=ph.subjects.find(x=>x.id===sid); const c=s.chapters.find(x=>x.id===cid);
     c.topics=c.topics.filter(t=>t.id!==tid); sv("phases",DB.phases); renderCurric();
+  });
+  $("phaseBody").querySelectorAll("[data-linktoggle]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.linktoggle;
+    if(expandedTopics.has(id))expandedTopics.delete(id); else expandedTopics.add(id);
+    renderCurric();
+  });
+  $("phaseBody").querySelectorAll("[data-addlink]").forEach(b=>b.onclick=()=>{
+    const sel=$("linkSel_"+b.dataset.addlink);
+    if(sel.value) linkTopics(b.dataset.addlink,sel.value);
+  });
+  $("phaseBody").querySelectorAll("[data-quicklink]").forEach(b=>b.onclick=()=>{
+    const [a,c2]=b.dataset.quicklink.split("|"); linkTopics(a,c2);
+  });
+  $("phaseBody").querySelectorAll("[data-unlink]").forEach(b=>b.onclick=()=>{
+    const [tid,rid]=b.dataset.unlink.split("|");
+    const {t}=findSCTAny(tid), {t:other}=findSCTAny(rid);
+    if(t) t.relatedIds=(t.relatedIds||[]).filter(x=>x!==rid);
+    if(other) other.relatedIds=(other.relatedIds||[]).filter(x=>x!==tid);
+    sv("phases",DB.phases); renderCurric();
   });
   $("phaseBody").querySelectorAll(".statpill").forEach(el=>{
     const [sid,cid,tid]=el.dataset.topic.split("|");
@@ -1153,6 +1267,85 @@ function renderMnemonics(q){
   });
 }
 $("mn_search").oninput=()=>renderMnemonics();
+
+/* ============ QUESTION BANK + WEAK AREAS ============ */
+$("qb_add").onclick=()=>{
+  const subj=allSubjects().find(x=>x.id===$("qb_subj").value);
+  if(!subj){toast("Choose a subject");return}
+  const total=parseInt($("qb_total").value), correct=parseInt($("qb_correct").value);
+  if(!total||total<=0){toast("Enter a valid question count");return}
+  if(isNaN(correct)||correct<0||correct>total){toast("Correct count looks off");return}
+  const t=allTopics().find(x=>x.id===$("qb_topic").value);
+  DB.qbank=DB.qbank||[];
+  DB.qbank.push({id:uid(),date:$("qb_date").value||todayStr(),subjectId:subj.id,subjectName:subj.name,subjectColor:subj.color,
+    topicId:t?t.id:null,topicName:t?t.name:null,total,correct});
+  sv("qbank",DB.qbank);
+  addXP(2,"Logged a question-bank session");
+  $("qb_total").value="";$("qb_correct").value="";
+  renderQBank();
+};
+function computeWeakAreas(){
+  const map={};
+  (DB.qbank||[]).forEach(s=>{
+    const key=s.topicId||("subj_"+s.subjectId);
+    if(!map[key])map[key]={name:s.topicName||s.subjectName,color:s.subjectColor||"#22ffb0",correct:0,total:0};
+    map[key].correct+=s.correct; map[key].total+=s.total;
+  });
+  return Object.values(map).map(v=>Object.assign({},v,{pct:v.total?Math.round(v.correct/v.total*100):0}))
+    .filter(v=>v.total>=5).sort((a,b)=>a.pct-b.pct);
+}
+function renderQBank(){
+  if(!$("qb_date").value)$("qb_date").value=todayStr();
+  const weak=computeWeakAreas().filter(w=>w.pct<60);
+  $("qb_weak").innerHTML = weak.length ? weak.map(w=>`<div class="row" style="--rc:#ff5d8f">
+    <div class="rowmain"><div class="rowtitle">${esc(w.name)}</div><div class="rowsub">${w.correct}/${w.total} correct</div></div>
+    <div class="chip" style="color:#ff5d8f;border-color:#ff5d8f">${w.pct}%</div></div>`).join("")
+    : '<div class="empty">No weak spots detected yet — log a few sessions first</div>';
+  const list=[...(DB.qbank||[])].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,25);
+  $("qb_list").innerHTML = list.length ? list.map(s=>`<div class="row" style="--rc:${s.subjectColor}">
+    <div class="rowmain"><div class="rowtitle">${esc(s.topicName||s.subjectName)}</div>
+    <div class="rowsub">${esc(s.date)} · ${s.correct}/${s.total} (${Math.round(s.correct/s.total*100)}%)</div></div>
+    <button class="iconbtn" data-delqb="${s.id}">✕</button></div>`).join("") : '<div class="empty">No sessions logged yet</div>';
+  $("qb_list").querySelectorAll("[data-delqb]").forEach(b=>b.onclick=()=>{
+    DB.qbank=DB.qbank.filter(x=>x.id!==b.dataset.delqb); sv("qbank",DB.qbank); renderQBank();
+  });
+}
+
+/* ============ ANALYTICS ============ */
+function renderHeatmap(){
+  const days=84, today=new Date(), dayTotals={};
+  (DB.xplog||[]).forEach(e=>{ const d=new Date(e.ts).toISOString().slice(0,10); dayTotals[d]=(dayTotals[d]||0)+e.amount; });
+  const cells=[];
+  for(let i=days-1;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); const ds=d.toISOString().slice(0,10); cells.push({date:ds,val:dayTotals[ds]||0}); }
+  const max=Math.max(...cells.map(c=>c.val),1);
+  const weeks=[]; for(let i=0;i<cells.length;i+=7)weeks.push(cells.slice(i,i+7));
+  function shade(v){
+    if(v<=0)return "background:rgba(255,255,255,.06)";
+    const r=v/max;
+    if(r>0.75)return "background:var(--emerald);box-shadow:0 0 6px rgba(34,255,176,.6)";
+    if(r>0.5)return "background:#1fae7c";
+    if(r>0.25)return "background:#146b4d";
+    return "background:#0f4a37";
+  }
+  $("heatmapEl").innerHTML = weeks.map(w=>`<div class="heatmap-col">${w.map(c=>`<div class="heatmap-cell" style="${shade(c.val)}" title="${esc(c.date)}: ${c.val} XP"></div>`).join("")}</div>`).join("");
+}
+function renderAnalytics(){
+  renderHeatmap();
+  const subs=allSubjects(), topics=allTopics();
+  $("anaSubjBars").innerHTML = subs.length ? subs.map(s=>{
+    const st=topics.filter(t=>t.subjectId===s.id);
+    const done=st.filter(t=>t.status==="mastered"||t.status==="revised").length;
+    const pct=st.length?Math.round(done/st.length*100):0;
+    return `<div class="chart-bar-row"><div class="chart-bar-label" style="color:${s.color}">${subjIcon(s.name,14)} ${esc(s.name)}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      <div class="chart-bar-val">${pct}%</div></div>`;
+  }).join("") : '<div class="empty">Add subjects in Curriculum to see this</div>';
+  const weak=computeWeakAreas();
+  $("anaWeak").innerHTML = weak.length ? weak.map(w=>`<div class="row" style="--rc:${w.pct<60?'#ff5d8f':'var(--emerald)'}">
+    <div class="rowmain"><div class="rowtitle">${esc(w.name)}</div><div class="rowsub">${w.correct}/${w.total} correct</div></div>
+    <div class="chip" style="color:${w.pct<60?'#ff5d8f':'var(--emerald)'};border-color:${w.pct<60?'#ff5d8f':'var(--emerald)'}">${w.pct}%</div></div>`).join("")
+    : '<div class="empty">Log question-bank sessions to see this</div>';
+}
 
 /* ============ SETTINGS ============ */
 $("s_save").onclick=()=>{ DB.profile.name=$("s_name").value.trim()||DB.profile.name; sv("profile",DB.profile); updateTopbar(); toast("Saved"); };
