@@ -128,6 +128,17 @@ label{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-tra
 input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:11px;background:rgba(255,255,255,.03);
   color:var(--ink);font-size:13.5px;font-family:inherit;outline:none;transition:all .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--emerald);box-shadow:0 0 0 3px rgba(34,255,176,.14)}
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}
+select option{background:var(--paper);color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:600;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted)}
+.flashwrap{max-width:520px;margin:0 auto;text-align:center}
+.flashcard{background:var(--glass);border:1.5px solid var(--line);border-radius:18px;padding:38px 24px;min-height:180px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;cursor:pointer;
+  box-shadow:var(--shadow-md);transition:transform .2s}
+.flashcard:hover{box-shadow:var(--shadow-md),var(--shadow-glow)}
+.flashmeta{font-size:11px;color:var(--faint);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px}
 .fg{margin-bottom:12px}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
 .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
@@ -246,7 +257,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--emerald);box-shadow:0
 
 <div id="authScreen" class="authwrap" style="display:none">
   <div class="authcard">
-    <div class="authlogo">Rx</div>
+    <img class="authlogo" src="icon-192.png" alt="StudyRx" style="object-fit:cover">
     <div class="authtitle brandfont">StudyRx</div>
     <div class="authsub">Your prescription for the professional exams</div>
     <div id="cfgWarnBox"></div>
@@ -263,11 +274,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--emerald);box-shadow:0
 
 <div class="app" id="appShell" style="display:none">
   <div class="rail">
-    <div class="logo">Rx</div>
+    <img class="logo" src="icon-192.png" alt="StudyRx" style="object-fit:cover">
     <button class="railbtn on" data-p="dash" title="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
     <button class="railbtn" data-p="curric" title="Curriculum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h9a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-9a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h9z"/></svg></button>
     <button class="railbtn" data-p="routine" title="Routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
     <button class="railbtn" data-p="pomo" title="Pomodoro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></button>
+    <button class="railbtn" data-p="flash" title="Flashcards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="7" width="14" height="10" rx="2"/><path d="M3 11h2M19 11h2M3 15h2M19 15h2"/></svg></button>
+    <button class="railbtn" data-p="notes" title="Notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></button>
+    <button class="railbtn" data-p="mnem" title="Mnemonics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg></button>
     <div class="railsep"></div>
     <button class="railbtn" data-p="set" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
     <div id="subjRail" style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>
@@ -395,6 +409,68 @@ input:focus,select:focus,textarea:focus{border-color:var(--emerald);box-shadow:0
         </div>
       </div>
 
+      <!-- FLASHCARDS -->
+      <div class="pg" id="pg-flash">
+        <div class="pagehd"><div><h2 class="brandfont">Flashcards</h2><p>Spaced repetition — cards resurface right before you'd forget them</p></div>
+          <div class="pill" id="dueCountPill">0 due today</div>
+        </div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Add a card</div>
+          <div class="g2" style="margin-bottom:10px">
+            <div><label>Front (question)</label><input id="fc_front" placeholder="e.g. Blood supply of the appendix?"></div>
+            <div><label>Back (answer)</label><input id="fc_back" placeholder="e.g. Appendicular artery"></div>
+          </div>
+          <div class="fg" style="max-width:320px"><label>Link to topic (optional)</label><select id="fc_topic"><option value="">— none —</option></select></div>
+          <button class="btn bt" id="fc_add">+ Add card</button>
+        </div>
+        <div class="card" style="margin-bottom:18px" id="fc_reviewCard" style="display:none">
+          <div class="cardhd">Review</div>
+          <div class="flashwrap" id="fc_reviewBox"></div>
+        </div>
+        <div class="card">
+          <div class="cardhd">All cards <span class="chip" id="fc_total">0</span></div>
+          <div id="fc_list"></div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="pg" id="pg-notes">
+        <div class="pagehd"><div><h2 class="brandfont">Notes</h2><p>Quick notes, tagged to any topic</p></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">New note</div>
+          <div class="g2" style="margin-bottom:10px">
+            <div><label>Title</label><input id="nt_title" placeholder="Note title"></div>
+            <div><label>Link to topic (optional)</label><select id="nt_topic"><option value="">— none —</option></select></div>
+          </div>
+          <div class="fg"><label>Content</label><textarea id="nt_body" rows="4" placeholder="Write your note..."></textarea></div>
+          <button class="btn bt" id="nt_add">+ Save note</button>
+        </div>
+        <div class="card">
+          <div class="cardhd">Your notes <span class="chip" id="nt_total">0</span></div>
+          <input id="nt_search" placeholder="🔍 Search notes..." style="margin-bottom:12px">
+          <div id="nt_list"></div>
+        </div>
+      </div>
+
+      <!-- MNEMONICS -->
+      <div class="pg" id="pg-mnem">
+        <div class="pagehd"><div><h2 class="brandfont">Mnemonic Vault</h2><p>Your own memory aids, searchable by subject</p></div></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="cardhd">Add a mnemonic</div>
+          <div class="g2" style="margin-bottom:10px">
+            <div><label>Term / concept</label><input id="mn_term" placeholder="e.g. Cranial nerves"></div>
+            <div><label>Link to subject (optional)</label><select id="mn_subj"><option value="">— none —</option></select></div>
+          </div>
+          <div class="fg"><label>Mnemonic</label><textarea id="mn_text" rows="2" placeholder="Your memory aid..."></textarea></div>
+          <button class="btn bt" id="mn_add">+ Add mnemonic</button>
+        </div>
+        <div class="card">
+          <div class="cardhd">Vault <span class="chip" id="mn_total">0</span></div>
+          <input id="mn_search" placeholder="🔍 Search mnemonics..." style="margin-bottom:12px">
+          <div id="mn_list"></div>
+        </div>
+      </div>
+
       <!-- SETTINGS -->
       <div class="pg" id="pg-set">
         <div class="pagehd"><div><h2 class="brandfont">Settings</h2><p>Your profile, appearance, and account</p></div></div>
@@ -437,8 +513,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--emerald);box-shadow:0
 /* ============================================================
    CONFIG — fill these in before this app will actually work.
    ============================================================ */
-const SUPABASE_URL = "https://benpysehgmjligfayapa.supabase.co";       // Project Settings → API → Project URL
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlbnB5c2VoZ21qbGlnZmF5YXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MjQ0NDQsImV4cCI6MjEwMzAwMDQ0NH0.GSjJyGM0_A_qfvzpvyiUt895K_rUcq2KgmA1odU_nEA";       // Project Settings → API → anon public key
+const SUPABASE_URL = "YOUR_STUDYRX_SUPABASE_URL";       // Project Settings → API → Project URL
+const SUPABASE_ANON_KEY = "YOUR_STUDYRX_ANON_KEY";       // Project Settings → API → anon public key
 const GOOGLE_CLIENT_ID = "214365170761-evmrnh579b05p6dpm1vkno7ltv174i1e.apps.googleusercontent.com"; // used from Stage 4 onward
 
 const CONFIG_OK = !SUPABASE_URL.startsWith("YOUR_") && !SUPABASE_ANON_KEY.startsWith("YOUR_");
@@ -472,6 +548,26 @@ function colorFor(name,fallbackIdx){
   if(SUBJECT_COLORS[k])return SUBJECT_COLORS[k];
   return COLOR_ROTATION[(fallbackIdx||0)%COLOR_ROTATION.length];
 }
+const SUBJECT_ICONS = {
+  "anatomy":'<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.5 8.5L15.5 15.5"/>',
+  "physiology":'<path d="M2 12h4l2-7 4 14 2-7h8"/>',
+  "biochemistry":'<path d="M9 2v6L4 20a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3L15 8V2"/><path d="M9 2h6"/><path d="M7 16h10"/>',
+  "forensic medicine":'<circle cx="10" cy="10" r="6"/><path d="M21 21l-5.2-5.2"/>',
+  "pharmacology":'<rect x="2" y="9" width="20" height="6" rx="3"/><path d="M12 9v6"/>',
+  "community medicine":'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  "pathology":'<path d="M9 20h6M12 20v-4M7 16h10M9 12a3 3 0 1 1 6 0c0 2-1 3-3 4-2-1-3-2-3-4z"/><path d="M14 6l3-3"/>',
+  "microbiology":'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.3"/><circle cx="14" cy="9" r="1"/><circle cx="13" cy="14" r="1.5"/><circle cx="8" cy="15" r="1"/>',
+  "medicine":'<path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v3a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="12" r="1.5"/><circle cx="6" cy="3" r="1.2"/><circle cx="10" cy="3" r="1.2"/>',
+  "surgery":'<path d="M4 20L15 9"/><path d="M14 4l6 6-4 4-6-6z"/>',
+  "obstetrics & gynaecology":'<circle cx="9" cy="9" r="5"/><circle cx="16" cy="9" r="3"/><path d="M9 14v7"/>',
+  "default":'<path d="M4 4h9a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-9a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h9z"/>'
+};
+function subjIcon(name,size){
+  const k=(name||"").trim().toLowerCase();
+  const inner=SUBJECT_ICONS[k]||SUBJECT_ICONS.default;
+  const sz=size||18;
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;flex-shrink:0">${inner}</svg>`;
+}
 
 const DEFAULT_PHASES = [
   {name:"1st Professional (Phase 1)",type:"undergrad",subjects:["Anatomy","Biochemistry","Physiology"]},
@@ -481,7 +577,7 @@ const DEFAULT_PHASES = [
 ];
 
 /* ============ STORAGE (local cache + cloud) ============ */
-const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog"};
+const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog",flashcards:"srx_flashcards",notes:"srx_notes",mnemonics:"srx_mnemonics"};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -489,7 +585,8 @@ const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}ca
 const svLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
 let USER=null;
-let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[])};
+let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[]),
+  flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[])};
 
 let cloudTimer=null;
 function sv(type,val){
@@ -579,9 +676,20 @@ function renderPage(p){
   if(p==="curric")renderCurric();
   if(p==="routine")renderRoutine();
   if(p==="pomo")fillTopicSelect($("pm_topic"));
+  if(p==="flash"){fillTopicSelect($("fc_topic"));renderFlashcards()}
+  if(p==="notes"){fillTopicSelect($("nt_topic"));renderNotes()}
+  if(p==="mnem"){fillSubjectSelect($("mn_subj"));renderMnemonics()}
   if(p==="set"){$("s_name").value=DB.profile.name||""}
 }
-function renderAll(){ renderSidebarSubjects(); renderDash(); renderCurric(); renderRoutine(); updateTopbar(); fillTopicSelect($("rt_topic")); fillTopicSelect($("pm_topic")); }
+function renderAll(){
+  renderSidebarSubjects(); renderDash(); renderCurric(); renderRoutine(); updateTopbar();
+  fillTopicSelect($("rt_topic")); fillTopicSelect($("pm_topic")); fillTopicSelect($("fc_topic")); fillTopicSelect($("nt_topic"));
+  fillSubjectSelect($("mn_subj")); renderFlashcards(); renderNotes(); renderMnemonics();
+}
+function fillSubjectSelect(sel){
+  if(!sel)return;
+  sel.innerHTML='<option value="">— none —</option>'+allSubjects().map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+}
 
 /* ============ SIDEBAR SUBJECT ICONS ============ */
 function allSubjects(){
@@ -599,7 +707,7 @@ function allTopics(){
 function renderSidebarSubjects(){
   const el=$("subjRail");
   el.innerHTML = allSubjects().slice(0,8).map(s=>
-    `<button class="railsub iconbtn" style="color:${s.color};border-color:${s.color}55" title="${esc(s.name)}">${esc(s.name.slice(0,2).toUpperCase())}</button>`
+    `<button class="railsub iconbtn" style="color:${s.color};border-color:${s.color}55" title="${esc(s.name)}">${subjIcon(s.name,19)}</button>`
   ).join("");
 }
 
@@ -683,16 +791,23 @@ function renderDash(){
     const circ=163;
     return `<div><div class="ring"><svg><circle class="bg" cx="30" cy="30" r="26"/>
       <circle cx="30" cy="30" r="26" stroke="${s.color}" stroke-dasharray="${circ}" stroke-dashoffset="${circ-(circ*pctS/100)}" stroke-linecap="round"/></svg></div>
+      <div style="display:flex;justify-content:center;color:${s.color};margin-bottom:2px">${subjIcon(s.name,15)}</div>
       <div class="subjpct" style="color:${s.color}">${pctS}%</div><div class="subjname">${esc(s.name)}</div></div>`;
   }).join("") : '<div class="empty">Add subjects in Curriculum to see progress here</div>';
 
-  // nearest exam
-  let nearest=null;
-  (DB.phases||[]).forEach(ph=>{ if(ph.examDate){ const d=new Date(ph.examDate+"T00:00"); if(!nearest||d<nearest.date) nearest={date:d,name:ph.name} } });
+  // nearest exam — checks both phase-level AND subject-level dates, shows the specific name
+  let candidates=[];
+  (DB.phases||[]).forEach(ph=>{
+    if(ph.examDate) candidates.push({date:new Date(ph.examDate+"T00:00"),name:ph.name});
+    (ph.subjects||[]).forEach(s=>{ if(s.examDate) candidates.push({date:new Date(s.examDate+"T00:00"),name:s.name}); });
+  });
+  const todayZero=new Date(new Date().toDateString());
+  const upcoming=candidates.filter(c=>c.date>=todayZero).sort((a,b)=>a.date-b.date);
+  const nearest=upcoming[0]||null;
   if(nearest){
     const days=Math.ceil((nearest.date-new Date())/86400000);
-    $("cdNum").textContent = days>=0 ? days : "0";
-    $("cdLabel").textContent = days>=0 ? "days to "+nearest.name : nearest.name+" has passed";
+    $("cdNum").textContent=days;
+    $("cdLabel").textContent="days to "+nearest.name;
   } else { $("cdNum").textContent="—"; $("cdLabel").textContent="Set an exam date in Curriculum"; }
 
   const today=todayStr();
@@ -753,9 +868,10 @@ function renderCurric(){
 function subjectBlockHTML(s){
   const chapters=s.chapters||[];
   return `<div class="card" style="margin-bottom:14px;border-left:3px solid ${s.color}">
-    <div class="cardhd" style="color:${s.color}">${esc(s.name)}
+    <div class="cardhd" style="color:${s.color}">${subjIcon(s.name,17)} ${esc(s.name)}
       <button class="iconbtn" style="margin-left:auto" data-delsubj="${s.id}">🗑</button>
     </div>
+    <div class="fg" style="max-width:220px"><label>Exam date for this subject (optional)</label><input type="date" value="${s.examDate||''}" data-subjexam="${s.id}"></div>
     <div class="btn-row" style="margin-bottom:10px"><input placeholder="New chapter name" id="newChap_${s.id}" style="max-width:220px"><button class="btn bo bsm" data-addchap="${s.id}">+ Add chapter</button></div>
     ${chapters.map(c=>chapterBlockHTML(s,c)).join("") || '<div class="empty" style="padding:14px">No chapters yet</div>'}
   </div>`;
@@ -776,6 +892,7 @@ function chapterBlockHTML(s,c){
 function topicRowHTML(s,c,t){
   const st=t.status||"todo";
   return `<div class="row" style="--rc:${s.color}" data-static="1">
+    <div style="color:${s.color}">${subjIcon(s.name,15)}</div>
     <div class="rowmain"><div class="rowtitle">${esc(t.name)}</div></div>
     <div class="btn-row" style="gap:5px">
       <span class="statpill" data-s="todo" data-topic="${s.id}|${c.id}|${t.id}" style="${st==='todo'?'':''}">${st==='todo'?'●':'To-do'}</span>
@@ -794,6 +911,11 @@ function findSCT(sid,cid,tid){
   return {ph,s,c,t};
 }
 function wireSubjectBlocks(ph){
+  $("phaseBody").querySelectorAll("[data-subjexam]").forEach(inp=>inp.onchange=()=>{
+    const s=ph.subjects.find(x=>x.id===inp.dataset.subjexam);
+    s.examDate=inp.value; sv("phases",DB.phases); toast("Exam date saved for "+s.name);
+    if($("pg-dash").classList.contains("on"))renderDash();
+  });
   $("phaseBody").querySelectorAll("[data-delsubj]").forEach(b=>b.onclick=()=>{
     if(!confirm("Delete this subject and all its chapters/topics?"))return;
     ph.subjects=ph.subjects.filter(s=>s.id!==b.dataset.delsubj); sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
@@ -829,7 +951,7 @@ function wireSubjectBlocks(ph){
     el.textContent = el.dataset.s==="todo"?"To-do":el.dataset.s.charAt(0).toUpperCase()+el.dataset.s.slice(1);
     el.onclick=()=>{
       t.status=el.dataset.s;
-      const XP_MAP={reading:0,revised:10,mastered:30};
+      const XP_MAP={reading:0,revised:5,mastered:15};
       const need=XP_MAP[t.status]||0;
       if(need>(t.xpAwarded||0)){
         addXP(need-(t.xpAwarded||0), t.name+" → "+t.status);
@@ -870,7 +992,7 @@ function wireRoutineRows(containerId){
   const el=$(containerId);
   el.querySelectorAll("[data-donetask]").forEach(b=>b.onclick=()=>{
     const r=DB.routine.find(x=>x.id===b.dataset.donetask);
-    if(!r.done){ r.done=true; addXP(5,"Completed: "+r.title); } else { r.done=false; }
+    if(!r.done){ r.done=true; addXP(3,"Completed: "+r.title); } else { r.done=false; }
     sv("routine",DB.routine); renderRoutine(); if($("pg-dash").classList.contains("on"))renderDash();
   });
   el.querySelectorAll("[data-deltask]").forEach(b=>b.onclick=()=>{
@@ -903,7 +1025,7 @@ $("pm_start").onclick=()=>{
       clearInterval(pmInterval); pmRunning=false;
       $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Done!";
       const mins=Math.round(pmSecondsTotal/60);
-      addXP(Math.max(3,Math.round(mins/2)),"Pomodoro session ("+mins+" min)");
+      addXP(Math.max(2,Math.round(mins/5)),"Pomodoro session ("+mins+" min)");
       pmSecondsLeft=pmSecondsTotal; pmRender();
       toast("Session complete — nice work");
     }
@@ -912,6 +1034,125 @@ $("pm_start").onclick=()=>{
 $("pm_pause").onclick=()=>{ clearInterval(pmInterval); pmRunning=false; $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Paused"; };
 $("pm_reset").onclick=()=>{ clearInterval(pmInterval); pmRunning=false; pmSecondsLeft=pmSecondsTotal; $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Ready"; pmRender(); };
 pmRender();
+
+/* ============ FLASHCARDS (simplified SM-2) ============ */
+function addDays(dstr,n){const d=new Date(dstr+"T00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+$("fc_add").onclick=()=>{
+  const front=$("fc_front").value.trim(), back=$("fc_back").value.trim();
+  if(!front||!back){toast("Fill in both front and back");return}
+  const t=allTopics().find(x=>x.id===$("fc_topic").value);
+  DB.flashcards=DB.flashcards||[];
+  DB.flashcards.push({id:uid(),front,back,topicId:t?t.id:null,topicName:t?t.name:null,subjectColor:t?t.subjectColor:"#22ffb0",
+    ease:2.5,interval:1,reps:0,due:todayStr()});
+  sv("flashcards",DB.flashcards);
+  $("fc_front").value="";$("fc_back").value="";
+  renderFlashcards(); toast("Card added");
+};
+let reviewQueue=[], reviewShowBack=false;
+function renderFlashcards(){
+  const cards=DB.flashcards||[];
+  $("fc_total").textContent=cards.length;
+  const today=todayStr();
+  const due=cards.filter(c=>c.due<=today);
+  $("dueCountPill").textContent=due.length+" due today";
+  $("fc_reviewCard").style.display = due.length ? "block" : "none";
+  if(due.length){ reviewQueue=due; renderReviewCard(); }
+  $("fc_list").innerHTML = cards.length ? cards.map(c=>`<div class="row" style="--rc:${c.subjectColor||'#22ffb0'}">
+    <div class="rowmain"><div class="rowtitle">${esc(c.front)}</div>
+    <div class="rowsub">${c.topicName?esc(c.topicName)+" · ":""}due ${esc(c.due)} · ${c.reps} review${c.reps!==1?'s':''}</div></div>
+    <button class="iconbtn" data-delcard="${c.id}">✕</button></div>`).join("") : '<div class="empty">No cards yet — add one above</div>';
+  $("fc_list").querySelectorAll("[data-delcard]").forEach(b=>b.onclick=()=>{
+    DB.flashcards=DB.flashcards.filter(c=>c.id!==b.dataset.delcard); sv("flashcards",DB.flashcards); renderFlashcards();
+  });
+}
+function renderReviewCard(){
+  if(!reviewQueue.length){ $("fc_reviewCard").style.display="none"; return }
+  const c=reviewQueue[0]; reviewShowBack=false;
+  $("fc_reviewBox").innerHTML=`
+    <div class="flashmeta">${reviewQueue.length} card${reviewQueue.length!==1?'s':''} left today</div>
+    <div class="flashcard" id="fcFace">${esc(c.front)}</div>
+    <p style="font-size:11.5px;color:var(--faint);margin-top:8px">Tap the card to reveal the answer</p>
+    <div class="btn-row" id="fcGrades" style="display:none;justify-content:center;margin-top:12px">
+      <button class="btn br bsm" data-q="0">Again</button>
+      <button class="btn bo bsm" data-q="3">Hard</button>
+      <button class="btn bt bsm" data-q="4">Good</button>
+      <button class="btn bg bsm" data-q="5">Easy</button>
+    </div>`;
+  $("fcFace").onclick=()=>{
+    if(reviewShowBack)return;
+    reviewShowBack=true; $("fcFace").textContent=c.back; $("fcGrades").style.display="flex";
+  };
+  $("fcGrades").querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>gradeCard(c,+b.dataset.q));
+}
+function gradeCard(c,q){
+  if(q<3){ c.reps=0; c.interval=1; }
+  else{
+    if(c.reps===0)c.interval=1; else if(c.reps===1)c.interval=6; else c.interval=Math.round(c.interval*c.ease);
+    c.reps=(c.reps||0)+1;
+  }
+  c.ease=Math.max(1.3,(c.ease||2.5)+(0.1-(5-q)*(0.08+(5-q)*0.02)));
+  c.due=addDays(todayStr(),c.interval);
+  sv("flashcards",DB.flashcards);
+  addXP(2,"Reviewed a flashcard");
+  reviewQueue.shift();
+  renderReviewCard();
+  renderFlashcards();
+}
+
+/* ============ NOTES ============ */
+$("nt_add").onclick=()=>{
+  const title=$("nt_title").value.trim(), body=$("nt_body").value.trim();
+  if(!title){toast("Give the note a title");return}
+  const t=allTopics().find(x=>x.id===$("nt_topic").value);
+  DB.notes=DB.notes||[];
+  DB.notes.push({id:uid(),title,body,topicId:t?t.id:null,topicName:t?t.name:null,color:t?t.subjectColor:"#22ffb0",ts:Date.now()});
+  sv("notes",DB.notes);
+  $("nt_title").value="";$("nt_body").value="";
+  renderNotes(); toast("Note saved");
+};
+function renderNotes(q){
+  q=(q||$("nt_search").value||"").toLowerCase();
+  let list=[...(DB.notes||[])].sort((a,b)=>b.ts-a.ts);
+  if(q) list=list.filter(n=>(n.title+" "+n.body).toLowerCase().includes(q));
+  $("nt_total").textContent=(DB.notes||[]).length;
+  $("nt_list").innerHTML = list.length ? list.map(n=>`<div class="row" style="--rc:${n.color||'#22ffb0'};align-items:flex-start">
+    <div class="rowmain"><div class="rowtitle">${esc(n.title)}</div>
+    <div class="rowsub" style="white-space:pre-wrap">${esc(n.body)}</div>
+    ${n.topicName?`<div class="chip" style="margin-top:6px">${esc(n.topicName)}</div>`:""}</div>
+    <button class="iconbtn" data-delnote="${n.id}">✕</button></div>`).join("") :
+    '<div class="empty">No notes match — add one above</div>';
+  $("nt_list").querySelectorAll("[data-delnote]").forEach(b=>b.onclick=()=>{
+    DB.notes=DB.notes.filter(n=>n.id!==b.dataset.delnote); sv("notes",DB.notes); renderNotes();
+  });
+}
+$("nt_search").oninput=()=>renderNotes();
+
+/* ============ MNEMONIC VAULT ============ */
+$("mn_add").onclick=()=>{
+  const term=$("mn_term").value.trim(), text=$("mn_text").value.trim();
+  if(!term||!text){toast("Fill in both the term and the mnemonic");return}
+  const s=allSubjects().find(x=>x.id===$("mn_subj").value);
+  DB.mnemonics=DB.mnemonics||[];
+  DB.mnemonics.push({id:uid(),term,text,subjectId:s?s.id:null,subjectName:s?s.name:null,color:s?s.color:"#ffcb47"});
+  sv("mnemonics",DB.mnemonics);
+  $("mn_term").value="";$("mn_text").value="";
+  renderMnemonics(); toast("Added to vault");
+};
+function renderMnemonics(q){
+  q=(q||$("mn_search").value||"").toLowerCase();
+  let list=DB.mnemonics||[];
+  if(q) list=list.filter(m=>(m.term+" "+m.text).toLowerCase().includes(q));
+  $("mn_total").textContent=(DB.mnemonics||[]).length;
+  $("mn_list").innerHTML = list.length ? list.map(m=>`<div class="row" style="--rc:${m.color||'#ffcb47'};align-items:flex-start">
+    ${m.subjectName?`<div style="color:${m.color}">${subjIcon(m.subjectName,16)}</div>`:""}
+    <div class="rowmain"><div class="rowtitle">${esc(m.term)}</div><div class="rowsub">${esc(m.text)}</div></div>
+    <button class="iconbtn" data-delmn="${m.id}">✕</button></div>`).join("") :
+    '<div class="empty">Nothing yet — add your first mnemonic above</div>';
+  $("mn_list").querySelectorAll("[data-delmn]").forEach(b=>b.onclick=()=>{
+    DB.mnemonics=DB.mnemonics.filter(m=>m.id!==b.dataset.delmn); sv("mnemonics",DB.mnemonics); renderMnemonics();
+  });
+}
+$("mn_search").oninput=()=>renderMnemonics();
 
 /* ============ SETTINGS ============ */
 $("s_save").onclick=()=>{ DB.profile.name=$("s_name").value.trim()||DB.profile.name; sv("profile",DB.profile); updateTopbar(); toast("Saved"); };
