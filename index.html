@@ -8,7 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1712">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -125,6 +127,7 @@ button{font-family:inherit}
 .bo{background:rgba(255,255,255,.04);color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
 .bo:active{transform:translateY(1px)}
 .br{background:linear-gradient(135deg,#ff5d8f,#b3244f);color:#fff}
+.bv{background:linear-gradient(135deg,#b490ff,#6d28d9);color:#fff}
 .bg{background:linear-gradient(135deg,var(--gold),#c9962c);color:#221900}
 .bsm{padding:7px 12px;font-size:12px}
 .bxs{padding:5px 9px;font-size:11px;border-radius:8px}
@@ -159,6 +162,15 @@ select option{background:var(--paper);color:var(--ink)}
 .chart-bar-val{width:40px;text-align:right;font-size:12px;font-weight:700}
 .linkchip{cursor:pointer}
 .linkchip:hover{border-color:var(--emerald)!important;color:var(--emerald)}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px}
+.badge-card{text-align:center;padding:12px 6px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);transition:all .2s}
+.badge-card.on{background:linear-gradient(135deg,var(--gold),#c9962c);border-color:transparent;color:#241900;box-shadow:0 0 14px rgba(255,203,71,.4)}
+.badge-card.off{opacity:.4}
+.badge-card .bic{margin:0 auto 6px;display:flex;justify-content:center}
+.badge-card .bname{font-size:10px;font-weight:700;line-height:1.3}
+.quest-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:7px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.quest-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--emerald);flex-shrink:0}
+.quest-box.done{background:var(--emerald);box-shadow:0 0 8px rgba(34,255,176,.6)}
 .fg{margin-bottom:12px}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
 .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
@@ -313,6 +325,9 @@ select option{background:var(--paper);color:var(--ink)}
     <button class="railbtn" data-p="drugs" title="Drug Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="6" rx="3"/><path d="M12 9v6"/></svg></button>
     <button class="railbtn" data-p="invs" title="Investigations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20h6M12 20v-4M7 16h10M9 12a3 3 0 1 1 6 0c0 2-1 3-3 4-2-1-3-2-3-4z"/></svg></button>
     <button class="railbtn" data-p="rx" title="Rx Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v3a5 5 0 0 0 10 0v-2"/></svg></button>
+    <button class="railbtn" data-p="pdf" title="PDF Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></button>
+    <button class="railbtn" data-p="milestones" title="Milestones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg></button>
+    <button class="railbtn" data-p="ai" title="Ask AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.5L19 9l-5.2 1.5L12 16l-1.8-5.5L5 9l5.2-1.5z"/></svg></button>
     <div class="railsep"></div>
     <button class="railbtn" data-p="set" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
     <div id="subjRail" style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>
@@ -374,9 +389,17 @@ select option{background:var(--paper);color:var(--ink)}
               <div class="cardhd">Subject progress</div>
               <div class="subjgrid" id="subjRings"></div>
             </div>
+            <div class="card tilt3d c-gold">
+              <div class="cardhd">Today's quests</div>
+              <div id="questList"></div>
+            </div>
             <div class="card tilt3d c-sky">
               <div class="cardhd">Today's routine</div>
               <div id="dashRoutine"></div>
+            </div>
+            <div class="card tilt3d c-rose">
+              <div class="cardhd">Badges</div>
+              <div class="badge-grid" id="badgeGrid"></div>
             </div>
           </div>
         </div>
@@ -435,6 +458,7 @@ select option{background:var(--paper);color:var(--ink)}
               <button class="btn bt" id="pm_start">▶ Start</button>
               <button class="btn bo" id="pm_pause" style="display:none">⏸ Pause</button>
               <button class="btn bo" id="pm_reset">↺ Reset</button>
+              <button class="btn bo" id="pm_ambient">🎧 Ambient sound: Off</button>
             </div>
           </div>
         </div>
@@ -704,6 +728,51 @@ select option{background:var(--paper);color:var(--ink)}
         </div>
       </div>
 
+      <!-- PDF LIBRARY -->
+      <div class="pg" id="pg-pdf">
+        <div class="pagehd"><div><h2 class="brandfont">PDF Library</h2><p>Your own files, stored in your own Google Drive — never on our servers</p></div></div>
+        <div class="card c-sky" style="margin-bottom:18px">
+          <div class="cardhd">Connection</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px" id="driveStatus">Not connected yet.</p>
+          <div class="btn-row">
+            <button class="btn bt" id="drive_connect">🔗 Connect Google Drive</button>
+            <button class="btn bo" id="drive_upload" style="display:none">⬆️ Upload a PDF</button>
+            <input type="file" id="drive_file" accept="application/pdf" style="display:none">
+          </div>
+        </div>
+        <div class="card c-em" id="driveLibCard" style="display:none">
+          <div class="cardhd">StudyRx Library <span class="chip" id="drive_total">0</span></div>
+          <input id="drive_search" placeholder="🔍 Search by filename or PDF text content..." style="margin-bottom:12px">
+          <div id="drive_list"></div>
+        </div>
+      </div>
+
+      <!-- MILESTONES -->
+      <div class="pg" id="pg-milestones">
+        <div class="pagehd"><div><h2 class="brandfont">Milestone Journal</h2><p>A scrapbook of the journey — not a planner, just the wins worth remembering</p></div></div>
+        <div class="card c-gold" style="margin-bottom:18px">
+          <div class="cardhd">Add a milestone</div>
+          <div class="g2" style="margin-bottom:10px">
+            <div><label>What happened</label><input id="ms_title" placeholder="e.g. Started clinical postings"></div>
+            <div><label>Date</label><input id="ms_date" type="date"></div>
+          </div>
+          <div class="fg"><label>Note (optional)</label><textarea id="ms_note" rows="2"></textarea></div>
+          <button class="btn bt" id="ms_add">+ Add to journal</button>
+        </div>
+        <div class="card c-violet"><div class="cardhd">Your journey</div><div id="ms_list"></div></div>
+      </div>
+
+      <!-- ASK AI -->
+      <div class="pg" id="pg-ai">
+        <div class="pagehd"><div><h2 class="brandfont">Ask AI</h2><p>Optional — needs your own Anthropic API key in Settings</p></div></div>
+        <div class="card c-violet">
+          <div class="cardhd">Doubt solver</div>
+          <div class="fg"><label>Your question</label><textarea id="ai_q" rows="3" placeholder="e.g. Why does aldosterone increase potassium excretion?"></textarea></div>
+          <button class="btn bt" id="ai_ask">✨ Ask</button>
+          <div id="ai_out" style="margin-top:16px"></div>
+        </div>
+      </div>
+
       <!-- SETTINGS -->
       <div class="pg" id="pg-set">
         <div class="pagehd"><div><h2 class="brandfont">Settings</h2><p>Your profile, appearance, and account</p></div></div>
@@ -720,10 +789,27 @@ select option{background:var(--paper);color:var(--ink)}
           <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Use the moon/sun icon in the top bar anytime — this just confirms your current mode.</p>
           <div class="btn-row"><button class="btn bo bsm" id="s_dark">🌙 Dark</button><button class="btn bo bsm" id="s_light">☀️ Light</button></div>
         </div>
-        <div class="card c-rose">
+        <div class="card c-violet" style="margin-bottom:18px">
+          <div class="cardhd">🔌 Online AI (optional)</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Paste your own Anthropic API key for the Ask AI doubt-solver. Stays on this device only. Leave blank to skip.</p>
+          <div class="g2">
+            <div><label>API key</label><input id="s_key" type="password" placeholder="sk-ant-..."></div>
+            <div><label>Model</label><select id="s_model"><option value="claude-sonnet-5">Claude Sonnet 5</option><option value="claude-opus-5">Claude Opus 5</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option></select></div>
+          </div>
+        </div>
+        <div class="card c-gold" style="margin-bottom:18px">
+          <div class="cardhd">📤 Exports</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Progress report as a printable PDF, or your routine and exam dates as a calendar file.</p>
+          <div class="btn-row"><button class="btn bg bsm" id="exp_pdf">🖨️ Progress report</button><button class="btn bg bsm" id="exp_ics">📅 Export calendar (.ics)</button></div>
+        </div>
+        <div class="card c-rose" style="margin-bottom:18px">
           <div class="cardhd">Account</div>
-          <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Google Drive connection for your PDF library arrives in a later update.</p>
           <button class="btn br bsm" id="s_logout">Log out</button>
+        </div>
+        <div class="card c-rose">
+          <div class="cardhd">⚠️ Danger zone</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Wipes every bit of data in StudyRx — curriculum, XP, flashcards, notes, everything you've logged. You stay logged in to this account; it just resets to a brand-new state, same default curriculum template you started with.</p>
+          <button class="btn br" id="s_reset">🗑 Reset all data</button>
         </div>
       </div>
 
@@ -809,9 +895,44 @@ const DEFAULT_PHASES = [
   {name:"Final Professional (Phase 4)",type:"undergrad",subjects:["Medicine","Surgery","Obstetrics & Gynaecology"]}
 ];
 
+const CASES = [
+{id:"case1",title:"Acute Right Iliac Fossa Pain",specialty:"Surgery",color:"#ff6a3d",
+ scenario:"A 22-year-old man presents with a 14-hour history of periumbilical pain that has now localised to the right iliac fossa. He has mild fever, nausea, and reduced appetite. On examination he has tenderness and guarding in the right iliac fossa, with rebound tenderness.",
+ steps:[
+  {q:"What is the most likely diagnosis?",opts:["Acute appendicitis","Renal colic","Mesenteric adenitis","Ectopic pregnancy"],correct:0,explain:"Migratory periumbilical-to-RIF pain with fever and localised peritonism is the classic presentation of acute appendicitis."},
+  {q:"What is the most appropriate initial investigation?",opts:["CT abdomen with contrast","Ultrasonography of whole abdomen","X-ray abdomen erect","MRI abdomen"],correct:1,explain:"Ultrasound is usually the first-line choice — quick, avoids radiation, and can show a thickened, non-compressible appendix."},
+  {q:"What is the definitive management?",opts:["IV antibiotics alone, no surgery","Appendicectomy","Bowel rest and observation","Colonoscopy"],correct:1,explain:"Appendicectomy remains the definitive treatment for acute appendicitis in most cases."},
+  {q:"Which complication should you watch for if surgery is delayed?",opts:["Perforation and peritonitis","Intussusception","Pyloric stenosis","Volvulus"],correct:0,explain:"A delayed diagnosis risks appendiceal perforation, leading to generalised peritonitis — a surgical emergency."}
+ ]},
+{id:"case2",title:"Prolonged Fever with Relative Bradycardia",specialty:"Medicine",color:"#34d399",
+ scenario:"A 19-year-old woman presents with fever for 8 days, stepwise in onset, with headache, abdominal discomfort, and constipation. Pulse is 84/min despite a temperature of 103°F, with mild splenomegaly.",
+ steps:[
+  {q:"What is the most likely diagnosis?",opts:["Enteric fever","Malaria","Dengue fever","Urinary tract infection"],correct:0,explain:"Stepwise fever, relative bradycardia, and splenomegaly point toward enteric (typhoid) fever."},
+  {q:"Which investigation would most directly confirm this?",opts:["Blood culture","Urine R/E","Chest X-ray","Serum amylase"],correct:0,explain:"Blood culture is the gold-standard confirmatory test for enteric fever, especially in the first week."},
+  {q:"What is an appropriate first-line antibiotic?",opts:["Ceftriaxone","Amoxicillin alone","Metronidazole alone","Doxycycline"],correct:0,explain:"IV ceftriaxone is a standard first-line choice, with oral step-down once improving."},
+  {q:"Which complication is this patient most at risk of if untreated?",opts:["Intestinal perforation","Pulmonary embolism","Acute pancreatitis","Renal stone"],correct:0,explain:"Untreated enteric fever carries a real risk of intestinal perforation and GI bleeding, usually week 2-3."}
+ ]},
+{id:"case3",title:"Groin Swelling That Reduces on Lying Down",specialty:"Surgery",color:"#ff6a3d",
+ scenario:"A 55-year-old man has a swelling in his right groin that appears on standing and straining, and disappears on lying down. It is not painful and there is a cough impulse on examination.",
+ steps:[
+  {q:"What is the most likely diagnosis?",opts:["Inguinal hernia","Femoral aneurysm","Lymphadenopathy","Hydrocele"],correct:0,explain:"A reducible groin swelling with a positive cough impulse is the textbook description of an inguinal hernia."},
+  {q:"Which structure, if reviewed, deepens your understanding of this case?",opts:["Inguinal canal and its boundaries","Brachial plexus","Circle of Willis","Coronary sinus"],correct:0,explain:"Reviewing the inguinal canal — its walls, contents, and rings — explains exactly why and where this hernia protrudes. Worth linking this case to your Anatomy topic on the inguinal region."},
+  {q:"What is the definitive management?",opts:["Surgical repair (herniorrhaphy/hernioplasty)","Truss/binder only, lifelong","Observation only","Antibiotics"],correct:0,explain:"Surgical repair is definitive; a truss is only a temporising option when surgery isn't immediately possible."},
+  {q:"What is the most dangerous complication?",opts:["Strangulation with bowel ischaemia","Otitis media","Cellulitis of the scalp","Pancreatitis"],correct:0,explain:"If irreducible and blood supply is compromised, strangulation can lead to bowel ischaemia — a surgical emergency."}
+ ]},
+{id:"case4",title:"Raised Blood Pressure in Late Pregnancy",specialty:"Obstetrics & Gynaecology",color:"#f472b6",
+ scenario:"A 26-year-old primigravida at 34 weeks presents with headache and blurring of vision. BP is 158/104 mmHg, urine dipstick shows 2+ protein. Mild epigastric discomfort, no fits.",
+ steps:[
+  {q:"What is the most likely diagnosis?",opts:["Pre-eclampsia","Gestational diabetes","Placenta praevia","Normal pregnancy"],correct:0,explain:"New-onset hypertension with proteinuria after 20 weeks, plus headache and visual symptoms, is classic for pre-eclampsia."},
+  {q:"Which investigation is most important to assess severity right now?",opts:["Liver function tests and platelet count","Chest X-ray","Thyroid function test","Stool R/E"],correct:0,explain:"LFTs and platelet count help detect HELLP syndrome, alongside renal function and urinary protein."},
+  {q:"What is the definitive treatment?",opts:["Delivery of the baby, timed appropriately","Lifelong antihypertensives only","Bed rest until term regardless","IV antibiotics"],correct:0,explain:"Delivery is the only definitive cure — timing depends on gestational age and severity."},
+  {q:"Which drug prevents progression to eclamptic seizures?",opts:["Magnesium sulphate","Salbutamol","Metformin","Warfarin"],correct:0,explain:"Magnesium sulphate is the standard agent for seizure prophylaxis in severe pre-eclampsia."}
+ ]}
+];
+
 /* ============ STORAGE (local cache + cloud) ============ */
 const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog",flashcards:"srx_flashcards",notes:"srx_notes",mnemonics:"srx_mnemonics",qbank:"srx_qbank",
-  wards:"srx_wards",procedures:"srx_procedures",caseProgress:"srx_caseprogress",pyq:"srx_pyq",caselog:"srx_caselog",mockexams:"srx_mockexams",rx:"srx_rx"};
+  wards:"srx_wards",procedures:"srx_procedures",caseProgress:"srx_caseprogress",pyq:"srx_pyq",caselog:"srx_caselog",mockexams:"srx_mockexams",rx:"srx_rx",milestones:"srx_milestones"};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -821,7 +942,7 @@ const svLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let USER=null;
 let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[]),
   flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[]),qbank:ld(K.qbank,[]),
-  wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),pyq:ld(K.pyq,[]),caselog:ld(K.caselog,[]),mockexams:ld(K.mockexams,[]),rx:ld(K.rx,[])};
+  wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),pyq:ld(K.pyq,[]),caselog:ld(K.caselog,[]),mockexams:ld(K.mockexams,[]),rx:ld(K.rx,[]),milestones:ld(K.milestones,[])};
 
 let cloudTimer=null;
 function sv(type,val){
@@ -895,6 +1016,28 @@ async function onLogin(user){
   renderAll();
 }
 $("s_logout").onclick=()=>{ if(sb) sb.auth.signOut(); };
+$("s_reset").onclick=async()=>{
+  if(!confirm("This permanently deletes ALL your data in StudyRx — curriculum, XP, streaks, flashcards, notes, everything logged in every tab. You'll stay logged in, but it becomes a brand-new account. Continue?"))return;
+  if(!confirm("Really sure? This cannot be undone."))return;
+  toast("Resetting…");
+  const freshName = USER&&USER.email ? USER.email.split("@")[0] : "";
+  const empty={
+    phases:[],routine:[],profile:{name:freshName,xp:0,streak:0,lastActive:null},xplog:[],
+    flashcards:[],notes:[],mnemonics:[],qbank:[],
+    wards:[],procedures:[],caseProgress:{},pyq:[],caselog:[],mockexams:[],rx:[],milestones:[]
+  };
+  Object.keys(K).forEach(type=>{ DB[type]=empty[type]; svLocal(K[type],DB[type]); });
+  DB.phases = DEFAULT_PHASES.map(p=>({
+    id:uid(),name:p.name,type:p.type,
+    subjects:p.subjects.map((s,i)=>({id:uid(),name:s,color:colorFor(s,i),chapters:[]}))
+  }));
+  svLocal(K.phases,DB.phases);
+  activePhase=null; expandedTopics=new Set(); activeCase=null; reviewQueue=[]; osceDeck=[];
+  if(sb&&USER){ await Promise.all(Object.keys(K).map(type=>pushType(type))); }
+  renderAll();
+  document.querySelector(".railbtn[data-p='dash']").click();
+  toast("All data reset — fresh start!");
+};
 
 /* ============ NAV ============ */
 document.querySelectorAll(".railbtn[data-p]").forEach(b=>b.onclick=()=>{
@@ -917,7 +1060,18 @@ function renderPage(p){
   if(p==="qbank"){fillSubjectSelect($("qb_subj"));fillTopicSelect($("qb_topic"));renderQBank()}
   if(p==="ana")renderAnalytics();
   if(p==="ward")renderWard();
-  if(p==="set"){$("s_name").value=DB.profile.name||""}
+  if(p==="case")renderCaseList();
+  if(p==="osce"){ /* idle state only, no render needed until started */ }
+  if(p==="pyq"){fillSubjectSelect($("pq_subj"));renderPYQ()}
+  if(p==="caselog")renderCaseLog();
+  if(p==="mock")renderMock();
+  if(p==="drugs"){fillDrugCats();renderDrugs()}
+  if(p==="invs"){fillInvCats();renderInvs()}
+  if(p==="rx")renderRx();
+  if(p==="pdf")renderDriveUI();
+  if(p==="milestones")renderMilestones();
+  if(p==="ai"){ /* nothing to preload */ }
+  if(p==="set"){$("s_name").value=DB.profile.name||"";$("s_key").value=DB.profile.aiKey||"";$("s_model").value=DB.profile.aiModel||"claude-sonnet-5"}
 }
 function renderAll(){
   renderSidebarSubjects(); renderDash(); renderCurric(); renderRoutine(); updateTopbar();
@@ -1053,6 +1207,10 @@ function renderDash(){
   $("dashRoutine").innerHTML = todays.length ? todays.map(r=>routineRowHTML(r)).join("") :
     '<div class="empty">Nothing scheduled for today — add a task in Routine</div>';
   wireRoutineRows("dashRoutine");
+
+  processQuestClaims();
+  renderQuestList();
+  renderBadges();
 }
 
 /* ============ CURRICULUM ============ */
@@ -1615,8 +1773,708 @@ $("pr_add").onclick=()=>{
   renderWard(); toast("Procedure added");
 };
 
+function renderCaseList(){
+  DB.caseProgress=DB.caseProgress||{};
+  $("caseList").innerHTML = CASES.map(cs=>{
+    const prog=DB.caseProgress[cs.id];
+    return `<div class="card" style="border-left:3px solid ${cs.color}">
+      <div class="cardhd" style="color:${cs.color}">${esc(cs.title)}</div>
+      <div class="chip" style="margin-bottom:10px">${esc(cs.specialty)}</div>
+      ${prog?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Best score: ${prog.score}/20</div>`:""}
+      <button class="btn bt bsm" data-startcase="${cs.id}">${prog?"Retry case":"Start case"}</button>
+    </div>`;
+  }).join("");
+  $("caseList").querySelectorAll("[data-startcase]").forEach(b=>b.onclick=()=>startCase(b.dataset.startcase));
+}
+let activeCase=null, caseStepIdx=0, caseScore=0;
+function startCase(id){
+  activeCase=CASES.find(c=>c.id===id); caseStepIdx=0; caseScore=0;
+  $("casePlayerCard").style.display="block";
+  renderCaseStep();
+  $("casePlayerCard").scrollIntoView({behavior:"smooth"});
+}
+function renderCaseStep(){
+  const cs=activeCase;
+  if(caseStepIdx>=cs.steps.length){
+    DB.caseProgress=DB.caseProgress||{};
+    const prev=DB.caseProgress[cs.id];
+    if(!prev||caseScore>prev.score){ DB.caseProgress[cs.id]={score:caseScore}; sv("caseProgress",DB.caseProgress); }
+    addXP(Math.round(caseScore/2),"Completed case: "+cs.title);
+    $("casePlayerBox").innerHTML=`<div style="text-align:center;padding:20px">
+      <div class="brandfont" style="font-size:22px;color:${cs.color};margin-bottom:6px">Case complete</div>
+      <div class="numfont" style="font-size:38px;font-weight:700">${caseScore}/20</div>
+      <button class="btn bo" style="margin-top:14px" id="caseCloseBtn">Back to cases</button>
+    </div>`;
+    $("caseCloseBtn").onclick=()=>{ $("casePlayerCard").style.display="none"; renderCaseList(); };
+    return;
+  }
+  const step=cs.steps[caseStepIdx];
+  $("casePlayerBox").innerHTML=`
+    <div class="cardhd" style="color:${cs.color}">${esc(cs.title)} — step ${caseStepIdx+1} of ${cs.steps.length}</div>
+    ${caseStepIdx===0?`<div class="row" style="--rc:${cs.color};align-items:flex-start;flex-direction:column;gap:6px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase">Scenario</div>
+      <div style="font-size:13.5px;line-height:1.6">${esc(cs.scenario)}</div></div>`:""}
+    <div style="font-weight:700;margin:14px 0 10px">${esc(step.q)}</div>
+    <div id="caseOpts" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="caseExplain" style="display:none;margin-top:12px;padding:12px;border-radius:10px;background:rgba(255,255,255,.05);font-size:12.5px;line-height:1.6"></div>
+    <button class="btn bt" id="caseNextBtn" style="display:none;margin-top:14px">Next</button>`;
+  $("caseOpts").innerHTML = step.opts.map((o,i)=>`<button class="btn bo" style="justify-content:flex-start;text-align:left" data-opt="${i}">${esc(o)}</button>`).join("");
+  $("caseOpts").querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.opt;
+    $("caseOpts").querySelectorAll("[data-opt]").forEach(x=>x.style.pointerEvents="none");
+    if(i===step.correct){ b.style.background="rgba(34,255,176,.18)"; b.style.borderColor="var(--emerald)"; caseScore+=5; }
+    else{
+      b.style.background="rgba(255,93,143,.14)"; b.style.borderColor="#ff5d8f";
+      const correctBtn=$("caseOpts").children[step.correct];
+      correctBtn.style.background="rgba(34,255,176,.18)"; correctBtn.style.borderColor="var(--emerald)";
+    }
+    $("caseExplain").style.display="block"; $("caseExplain").textContent=step.explain;
+    $("caseNextBtn").style.display="inline-flex";
+  });
+  $("caseNextBtn").onclick=()=>{ caseStepIdx++; renderCaseStep(); };
+}
+
+/* ============ OSCE / VIVA DRILL ============ */
+let osceTimer=null, osceSecs=0, osceRight=0, osceTotal=0, osceDeck=[];
+$("osce_start").onclick=()=>{
+  osceDeck=[...(DB.flashcards||[])].sort(()=>Math.random()-.5);
+  if(!osceDeck.length){toast("Add some flashcards first");return}
+  osceSecs=+$("osce_len").value; osceRight=0; osceTotal=0;
+  $("osceIdle").style.display="none"; $("osceRun").style.display="block";
+  nextOsceCard();
+  clearInterval(osceTimer);
+  osceTimer=setInterval(()=>{
+    osceSecs--; $("osceTimer").textContent=Math.floor(osceSecs/60)+":"+String(osceSecs%60).padStart(2,"0");
+    if(osceSecs<=0) endOsce();
+  },1000);
+};
+function nextOsceCard(){
+  if(!osceDeck.length) osceDeck=[...(DB.flashcards||[])].sort(()=>Math.random()-.5);
+  const c=osceDeck.shift();
+  $("osceFace").dataset.back=c?c.back:"";
+  $("osceFace").textContent=c?c.front:"";
+  $("osceFace").dataset.shown="0";
+  $("osceScoreLine").textContent=osceRight+"/"+osceTotal+" so far";
+}
+$("osceFace").onclick=()=>{
+  if($("osceFace").dataset.shown==="1")return;
+  $("osceFace").dataset.shown="1"; $("osceFace").textContent=$("osceFace").dataset.back||"";
+};
+$("osce_right").onclick=()=>{ osceTotal++; osceRight++; nextOsceCard(); };
+$("osce_wrong").onclick=()=>{ osceTotal++; nextOsceCard(); };
+function endOsce(){
+  clearInterval(osceTimer);
+  $("osceRun").style.display="none"; $("osceIdle").style.display="block";
+  if(osceRight>0) addXP(Math.min(15,osceRight),"OSCE drill: "+osceRight+"/"+osceTotal);
+  toast("Drill done — "+osceRight+"/"+osceTotal+" correct");
+}
+
+/* ============ PYQ TRACKER ============ */
+$("pq_add").onclick=()=>{
+  const subj=allSubjects().find(x=>x.id===$("pq_subj").value);
+  const text=$("pq_text").value.trim();
+  if(!subj){toast("Choose a subject");return}
+  if(!text){toast("Enter the question");return}
+  DB.pyq=DB.pyq||[];
+  DB.pyq.push({id:uid(),year:$("pq_year").value.trim(),exam:$("pq_exam").value.trim(),
+    subjectId:subj.id,subjectName:subj.name,subjectColor:subj.color,text});
+  sv("pyq",DB.pyq);
+  addXP(2,"Logged a PYQ");
+  $("pq_year").value="";$("pq_exam").value="";$("pq_text").value="";
+  renderPYQ(); toast("Question added");
+};
+function renderPYQ(q){
+  q=(q||$("pq_search").value||"").toLowerCase();
+  let list=[...(DB.pyq||[])].sort((a,b)=>(b.year||"").localeCompare(a.year||""));
+  if(q) list=list.filter(p=>(p.text+" "+p.subjectName+" "+(p.exam||"")).toLowerCase().includes(q));
+  $("pq_total").textContent=(DB.pyq||[]).length;
+  $("pq_list").innerHTML = list.length ? list.map(p=>`<div class="row" style="--rc:${p.subjectColor};align-items:flex-start">
+    <div style="color:${p.subjectColor}">${subjIcon(p.subjectName,15)}</div>
+    <div class="rowmain"><div class="rowtitle">${esc(p.text)}</div>
+    <div class="rowsub">${esc(p.subjectName)}${p.exam?" · "+esc(p.exam):""}${p.year?" · "+esc(p.year):""}</div></div>
+    <button class="iconbtn" data-delpq="${p.id}">✕</button></div>`).join("") : '<div class="empty">No questions logged yet — add one above</div>';
+  $("pq_list").querySelectorAll("[data-delpq]").forEach(b=>b.onclick=()=>{
+    DB.pyq=DB.pyq.filter(p=>p.id!==b.dataset.delpq); sv("pyq",DB.pyq); renderPYQ();
+  });
+}
+$("pq_search").oninput=()=>renderPYQ();
+
+/* ============ CASE LOG ============ */
+$("cl_add").onclick=()=>{
+  const dept=$("cl_dept").value.trim(), pres=$("cl_pres").value.trim();
+  if(!dept||!pres){toast("Fill in the department and what you saw");return}
+  DB.caselog=DB.caselog||[];
+  DB.caselog.push({id:uid(),dept,date:$("cl_date").value||todayStr(),pres,learn:$("cl_learn").value.trim(),ts:Date.now()});
+  sv("caselog",DB.caselog);
+  addXP(3,"Logged a case: "+dept);
+  $("cl_dept").value="";$("cl_pres").value="";$("cl_learn").value="";
+  renderCaseLog(); toast("Case saved");
+};
+function renderCaseLog(){
+  if(!$("cl_date").value)$("cl_date").value=todayStr();
+  const list=[...(DB.caselog||[])].sort((a,b)=>b.ts-a.ts);
+  $("cl_total").textContent=list.length;
+  $("cl_list").innerHTML = list.length ? list.map(c=>`<div class="row" style="--rc:#f472b6;align-items:flex-start">
+    <div class="rowmain"><div class="rowtitle">${esc(c.dept)} — ${esc(c.date)}</div>
+    <div class="rowsub"><b>Saw:</b> ${esc(c.pres)}</div>
+    ${c.learn?`<div class="rowsub"><b>Learned:</b> ${esc(c.learn)}</div>`:""}</div>
+    <button class="iconbtn" data-delcl="${c.id}">✕</button></div>`).join("") : '<div class="empty">No cases logged yet — add one above</div>';
+  $("cl_list").querySelectorAll("[data-delcl]").forEach(b=>b.onclick=()=>{
+    DB.caselog=DB.caselog.filter(c=>c.id!==b.dataset.delcl); sv("caselog",DB.caselog); renderCaseLog();
+  });
+}
+
+/* ============ MOCK EXAM ============ */
+let mkTimer=null, mkSecs=0;
+$("mk_start").onclick=()=>{
+  const title=$("mk_title").value.trim();
+  if(!title){toast("Give the mock a title");return}
+  mkSecs=+$("mk_dur").value*60;
+  $("mkIdle").style.display="none"; $("mkRun").style.display="block"; $("mkScoreEntry").style.display="none";
+  clearInterval(mkTimer);
+  mkTimer=setInterval(()=>{
+    mkSecs--; $("mkTimer").textContent=Math.floor(mkSecs/60)+":"+String(mkSecs%60).padStart(2,"0");
+    if(mkSecs<=0) finishMock();
+  },1000);
+};
+$("mk_finish").onclick=()=>finishMock();
+function finishMock(){
+  clearInterval(mkTimer);
+  $("mkRun").style.display="none"; $("mkScoreEntry").style.display="block";
+}
+$("mk_save").onclick=()=>{
+  const title=$("mk_title").value.trim()||"Mock exam";
+  const total=parseInt($("mk_total").value)||0;
+  const correct=parseInt($("mk_correct").value);
+  if(isNaN(correct)){toast("Enter how many you got right");return}
+  DB.mockexams=DB.mockexams||[];
+  DB.mockexams.push({id:uid(),title,date:todayStr(),durationMin:+$("mk_dur").value,total,correct});
+  sv("mockexams",DB.mockexams);
+  addXP(8,"Completed mock: "+title);
+  $("mk_title").value="";$("mk_total").value="";$("mk_correct").value="";
+  $("mkIdle").style.display="block"; $("mkScoreEntry").style.display="none";
+  renderMock(); toast("Mock result saved");
+};
+function renderMock(){
+  const list=[...(DB.mockexams||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  $("mk_list").innerHTML = list.length ? list.map(m=>{
+    const pct = m.total? Math.round(m.correct/m.total*100) : null;
+    return `<div class="row" style="--rc:#ffcb47">
+    <div class="rowmain"><div class="rowtitle">${esc(m.title)}</div>
+    <div class="rowsub">${esc(m.date)} · ${m.durationMin} min${m.total?" · "+m.correct+"/"+m.total+(pct!=null?" ("+pct+"%)":""):""}</div></div>
+    <button class="iconbtn" data-delmk="${m.id}">✕</button></div>`;
+  }).join("") : '<div class="empty">No mocks completed yet</div>';
+  $("mk_list").querySelectorAll("[data-delmk]").forEach(b=>b.onclick=()=>{
+    DB.mockexams=DB.mockexams.filter(m=>m.id!==b.dataset.delmk); sv("mockexams",DB.mockexams); renderMock();
+  });
+}
+
+/* ============ DRUG LIBRARY ============ */
+/* brands:[] = generic-only reference (not yet brand-verified). Populated brands were cross-checked against
+   manufacturer/pharmacy listings for Bangladesh. Brand availability changes over time — verify against
+   current packaging or a pharmacist before relying on any brand name here. */
+const DRUGS=[
+{n:"Paracetamol",brands:["Napa","Ace","Xel-Z"],c:"Antipyretic / Analgesic",d:"500 mg",f:"1+1+1",u:"As needed",note:"After meal, max 4 g/day"},
+{n:"Ibuprofen",brands:["Flexi"],c:"NSAID",d:"400 mg",f:"1+0+1",u:"5 days",note:"After meal"},
+{n:"Diclofenac sodium",brands:[],c:"NSAID",d:"50 mg",f:"1+0+1",u:"5 days",note:"After meal"},
+{n:"Aceclofenac",brands:[],c:"NSAID",d:"100 mg",f:"1+0+1",u:"5 days",note:"After meal"},
+{n:"Etoricoxib",brands:[],c:"NSAID",d:"90 mg",f:"1+0+0",u:"5 days",note:"After meal"},
+{n:"Ketorolac",brands:[],c:"NSAID",d:"10-30 mg",f:"Every 8 hours",u:"Max 5 days",note:"IV/IM, short term only"},
+{n:"Tramadol",brands:[],c:"Opioid analgesic",d:"50-100 mg",f:"1+0+1",u:"3-5 days",note:"May cause drowsiness"},
+{n:"Omeprazole",brands:["Seclo","Losectil","Omep"],c:"PPI",d:"20 mg",f:"1+0+0",u:"4 weeks",note:"30 min before breakfast"},
+{n:"Esomeprazole",brands:["Esomep","Nexum"],c:"PPI",d:"20-40 mg",f:"1+0+0",u:"4 weeks",note:"Before meal"},
+{n:"Pantoprazole",brands:["Pantonix"],c:"PPI",d:"20-40 mg",f:"1+0+0",u:"4 weeks",note:"Before meal"},
+{n:"Rabeprazole",brands:["Rabep"],c:"PPI",d:"10-20 mg",f:"1+0+0",u:"4 weeks",note:"Before meal"},
+{n:"Famotidine",brands:["Fimotac"],c:"H2 blocker",d:"20-40 mg",f:"0+0+1",u:"4 weeks",note:"At bedtime"},
+{n:"Domperidone",brands:["Motigut","Domiren"],c:"Antiemetic / Prokinetic",d:"10 mg",f:"1+1+1",u:"5 days",note:"30 min before meal"},
+{n:"Ondansetron",brands:[],c:"Antiemetic",d:"4-8 mg",f:"1+1+1",u:"3 days",note:"Before meal"},
+{n:"Metoclopramide",brands:[],c:"Antiemetic",d:"10 mg",f:"1+1+1",u:"3 days",note:"Before meal"},
+{n:"Amoxicillin",brands:[],c:"Antibiotic — Penicillin",d:"500 mg",f:"1+1+1",u:"7 days",note:"After meal"},
+{n:"Amoxicillin + Clavulanic acid",brands:["Moxaclav"],c:"Antibiotic — Penicillin",d:"625 mg",f:"1+0+1",u:"7 days",note:"After meal"},
+{n:"Flucloxacillin",brands:[],c:"Antibiotic — Penicillin",d:"500 mg",f:"1+1+1+1",u:"7 days",note:"Empty stomach"},
+{n:"Cefixime",brands:["Suprax","Ominax"],c:"Antibiotic — Cephalosporin",d:"200-400 mg",f:"1+0+1",u:"7 days",note:"After meal"},
+{n:"Cefuroxime",brands:["Axet"],c:"Antibiotic — Cephalosporin",d:"250-500 mg",f:"1+0+1",u:"7 days",note:"After meal"},
+{n:"Ceftriaxone",brands:["Cef-3"],c:"Antibiotic — Cephalosporin",d:"1-2 g",f:"1+0+1",u:"7-14 days",note:"IV/IM"},
+{n:"Cephradine",brands:[],c:"Antibiotic — Cephalosporin",d:"500 mg",f:"1+1+1+1",u:"7 days",note:"After meal"},
+{n:"Azithromycin",brands:["Zimax","Tridosil"],c:"Antibiotic — Macrolide",d:"500 mg",f:"1+0+0",u:"3-5 days",note:"Empty stomach"},
+{n:"Clarithromycin",brands:[],c:"Antibiotic — Macrolide",d:"500 mg",f:"1+0+1",u:"7 days",note:"After meal"},
+{n:"Erythromycin",brands:[],c:"Antibiotic — Macrolide",d:"500 mg",f:"1+1+1+1",u:"7 days",note:"Before meal"},
+{n:"Ciprofloxacin",brands:["Ciprocin"],c:"Antibiotic — Quinolone",d:"500 mg",f:"1+0+1",u:"7 days",note:"Avoid antacid/milk"},
+{n:"Levofloxacin",brands:[],c:"Antibiotic — Quinolone",d:"500-750 mg",f:"1+0+0",u:"7 days",note:"After meal"},
+{n:"Piperacillin + Tazobactam",brands:["Tazocin"],c:"Antibiotic — Penicillin",d:"4.5 g",f:"Every 8 hours",u:"7 days",note:"IV infusion"},
+{n:"Metronidazole",brands:[],c:"Antibiotic — Other",d:"400 mg",f:"1+1+1",u:"7 days",note:"No alcohol"},
+{n:"Doxycycline",brands:[],c:"Antibiotic — Other",d:"100 mg",f:"1+0+1",u:"7 days",note:"Upright with water"},
+{n:"Cotrimoxazole",brands:[],c:"Antibiotic — Other",d:"960 mg",f:"1+0+1",u:"5-7 days",note:"Plenty of water"},
+{n:"Fluconazole",brands:["Flucon"],c:"Antifungal",d:"150 mg",f:"Weekly/Stat",u:"As needed",note:"After meal"},
+{n:"Clotrimazole cream",brands:[],c:"Antifungal",d:"1%",f:"1+0+1",u:"2-4 weeks",note:"Topical"},
+{n:"Terbinafine",brands:[],c:"Antifungal",d:"250 mg",f:"1+0+0",u:"2-6 weeks",note:"After meal"},
+{n:"Anti-TB FDC (4-drug)",brands:[],c:"Antitubercular",d:"Weight-band",f:"1+0+0",u:"2 months intensive",note:"Empty stomach — HRZE"},
+{n:"Isoniazid",brands:[],c:"Antitubercular",d:"300 mg",f:"1+0+0",u:"6 months",note:"With pyridoxine"},
+{n:"Rifampicin",brands:[],c:"Antitubercular",d:"600 mg",f:"1+0+0",u:"6 months",note:"Turns urine orange"},
+{n:"Artemether + Lumefantrine",brands:[],c:"Antimalarial",d:"20/120 mg",f:"1+0+1",u:"3 days",note:"With fatty food"},
+{n:"Albendazole",brands:[],c:"Anthelmintic",d:"400 mg",f:"Stat",u:"Single dose",note:"Chew, repeat in 2 weeks"},
+{n:"Fexofenadine",brands:["Fexo"],c:"Antihistamine",d:"120-180 mg",f:"1+0+0",u:"7 days",note:"Non-sedating"},
+{n:"Loratadine",brands:["Alatrol"],c:"Antihistamine",d:"10 mg",f:"1+0+0",u:"7 days",note:"Non-sedating"},
+{n:"Cetirizine",brands:["Reliver"],c:"Antihistamine",d:"10 mg",f:"0+0+1",u:"7 days",note:"May cause mild drowsiness"},
+{n:"Desloratadine",brands:["Deslor"],c:"Antihistamine",d:"5 mg",f:"1+0+0",u:"7 days",note:"Non-sedating"},
+{n:"Montelukast",brands:["Montair","Moxus","Monas"],c:"Respiratory",d:"10 mg",f:"0+0+1",u:"Long term",note:"At bedtime"},
+{n:"Salbutamol inhaler",brands:[],c:"Respiratory",d:"100 mcg/puff",f:"2 puffs PRN",u:"As needed",note:"Use a spacer"},
+{n:"Bromhexine",brands:["Bromex"],c:"Mucolytic",d:"8 mg",f:"1+1+1",u:"5 days",note:"After meal"},
+{n:"Ambroxol",brands:[],c:"Mucolytic",d:"30 mg",f:"1+1+1",u:"5 days",note:"After meal"},
+{n:"Amlodipine",brands:["Amlopres"],c:"Antihypertensive",d:"5-10 mg",f:"1+0+0",u:"Long term",note:"Watch ankle oedema"},
+{n:"Losartan",brands:["Losar"],c:"Antihypertensive",d:"50 mg",f:"1+0+0",u:"Long term",note:"Monitor K+ / creatinine"},
+{n:"Olmesartan",brands:["Olmes"],c:"Antihypertensive",d:"20-40 mg",f:"1+0+0",u:"Long term",note:"After meal"},
+{n:"Olmesartan + Amlodipine",brands:["Duopres"],c:"Antihypertensive",d:"20/5 mg",f:"1+0+0",u:"Long term",note:"After meal"},
+{n:"Metoprolol Succinate",brands:["Cardiloc"],c:"Antihypertensive",d:"25-50 mg",f:"1+0+0",u:"Long term",note:"Extended release"},
+{n:"Atenolol",brands:[],c:"Antihypertensive",d:"50 mg",f:"1+0+0",u:"Long term",note:"Avoid in asthma"},
+{n:"Ramipril",brands:[],c:"Antihypertensive",d:"5 mg",f:"1+0+0",u:"Long term",note:"Dry cough is common"},
+{n:"Furosemide",brands:[],c:"Diuretic",d:"40 mg",f:"1+0+0",u:"As needed",note:"Morning, monitor electrolytes"},
+{n:"Spironolactone",brands:[],c:"Diuretic",d:"25-50 mg",f:"1+0+0",u:"Long term",note:"Watch hyperkalaemia"},
+{n:"Atorvastatin",brands:["Tiginor","Avas"],c:"Statin",d:"10-20 mg",f:"0+0+1",u:"Long term",note:"At night"},
+{n:"Rosuvastatin",brands:["Rocovas","Rosu"],c:"Statin",d:"5-20 mg",f:"0+0+1",u:"Long term",note:"At night"},
+{n:"Aspirin",brands:[],c:"Antiplatelet",d:"75 mg",f:"1+0+0",u:"Long term",note:"After meal"},
+{n:"Clopidogrel",brands:[],c:"Antiplatelet",d:"75 mg",f:"1+0+0",u:"Long term",note:"After meal"},
+{n:"Metformin",brands:["Diabinil","Glucomin"],c:"Antidiabetic",d:"500-850 mg",f:"1+0+1",u:"Long term",note:"After meal"},
+{n:"Gliclazide",brands:["Glory"],c:"Antidiabetic",d:"30-80 mg (MR)",f:"1+0+0",u:"Long term",note:"Before breakfast"},
+{n:"Glimepiride",brands:[],c:"Antidiabetic",d:"1-4 mg",f:"1+0+0",u:"Long term",note:"Before breakfast"},
+{n:"Sitagliptin",brands:[],c:"Antidiabetic",d:"100 mg",f:"1+0+0",u:"Long term",note:"With or without food"},
+{n:"Insulin (mixed/regular/isophane)",brands:["Mixtard 30"],c:"Antidiabetic",d:"Per sliding scale",f:"As per chart",u:"Ongoing",note:"SC, 30 min before meal"},
+{n:"Levothyroxine",brands:[],c:"Thyroid",d:"50-100 mcg",f:"1+0+0",u:"Long term",note:"Empty stomach, 30-60 min before food"},
+{n:"Prednisolone",brands:[],c:"Steroid",d:"5-20 mg",f:"1+0+0",u:"As advised",note:"After breakfast, taper slowly"},
+{n:"Dexamethasone",brands:[],c:"Steroid",d:"4-8 mg",f:"Every 8 hours",u:"As needed",note:"IV/oral"},
+{n:"Hyoscine butylbromide",brands:[],c:"Antispasmodic",d:"10-20 mg",f:"1+1+1",u:"3 days",note:"For colicky pain"},
+{n:"Drotaverine",brands:[],c:"Antispasmodic",d:"40-80 mg",f:"1+1+1",u:"3 days",note:"After meal"},
+{n:"ORS sachet",brands:[],c:"Antidiarrhoeal",d:"1 sachet/500 ml",f:"After each loose stool",u:"Until diarrhoea stops",note:"Freshly prepared water"},
+{n:"Zinc sulphate",brands:[],c:"Antidiarrhoeal",d:"20 mg",f:"1+0+0",u:"14 days",note:"Especially in children"},
+{n:"Loperamide",brands:[],c:"Antidiarrhoeal",d:"2 mg",f:"After each loose stool",u:"Max 2 days",note:"Avoid in dysentery"},
+{n:"Lactulose",brands:[],c:"Laxative",d:"10 g/15 ml",f:"0+0+1",u:"As needed",note:"Titrate to soft stool"},
+{n:"Carbamazepine",brands:[],c:"Antiepileptic",d:"200-400 mg",f:"1+0+1",u:"Long term",note:"Monitor CBC, LFT"},
+{n:"Sodium valproate",brands:[],c:"Antiepileptic",d:"200-500 mg",f:"1+0+1",u:"Long term",note:"Avoid in pregnancy"},
+{n:"Phenytoin",brands:[],c:"Antiepileptic",d:"100 mg",f:"1+0+1",u:"Long term",note:"Monitor level"},
+{n:"Levetiracetam",brands:[],c:"Antiepileptic",d:"500 mg-1 g",f:"1+0+1",u:"Long term",note:"After meal"},
+{n:"Sertraline",brands:[],c:"Psychiatry (SSRI)",d:"25-50 mg",f:"1+0+0",u:"6-12 months",note:"After breakfast"},
+{n:"Escitalopram",brands:[],c:"Psychiatry (SSRI)",d:"10 mg",f:"1+0+0",u:"6-12 months",note:"After meal"},
+{n:"Amitriptyline",brands:[],c:"Psychiatry (TCA)",d:"10-25 mg",f:"0+0+1",u:"As advised",note:"At bedtime"},
+{n:"Betahistine",brands:[],c:"Antivertigo",d:"16 mg",f:"1+1+1",u:"4 weeks",note:"After meal"},
+{n:"Tamsulosin",brands:[],c:"Urology",d:"0.4 mg",f:"0+0+1",u:"Long term",note:"After dinner"},
+{n:"Iron + Folic acid",brands:[],c:"Gynae/Obstetric",d:"60 mg + 0.4 mg",f:"1+0+0",u:"Ongoing",note:"With vitamin C, not with tea"},
+{n:"Mefenamic acid",brands:[],c:"Gynae/Obstetric",d:"500 mg",f:"1+1+1",u:"3 days",note:"After meal, for dysmenorrhoea"},
+{n:"Magnesium sulphate",brands:[],c:"Obstetric emergency",d:"4 g loading",f:"As per protocol",u:"24 hours",note:"Eclampsia prophylaxis"},
+{n:"Ferrous sulphate",brands:[],c:"Vitamin/Supplement",d:"200 mg",f:"1+0+1",u:"3 months",note:"Empty stomach, dark stool is normal"},
+{n:"Folic acid",brands:[],c:"Vitamin/Supplement",d:"5 mg",f:"1+0+0",u:"3 months",note:"After meal"},
+{n:"Vitamin B complex",brands:["Neuro-B"],c:"Vitamin/Supplement",d:"1 tablet",f:"1+0+0",u:"1 month",note:"After meal"},
+{n:"Vitamin D3",brands:[],c:"Vitamin/Supplement",d:"1000-40000 IU",f:"Weekly/Daily",u:"8-12 weeks",note:"With fatty meal"},
+{n:"Calcium + Vitamin D3",brands:["Ostecal D","Calcibex"],c:"Vitamin/Supplement",d:"500 mg + 200 IU",f:"1+0+1",u:"Long term",note:"After meal"},
+{n:"Vitamin C",brands:["Ceevit"],c:"Vitamin/Supplement",d:"250-500 mg",f:"1+0+0",u:"As needed",note:"Chewable"},
+{n:"Normal saline 0.9%",brands:[],c:"IV fluid",d:"500-1000 ml",f:"As per chart",u:"As needed",note:"First-line isotonic fluid"},
+{n:"Ringer's lactate",brands:[],c:"IV fluid",d:"500-1000 ml",f:"As per chart",u:"As needed",note:"Avoid in liver failure"},
+{n:"5% Dextrose in water",brands:[],c:"IV fluid",d:"500-1000 ml",f:"As per chart",u:"As needed",note:"Avoid in head injury"}
+];
+const DRUG_CATS=[...new Set(DRUGS.map(d=>d.c))].sort();
+function fillDrugCats(){ $("dl_cat").innerHTML='<option value="">All categories</option>'+DRUG_CATS.map(c=>`<option>${esc(c)}</option>`).join(""); }
+function renderDrugs(){
+  const q=($("dl_search").value||"").toLowerCase(), cat=$("dl_cat").value;
+  let list=DRUGS;
+  if(cat) list=list.filter(d=>d.c===cat);
+  if(q) list=list.filter(d=>(d.n+" "+(d.brands||[]).join(" ")+" "+d.c).toLowerCase().includes(q));
+  $("dl_list").innerHTML = list.length ? list.map(d=>`<div class="libitem" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px">
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:13.5px">${esc(d.n)} ${(d.brands&&d.brands.length)?d.brands.map(b=>`<span class="chip" style="margin-left:4px;color:var(--emerald);border-color:var(--emerald)">${esc(b)}</span>`).join(""):""}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:3px">${esc(d.c)}</div>
+      <div style="font-size:12px;margin-top:4px">${esc([d.d,d.f,d.u,d.note].filter(Boolean).join("  ·  "))}</div>
+    </div></div>`).join("") : '<div class="empty">No drugs matched</div>';
+}
+$("dl_search").oninput=renderDrugs; $("dl_cat").onchange=renderDrugs;
+
+/* ============ INVESTIGATION LIBRARY ============ */
+const INVS=[
+{n:"Haemoglobin (Hb%)",c:"Haematology",range:"M: 13.5–17.5 g/dL · F: 12.0–15.5 g/dL"},
+{n:"Total WBC count",c:"Haematology",range:"4,000–11,000 /mm³"},
+{n:"Platelet count",c:"Haematology",range:"150,000–450,000 /mm³"},
+{n:"ESR",c:"Haematology",range:"M: 0–15 mm/hr · F: 0–20 mm/hr"},
+{n:"Peripheral Blood Film (PBF)",c:"Haematology",range:""},
+{n:"Prothrombin Time (PT) / INR",c:"Haematology",range:"PT 11–13.5 sec · INR 0.8–1.1"},
+{n:"APTT",c:"Haematology",range:"25–35 sec"},
+{n:"Serum ferritin",c:"Haematology",range:"M: 20–250 ng/mL · F: 10–120 ng/mL"},
+{n:"Serum iron & TIBC",c:"Haematology",range:"Iron 60–170 mcg/dL · TIBC 240–450 mcg/dL"},
+{n:"Fasting Blood Sugar (FBS)",c:"Biochemistry",range:"70–100 mg/dL"},
+{n:"2 hours after breakfast (2HABF)",c:"Biochemistry",range:"<140 mg/dL"},
+{n:"Random Blood Sugar (RBS)",c:"Biochemistry",range:"70–140 mg/dL (non-fasting)"},
+{n:"HbA1c",c:"Biochemistry",range:"<5.7% normal · 5.7–6.4% prediabetes · ≥6.5% diabetes"},
+{n:"Serum creatinine",c:"Biochemistry",range:"M: 0.7–1.3 mg/dL · F: 0.6–1.1 mg/dL"},
+{n:"Blood urea",c:"Biochemistry",range:"15–45 mg/dL"},
+{n:"Serum sodium",c:"Biochemistry",range:"135–145 mmol/L"},
+{n:"Serum potassium",c:"Biochemistry",range:"3.5–5.0 mmol/L"},
+{n:"Serum chloride",c:"Biochemistry",range:"98–107 mmol/L"},
+{n:"Serum bicarbonate",c:"Biochemistry",range:"22–28 mmol/L"},
+{n:"Serum calcium",c:"Biochemistry",range:"8.5–10.5 mg/dL"},
+{n:"Serum phosphate",c:"Biochemistry",range:"2.5–4.5 mg/dL"},
+{n:"Serum uric acid",c:"Biochemistry",range:"M: 3.5–7.2 mg/dL · F: 2.6–6.0 mg/dL"},
+{n:"Total bilirubin",c:"Biochemistry",range:"0.3–1.2 mg/dL"},
+{n:"Direct bilirubin",c:"Biochemistry",range:"0–0.3 mg/dL"},
+{n:"SGPT (ALT)",c:"Biochemistry",range:"7–56 U/L"},
+{n:"SGOT (AST)",c:"Biochemistry",range:"10–40 U/L"},
+{n:"Serum alkaline phosphatase",c:"Biochemistry",range:"44–147 U/L"},
+{n:"Total protein",c:"Biochemistry",range:"6.0–8.3 g/dL"},
+{n:"Serum albumin",c:"Biochemistry",range:"3.5–5.0 g/dL"},
+{n:"Serum amylase",c:"Biochemistry",range:"23–85 U/L"},
+{n:"Serum lipase",c:"Biochemistry",range:"0–160 U/L"},
+{n:"Total cholesterol",c:"Biochemistry",range:"<200 mg/dL desirable"},
+{n:"LDL cholesterol",c:"Biochemistry",range:"<100 mg/dL optimal"},
+{n:"HDL cholesterol",c:"Biochemistry",range:"M: >40 mg/dL · F: >50 mg/dL"},
+{n:"Triglycerides",c:"Biochemistry",range:"<150 mg/dL"},
+{n:"TSH",c:"Biochemistry",range:"0.4–4.0 mIU/L"},
+{n:"Free T4",c:"Biochemistry",range:"0.8–1.8 ng/dL"},
+{n:"Free T3",c:"Biochemistry",range:"2.3–4.2 pg/mL"},
+{n:"C-Reactive Protein (CRP)",c:"Serology",range:"<6 mg/L"},
+{n:"Serum vitamin D (25-OH)",c:"Biochemistry",range:"30–100 ng/mL sufficient"},
+{n:"Serum vitamin B12",c:"Biochemistry",range:"200–900 pg/mL"},
+{n:"Arterial Blood Gas (ABG) — pH",c:"Biochemistry",range:"7.35–7.45"},
+{n:"Widal test",c:"Serology",range:""},
+{n:"Dengue NS1 antigen",c:"Serology",range:""},
+{n:"HBsAg",c:"Serology",range:""},
+{n:"Anti-HCV",c:"Serology",range:""},
+{n:"VDRL / TPHA",c:"Serology",range:""},
+{n:"Blood culture & sensitivity",c:"Microbiology",range:""},
+{n:"Urine culture & sensitivity",c:"Microbiology",range:""},
+{n:"Sputum for AFB",c:"Microbiology",range:""},
+{n:"Urine R/E",c:"Urine & Stool",range:""},
+{n:"Stool R/E",c:"Urine & Stool",range:""},
+{n:"24-hour urinary total protein",c:"Urine & Stool",range:"<150 mg/24h"},
+{n:"Chest X-ray P/A view",c:"Imaging",range:""},
+{n:"X-ray abdomen erect & supine",c:"Imaging",range:""},
+{n:"USG of whole abdomen",c:"Imaging",range:""},
+{n:"CT scan of brain (plain)",c:"Imaging",range:""},
+{n:"MRI of brain",c:"Imaging",range:""},
+{n:"ECG (12 lead)",c:"Cardiology",range:""},
+{n:"Echocardiography",c:"Cardiology",range:""},
+{n:"Troponin I",c:"Cardiology",range:"<0.04 ng/mL"}
+];
+const INV_CATS=[...new Set(INVS.map(i=>i.c))].sort();
+function fillInvCats(){ $("il_cat").innerHTML='<option value="">All categories</option>'+INV_CATS.map(c=>`<option>${esc(c)}</option>`).join(""); }
+function renderInvs(){
+  const q=($("il_search").value||"").toLowerCase(), cat=$("il_cat").value;
+  let list=INVS;
+  if(cat) list=list.filter(i=>i.c===cat);
+  if(q) list=list.filter(i=>(i.n+" "+i.c).toLowerCase().includes(q));
+  $("il_list").innerHTML = list.length ? list.map(i=>`<div class="libitem" style="display:flex;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px">
+    <div><div style="font-weight:700;font-size:13.5px">${esc(i.n)}</div><div style="font-size:11.5px;color:var(--muted)">${esc(i.c)}</div></div>
+    ${i.range?`<div class="numfont" style="font-size:12.5px;color:var(--emerald);text-align:right;flex-shrink:0;padding-left:10px">${esc(i.range)}</div>`:""}
+    </div>`).join("") : '<div class="empty">No investigations matched</div>';
+}
+$("il_search").oninput=renderInvs; $("il_cat").onchange=renderInvs;
+
+/* ============ RX LIBRARY ============ */
+$("rx_add").onclick=()=>{
+  const dx=$("rx_dx").value.trim();
+  if(!dx){toast("Enter the disease/diagnosis name");return}
+  DB.rx=DB.rx||[];
+  DB.rx.push({id:uid(),dx,ss:$("rx_ss").value.trim(),oe:$("rx_oe").value.trim(),
+    inv:$("rx_inv").value.trim(),mx:$("rx_mx").value.trim(),adv:$("rx_adv").value.trim(),ts:Date.now()});
+  sv("rx",DB.rx);
+  ["rx_dx","rx_ss","rx_oe","rx_inv","rx_mx","rx_adv"].forEach(id=>$(id).value="");
+  renderRx(); toast("Prescription saved");
+};
+function renderRx(q){
+  q=(q||$("rx_search").value||"").toLowerCase();
+  let list=[...(DB.rx||[])].sort((a,b)=>b.ts-a.ts);
+  if(q) list=list.filter(r=>(r.dx+" "+r.ss+" "+r.oe).toLowerCase().includes(q));
+  $("rx_total").textContent=(DB.rx||[]).length;
+  $("rx_list").innerHTML = list.length ? list.map(r=>`<div class="row" style="--rc:var(--emerald);align-items:flex-start;flex-direction:column;gap:6px">
+    <div style="display:flex;width:100%;justify-content:space-between"><div class="rowtitle">${esc(r.dx)}</div><button class="iconbtn" data-delrx="${r.id}">✕</button></div>
+    ${r.ss?`<div class="rowsub"><b>S/S:</b> ${esc(r.ss)}</div>`:""}
+    ${r.oe?`<div class="rowsub"><b>O/E:</b> ${esc(r.oe)}</div>`:""}
+    ${r.inv?`<div class="rowsub"><b>Ix:</b> ${esc(r.inv)}</div>`:""}
+    ${r.mx?`<div class="rowsub"><b>Mx:</b> ${esc(r.mx)}</div>`:""}
+    ${r.adv?`<div class="rowsub"><b>Advice:</b> ${esc(r.adv)}</div>`:""}
+  </div>`).join("") : '<div class="empty">No prescriptions saved yet</div>';
+  $("rx_list").querySelectorAll("[data-delrx]").forEach(b=>b.onclick=()=>{
+    DB.rx=DB.rx.filter(r=>r.id!==b.dataset.delrx); sv("rx",DB.rx); renderRx();
+  });
+}
+$("rx_search").oninput=()=>renderRx();
+
+/* ============ QUESTS ============ */
+function todaysLogReasons(){
+  const today=todayStr();
+  return (DB.xplog||[]).filter(e=>new Date(e.ts).toISOString().slice(0,10)===today).map(e=>e.reason);
+}
+const QUESTS=[
+  {id:"q_topic",title:"Progress a topic (reading / revised / mastered)",xp:10,check:r=>r.some(x=>x.includes("→"))},
+  {id:"q_pomo",title:"Complete one Pomodoro session",xp:10,check:r=>r.some(x=>x.startsWith("Pomodoro session"))},
+  {id:"q_card",title:"Review 5 flashcards",xp:10,check:r=>r.filter(x=>x==="Reviewed a flashcard").length>=5},
+  {id:"q_task",title:"Complete a routine task",xp:5,check:r=>r.some(x=>x.startsWith("Completed:"))}
+];
+function processQuestClaims(){
+  const reasons=todaysLogReasons(); const today=todayStr();
+  DB.profile.questClaims=DB.profile.questClaims||{};
+  let any=false;
+  QUESTS.forEach(q=>{
+    const key=today+"_"+q.id;
+    if(q.check(reasons) && !DB.profile.questClaims[key]){
+      DB.profile.questClaims[key]=true; any=true;
+      addXP(q.xp,"Quest complete: "+q.title);
+    }
+  });
+  if(any) sv("profile",DB.profile);
+}
+function renderQuestList(){
+  const reasons=todaysLogReasons();
+  $("questList").innerHTML = QUESTS.map(q=>{
+    const done=q.check(reasons);
+    return `<div class="quest-row"><div class="quest-box ${done?'done':''}"></div>
+      <div style="flex:1;font-size:12.5px;${done?'text-decoration:line-through;opacity:.6':''}">${esc(q.title)}</div>
+      <div style="font-size:11px;color:var(--gold);font-weight:700">+${q.xp} XP</div></div>`;
+  }).join("");
+}
+
+/* ============ BADGES ============ */
+const BADGE_ICONS={
+  fire:'<path d="M12 2c1 4-4 5-4 9a4 4 0 0 0 8 0c0-1.5-1-2-1-3.5 2 1 3 3 3 5.5a6 6 0 0 1-12 0C6 8 10 6 12 2z"/>',
+  trophy:'<path d="M8 4h8v6a4 4 0 0 1-8 0z"/><path d="M8 5H4v2a4 4 0 0 0 4 3M16 5h4v2a4 4 0 0 1-4 3"/><path d="M12 14v3M9 21h6M9 21l1-4h4l1 4"/>',
+  cards:'<rect x="5" y="7" width="14" height="10" rx="2"/><path d="M3 11h2M19 11h2M3 15h2M19 15h2"/>',
+  case:'<circle cx="12" cy="12" r="9"/><path d="M9.5 15c0-1 .8-1.3 2-1.6l1-.2c1-.2 1.5-.5 1.5-1.1 0-.7-.7-1.1-1.7-1.1s-1.9.4-2.1 1.3"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'
+};
+function badgeIcon(key,size){
+  const sz=size||24;
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${BADGE_ICONS[key]||BADGE_ICONS.trophy}</svg>`;
+}
+function computeBadges(){
+  const topics=allTopics();
+  const mastered=topics.filter(t=>t.status==="mastered").length;
+  const cardsReviewed=(DB.xplog||[]).filter(e=>e.reason==="Reviewed a flashcard").length;
+  const casesDone=Object.keys(DB.caseProgress||{}).length;
+  const qbankSessions=(DB.qbank||[]).length;
+  const streak=DB.profile.streak||0;
+  return [
+    {name:"7-Day Streak",ic:"fire",on:streak>=7},
+    {name:"30-Day Streak",ic:"fire",on:streak>=30},
+    {name:"100-Day Streak",ic:"fire",on:streak>=100},
+    {name:"10 Topics Mastered",ic:"trophy",on:mastered>=10},
+    {name:"50 Topics Mastered",ic:"trophy",on:mastered>=50},
+    {name:"50 Cards Reviewed",ic:"cards",on:cardsReviewed>=50},
+    {name:"200 Cards Reviewed",ic:"cards",on:cardsReviewed>=200},
+    {name:"All Starter Cases Done",ic:"case",on:casesDone>=CASES.length},
+    {name:"10 QBank Sessions",ic:"target",on:qbankSessions>=10}
+  ];
+}
+function renderBadges(){
+  $("badgeGrid").innerHTML = computeBadges().map(b=>
+    `<div class="badge-card ${b.on?'on':'off'}"><div class="bic">${badgeIcon(b.ic,24)}</div><div class="bname">${esc(b.name)}</div></div>`
+  ).join("");
+}
+
+/* ============ GOOGLE DRIVE PDF LIBRARY ============ */
+let gisClient=null, driveToken=null, driveFolderId=null;
+function driveReady(){ return typeof google!=="undefined" && google.accounts && google.accounts.oauth2; }
+function initGis(){
+  if(!driveReady())return;
+  gisClient=google.accounts.oauth2.initTokenClient({
+    client_id:GOOGLE_CLIENT_ID,
+    scope:"https://www.googleapis.com/auth/drive.file",
+    callback:async(resp)=>{
+      if(resp.error){ toast("Drive connection failed"); return; }
+      driveToken=resp.access_token;
+      $("driveStatus").textContent="Connecting…";
+      await ensureDriveFolder();
+      $("drive_connect").textContent="✅ Connected";
+      $("drive_upload").style.display="inline-flex";
+      $("driveLibCard").style.display="block";
+      $("driveStatus").textContent="Connected — files live in a 'StudyRx Library' folder in your Drive.";
+      listDriveFiles();
+    }
+  });
+}
+$("drive_connect").onclick=()=>{
+  if(!driveReady()){ toast("Google sign-in script hasn't loaded yet — try again in a moment"); return; }
+  if(!gisClient) initGis();
+  gisClient.requestAccessToken();
+};
+async function driveFetch(url,opts){
+  opts=opts||{};
+  opts.headers=Object.assign({},opts.headers,{Authorization:"Bearer "+driveToken});
+  const res=await fetch(url,opts);
+  if(!res.ok) throw new Error("Drive API error "+res.status);
+  return res;
+}
+async function ensureDriveFolder(){
+  try{
+    const q=encodeURIComponent("name='StudyRx Library' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+    const res=await driveFetch("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id,name)");
+    const data=await res.json();
+    if(data.files&&data.files.length){ driveFolderId=data.files[0].id; return; }
+    const createRes=await driveFetch("https://www.googleapis.com/drive/v3/files",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({name:"StudyRx Library",mimeType:"application/vnd.google-apps.folder"})
+    });
+    const created=await createRes.json();
+    driveFolderId=created.id;
+  }catch(e){ toast("Couldn't set up the Drive folder — try reconnecting"); }
+}
+$("drive_upload").onclick=()=>$("drive_file").click();
+$("drive_file").onchange=async e=>{
+  const file=e.target.files[0]; if(!file)return;
+  if(!driveFolderId){ toast("Not connected yet"); return; }
+  toast("Uploading…");
+  try{
+    const metadata={name:file.name,parents:[driveFolderId]};
+    const form=new FormData();
+    form.append("metadata",new Blob([JSON.stringify(metadata)],{type:"application/json"}));
+    form.append("file",file);
+    await driveFetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",{method:"POST",body:form});
+    toast("Uploaded — synced to your Drive");
+    listDriveFiles();
+  }catch(err){ toast("Upload failed — try reconnecting Drive"); }
+  $("drive_file").value="";
+};
+async function listDriveFiles(q){
+  if(!driveFolderId)return;
+  try{
+    let query="'"+driveFolderId+"' in parents and trashed=false";
+    if(q) query += " and (name contains '"+q.replace(/'/g,"")+"' or fullText contains '"+q.replace(/'/g,"")+"')";
+    const res=await driveFetch("https://www.googleapis.com/drive/v3/files?q="+encodeURIComponent(query)+"&fields=files(id,name,size,modifiedTime)&orderBy=modifiedTime desc");
+    const data=await res.json();
+    const files=data.files||[];
+    $("drive_total").textContent=files.length;
+    $("drive_list").innerHTML = files.length ? files.map(f=>`<div class="row" style="--rc:var(--emerald)">
+      <div class="rowmain"><div class="rowtitle">${esc(f.name)}</div>
+      <div class="rowsub">${f.size?Math.round(f.size/1024)+" KB · ":""}updated ${esc((f.modifiedTime||"").slice(0,10))}</div></div>
+      <a class="btn bo bxs" href="https://drive.google.com/file/d/${f.id}/view" target="_blank" rel="noopener">Open</a>
+      <button class="iconbtn" data-drivedel="${f.id}">✕</button></div>`).join("") : '<div class="empty">Nothing here yet — upload a PDF above</div>';
+    $("drive_list").querySelectorAll("[data-drivedel]").forEach(b=>b.onclick=async()=>{
+      if(!confirm("Delete this file from your Drive?"))return;
+      try{ await driveFetch("https://www.googleapis.com/drive/v3/files/"+b.dataset.drivedel,{method:"DELETE"}); listDriveFiles($("drive_search").value); }
+      catch(e){ toast("Delete failed"); }
+    });
+  }catch(e){ $("drive_list").innerHTML='<div class="empty">Couldn\'t load your Drive files — try reconnecting</div>'; }
+}
+$("drive_search").oninput=()=>{ clearTimeout(window._dsT); window._dsT=setTimeout(()=>listDriveFiles($("drive_search").value),400); };
+function renderDriveUI(){
+  if(driveToken&&driveFolderId){
+    $("drive_connect").textContent="✅ Connected"; $("drive_upload").style.display="inline-flex";
+    $("driveLibCard").style.display="block"; listDriveFiles();
+  }
+  if(driveReady()&&!gisClient) initGis();
+}
+
+/* ============ MILESTONE JOURNAL ============ */
+$("ms_add").onclick=()=>{
+  const title=$("ms_title").value.trim();
+  if(!title){toast("What happened?");return}
+  DB.milestones=DB.milestones||[];
+  DB.milestones.push({id:uid(),title,date:$("ms_date").value||todayStr(),note:$("ms_note").value.trim(),ts:Date.now()});
+  sv("milestones",DB.milestones);
+  $("ms_title").value="";$("ms_note").value="";
+  renderMilestones(); toast("Added to your journal");
+};
+function renderMilestones(){
+  if(!$("ms_date").value)$("ms_date").value=todayStr();
+  const list=[...(DB.milestones||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  $("ms_list").innerHTML = list.length ? list.map(m=>`<div class="row" style="--rc:var(--gold);align-items:flex-start">
+    <div class="rowmain"><div class="rowtitle">🚩 ${esc(m.title)}</div><div class="rowsub">${esc(m.date)}${m.note?" — "+esc(m.note):""}</div></div>
+    <button class="iconbtn" data-delms="${m.id}">✕</button></div>`).join("") : '<div class="empty">Nothing logged yet — your first milestone starts the journal</div>';
+  $("ms_list").querySelectorAll("[data-delms]").forEach(b=>b.onclick=()=>{
+    DB.milestones=DB.milestones.filter(m=>m.id!==b.dataset.delms); sv("milestones",DB.milestones); renderMilestones();
+  });
+}
+
+/* ============ ASK AI (BYOK) ============ */
+$("ai_ask").onclick=async()=>{
+  const q=$("ai_q").value.trim();
+  if(!q){toast("Type a question first");return}
+  if(!DB.profile.aiKey){ $("ai_out").innerHTML='<div class="empty">Add your Anthropic API key in Settings to use this.</div>'; return; }
+  const btn=$("ai_ask"); btn.disabled=true; btn.textContent="Thinking…";
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":DB.profile.aiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:DB.profile.aiModel||"claude-sonnet-5",max_tokens:700,
+        messages:[{role:"user",content:"You are helping a medical student understand a concept. Be clear, concise, and accurate. Question: "+q}]})
+    });
+    if(!res.ok) throw new Error(await res.text());
+    const data=await res.json();
+    const txt=(data.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("");
+    $("ai_out").innerHTML=`<div class="row" style="--rc:var(--emerald);align-items:flex-start;white-space:pre-wrap">${esc(txt)}</div>`;
+    $("ai_q").value="";
+  }catch(e){ $("ai_out").innerHTML='<div class="empty">Couldn\'t reach the AI — check your API key in Settings.</div>'; }
+  btn.disabled=false; btn.textContent="✨ Ask";
+};
+
+/* ============ EXPORTS ============ */
+$("exp_ics").onclick=()=>{
+  const events=[];
+  (DB.phases||[]).forEach(ph=>{
+    if(ph.examDate) events.push({title:ph.name,date:ph.examDate});
+    (ph.subjects||[]).forEach(s=>{ if(s.examDate) events.push({title:s.name+" exam",date:s.examDate}); });
+  });
+  if(DB.profile.wardFinalDate) events.push({title:"Ward final exam",date:DB.profile.wardFinalDate});
+  (DB.routine||[]).filter(r=>!r.done).forEach(r=>events.push({title:r.title,date:r.date}));
+  if(!events.length){ toast("Nothing to export yet — add exam dates or routine tasks first"); return; }
+  const pad=n=>String(n).padStart(2,"0");
+  const dstamp=d=>d.replace(/-/g,"");
+  let ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//StudyRx//EN\r\n";
+  events.forEach((e,i)=>{
+    ics+="BEGIN:VEVENT\r\nUID:"+uid()+i+"@studyrx\r\nDTSTAMP:"+dstamp(todayStr())+"T000000Z\r\nDTSTART;VALUE=DATE:"+dstamp(e.date)+"\r\nSUMMARY:"+e.title.replace(/[\r\n,;]/g," ")+"\r\nEND:VEVENT\r\n";
+  });
+  ics+="END:VCALENDAR";
+  const blob=new Blob([ics],{type:"text/calendar"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="studyrx-calendar.ics"; a.click();
+  toast("Calendar file downloaded");
+};
+$("exp_pdf").onclick=()=>{
+  const xp=DB.profile.xp||0, lvl=levelFor(xp), rank=rankFor(xp);
+  const subs=allSubjects(), topics=allTopics();
+  const subjRows=subs.map(s=>{
+    const st=topics.filter(t=>t.subjectId===s.id);
+    const done=st.filter(t=>t.status==="mastered"||t.status==="revised").length;
+    const pct=st.length?Math.round(done/st.length*100):0;
+    return "<tr><td>"+esc(s.name)+"</td><td>"+pct+"%</td></tr>";
+  }).join("");
+  const badges=computeBadges().filter(b=>b.on).map(b=>"<li>"+esc(b.name)+"</li>").join("");
+  const html=`<html><head><meta charset="utf-8"><title>StudyRx Progress Report</title>
+    <style>body{font-family:Georgia,serif;padding:40px;color:#0d2818}h1{color:#0f7a4f}table{border-collapse:collapse;width:100%;margin-top:10px}
+    td,th{border:1px solid #ccc;padding:8px 12px;text-align:left;font-size:13px}th{background:#e6f9f0}</style></head>
+    <body><h1>StudyRx Progress Report</h1>
+    <p><b>Generated:</b> ${esc(todayStr())}</p>
+    <p><b>Level:</b> ${lvl} &nbsp; <b>Rank:</b> ${esc(rank.n)} &nbsp; <b>Total XP:</b> ${xp} &nbsp; <b>Streak:</b> ${DB.profile.streak||0} days</p>
+    <h2>Subject completion</h2><table><tr><th>Subject</th><th>Completion</th></tr>${subjRows||"<tr><td colspan=2>No subjects yet</td></tr>"}</table>
+    <h2>Badges earned</h2><ul>${badges||"<li>None yet</li>"}</ul>
+    </body></html>`;
+  const w=window.open("","_blank");
+  if(!w){ toast("Allow pop-ups to generate the report"); return; }
+  w.document.write(html); w.document.close(); w.focus();
+  setTimeout(()=>w.print(),300);
+};
+
+/* ============ AMBIENT SOUND (Pomodoro) ============ */
+let ambientCtx=null, ambientNode=null, ambientOn=false;
+function startAmbient(){
+  if(!ambientCtx) ambientCtx=new (window.AudioContext||window.webkitAudioContext)();
+  const bufferSize=2*ambientCtx.sampleRate;
+  const buffer=ambientCtx.createBuffer(1,bufferSize,ambientCtx.sampleRate);
+  const data=buffer.getChannelData(0);
+  let last=0;
+  for(let i=0;i<bufferSize;i++){ const white=Math.random()*2-1; data[i]=(last+0.02*white)/1.02; last=data[i]; data[i]*=3.5; }
+  ambientNode=ambientCtx.createBufferSource(); ambientNode.buffer=buffer; ambientNode.loop=true;
+  const gain=ambientCtx.createGain(); gain.gain.value=0.06;
+  ambientNode.connect(gain); gain.connect(ambientCtx.destination);
+  ambientNode.start();
+}
+function stopAmbient(){ if(ambientNode){ ambientNode.stop(); ambientNode=null; } }
+$("pm_ambient").onclick=()=>{
+  ambientOn=!ambientOn;
+  if(ambientOn){ startAmbient(); $("pm_ambient").textContent="🎧 Ambient sound: On"; }
+  else{ stopAmbient(); $("pm_ambient").textContent="🎧 Ambient sound: Off"; }
+};
+
 /* ============ SETTINGS ============ */
-$("s_save").onclick=()=>{ DB.profile.name=$("s_name").value.trim()||DB.profile.name; sv("profile",DB.profile); updateTopbar(); toast("Saved"); };
+$("s_save").onclick=()=>{
+  DB.profile.name=$("s_name").value.trim()||DB.profile.name;
+  DB.profile.aiKey=$("s_key").value.trim();
+  DB.profile.aiModel=$("s_model").value;
+  sv("profile",DB.profile); updateTopbar(); toast("Saved");
+};
 $("s_dark").onclick=()=>applyTheme("dark");
 $("s_light").onclick=()=>applyTheme("light");
 
