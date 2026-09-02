@@ -861,7 +861,10 @@ select option{background:var(--paper);color:var(--ink)}
 
         <div class="card c-violet" style="margin-bottom:16px">
           <div class="cardhd">🔬 Investigations <span class="chip" id="rxIvN">0</span></div>
-          <div class="ac" style="margin-bottom:11px"><input id="rx_iname" placeholder="Search investigation library..." autocomplete="off"><div class="ac-drop" id="rx_iAc"></div></div>
+          <div style="display:flex;gap:8px;margin-bottom:11px">
+            <div class="ac" style="flex:1"><input id="rx_iname" placeholder="Search library, or type your own and press Enter / Add" autocomplete="off"><div class="ac-drop" id="rx_iAc"></div></div>
+            <button class="btn bo bsm" id="rx_iAdd" style="flex-shrink:0">+ Add</button>
+          </div>
           <div id="rxIvList"></div>
         </div>
 
@@ -2603,13 +2606,19 @@ $("rx_dname").oninput=()=>{
   const q=$("rx_dname").value.trim().toLowerCase();
   const drop=$("rx_dAc");
   if(!q){drop.classList.remove("on");drop.innerHTML="";return}
-  const list=(DB.drugs&&DB.drugs.length?DB.drugs:DRUGS).filter(d=>(d.n+" "+(d.brands||[]).join(" ")).toLowerCase().includes(q)).slice(0,20);
+  const src=(DB.drugs&&DB.drugs.length?DB.drugs:DRUGS).filter(d=>(d.n+" "+(d.brands||[]).join(" ")).toLowerCase().includes(q));
+  const rows=[];
+  src.forEach(d=>{
+    if(d.brands&&d.brands.length){ d.brands.forEach(b=>rows.push({label:b+" ("+d.n+")",fill:b+" ("+d.n+")",d})); }
+    else{ rows.push({label:d.n,fill:d.n,d}); }
+  });
+  const list=rows.slice(0,20);
   if(!list.length){drop.classList.remove("on");return}
-  drop.innerHTML=list.map((d,i)=>`<div class="ac-i" data-i="${i}">${esc(d.n)}${(d.brands&&d.brands.length)?" — "+esc(d.brands.join(", ")):""}<div class="s">${esc([d.d,d.f,d.u].filter(Boolean).join(" · "))}</div></div>`).join("");
+  drop.innerHTML=list.map((r,i)=>`<div class="ac-i" data-i="${i}">${esc(r.label)}<div class="s">${esc([r.d.d,r.d.f,r.d.u].filter(Boolean).join(" · "))}</div></div>`).join("");
   drop.classList.add("on");
   drop.querySelectorAll(".ac-i").forEach(el=>el.onmousedown=e=>{
-    e.preventDefault(); const d=list[+el.dataset.i];
-    $("rx_dname").value=d.n; $("rx_ddose").value=d.d||""; $("rx_dfreq").value=d.f||""; $("rx_ddur").value=d.u||""; $("rx_dnote").value=d.note||"";
+    e.preventDefault(); const r=list[+el.dataset.i];
+    $("rx_dname").value=r.fill; $("rx_ddose").value=r.d.d||""; $("rx_dfreq").value=r.d.f||""; $("rx_ddur").value=r.d.u||""; $("rx_dnote").value=r.d.note||"";
     drop.classList.remove("on");
   });
 };
@@ -2630,7 +2639,7 @@ function renderRxMeds(){
   $("rxMdList").querySelectorAll("[data-delmed]").forEach(b=>b.onclick=()=>{ RX_MEDS.splice(+b.dataset.delmed,1); renderRxMeds(); });
 }
 
-/* --- investigations (autocomplete against Investigation Library) --- */
+/* --- investigations (autocomplete against Investigation Library, or type your own) --- */
 $("rx_iname").oninput=()=>{
   const q=$("rx_iname").value.trim().toLowerCase();
   const drop=$("rx_iAc");
@@ -2646,6 +2655,16 @@ $("rx_iname").oninput=()=>{
   });
 };
 $("rx_iname").onblur=()=>setTimeout(()=>$("rx_iAc").classList.remove("on"),150);
+function addRxInvestigationFreeText(){
+  const n=$("rx_iname").value.trim();
+  if(!n){toast("Type an investigation name first");return}
+  if(!RX_IVS.some(x=>x.n.toLowerCase()===n.toLowerCase())) RX_IVS.push({n});
+  $("rx_iname").value=""; $("rx_iAc").classList.remove("on"); renderRxIvs();
+}
+$("rx_iAdd").onclick=addRxInvestigationFreeText;
+$("rx_iname").onkeydown=e=>{
+  if(e.key==="Enter"){ e.preventDefault(); addRxInvestigationFreeText(); }
+};
 function renderRxIvs(){
   $("rxIvN").textContent=RX_IVS.length;
   $("rxIvList").innerHTML = RX_IVS.length ? RX_IVS.map((iv,i)=>`<div class="row" style="--rc:#b490ff">
@@ -2838,27 +2857,6 @@ function initGis(){
     }
   });
 }
-function tryAutoConnectDrive(){
-  if(driveToken || !DB.profile.driveFolderId || !driveReady())return;
-  if(!gisClient) initGis();
-  const originalCallback=gisClient.callback;
-  gisClient.callback=(resp)=>{
-    if(resp.error){
-      gisClient.callback=originalCallback;
-      $("driveStatus").textContent="Couldn't reconnect automatically — tap Connect Google Drive to continue.";
-      return;
-    }
-    driveToken=resp.access_token;
-    driveFolderId=DB.profile.driveFolderId;
-    $("drive_connect").textContent="✅ Connected";
-    $("drive_upload").style.display="inline-flex";
-    $("driveLibCard").style.display="block";
-    $("driveStatus").textContent="Connected — files live in a 'StudyRx Library' folder in your Drive.";
-    listDriveFiles();
-    gisClient.callback=originalCallback;
-  };
-  gisClient.requestAccessToken({prompt:""});
-}
 $("drive_connect").onclick=()=>{
   if(!driveReady()){ toast("Google sign-in script hasn't loaded yet — try again in a moment"); return; }
   if(!gisClient) initGis();
@@ -2873,6 +2871,13 @@ async function driveFetch(url,opts){
 }
 async function ensureDriveFolder(){
   try{
+    if(DB.profile.driveFolderId){
+      try{
+        const check=await driveFetch("https://www.googleapis.com/drive/v3/files/"+DB.profile.driveFolderId+"?fields=id,trashed");
+        const d=await check.json();
+        if(d.id && !d.trashed){ driveFolderId=d.id; return; }
+      }catch(e){ /* cached id no longer valid, fall through to search/create */ }
+    }
     const q=encodeURIComponent("name='StudyRx Library' and mimeType='application/vnd.google-apps.folder' and trashed=false");
     const res=await driveFetch("https://www.googleapis.com/drive/v3/files?q="+q+"&fields=files(id,name)");
     const data=await res.json();
@@ -2928,8 +2933,8 @@ function renderDriveUI(){
     $("drive_connect").textContent="✅ Connected"; $("drive_upload").style.display="inline-flex";
     $("driveLibCard").style.display="block"; listDriveFiles();
   } else if(DB.profile.driveFolderId){
-    $("driveStatus").textContent="Reconnecting to your Drive…";
-    tryAutoConnectDrive();
+    $("driveStatus").textContent="You've connected before — tap Connect Google Drive to resume this session (browsers require a click here, not something the app can do automatically).";
+    $("drive_connect").textContent="🔗 Reconnect Google Drive";
   }
   if(driveReady()&&!gisClient) initGis();
 }
