@@ -57,18 +57,25 @@ button{font-family:inherit}
 
 /* ============ layout shell ============ */
 .app{display:flex;min-height:100vh}
-.rail{width:78px;flex-shrink:0;padding:18px 0;display:flex;flex-direction:column;align-items:center;gap:6px;
+.rail{width:222px;flex-shrink:0;padding:16px 10px;display:flex;flex-direction:column;gap:3px;
   background:var(--bg1);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:60}
-.rail .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--emerald),var(--emeraldD));
-  display:flex;align-items:center;justify-content:center;font-weight:700;color:#04140d;font-size:17px;margin-bottom:16px;
-  box-shadow:0 0 18px rgba(34,255,176,.5);flex-shrink:0}
-.railbtn{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--faint);border:none;background:none;position:relative;transition:all .18s;flex-shrink:0}
-.railbtn svg{width:20px;height:20px}
+.railbrand{display:flex;align-items:center;gap:10px;padding:4px 6px 16px}
+.railbrand .logo{width:36px;height:36px;border-radius:11px;box-shadow:0 0 16px rgba(34,255,176,.4);flex-shrink:0;object-fit:cover}
+.railbrand span{font-weight:700;font-size:15px;white-space:nowrap}
+.railbtn{width:100%;padding:9px 12px;border-radius:11px;display:flex;align-items:center;gap:12px;
+  cursor:pointer;color:var(--faint);border:none;background:none;position:relative;transition:all .18s;flex-shrink:0;text-align:left}
+.railbtn svg{width:19px;height:19px;flex-shrink:0}
+.railbtn .raillabel{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .railbtn:hover{color:var(--ink);background:rgba(255,255,255,.05)}
 .railbtn.on{color:var(--emerald);background:rgba(34,255,176,.12);box-shadow:0 0 14px rgba(34,255,176,.3)}
-.railsep{width:30px;height:1px;background:var(--line);margin:8px 0}
-.railsub{width:44px;height:44px;border-radius:13px;flex-shrink:0}
+.railsep{width:100%;height:1px;background:var(--line);margin:8px 0}
+.railsub{width:100%;height:auto;padding:7px 12px;border-radius:11px;flex-shrink:0}
+@media(max-width:820px){
+  .rail{width:64px;padding:14px 8px}
+  .railbrand span,.railbtn .raillabel{display:none}
+  .railbrand{justify-content:center;padding:4px 0 14px}
+  .railbtn{justify-content:center;padding:10px}
+}
 
 .main{flex:1;min-width:0}
 .topbar{position:sticky;top:0;z-index:50;background:var(--glass2);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
@@ -128,6 +135,15 @@ button{font-family:inherit}
 .bo:active{transform:translateY(1px)}
 .br{background:linear-gradient(135deg,#ff5d8f,#b3244f);color:#fff}
 .bv{background:linear-gradient(135deg,#b490ff,#6d28d9);color:#fff}
+.bs{background:linear-gradient(135deg,#38bdf8,#0369a1);color:#fff}
+.g5{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:9px}
+.ac{position:relative}
+.ac-drop{position:absolute;top:100%;left:0;right:0;background:var(--paper);border:1.5px solid var(--emerald);border-top:none;
+  border-radius:0 0 10px 10px;z-index:100;max-height:230px;overflow-y:auto;box-shadow:var(--shadow-md);display:none}
+.ac-drop.on{display:block}
+.ac-i{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--line)}
+.ac-i:hover,.ac-i.sel{background:rgba(34,255,176,.12)}
+.ac-i .s{font-size:11px;color:var(--muted);margin-top:1px}
 .bg{background:linear-gradient(135deg,var(--gold),#c9962c);color:#221900}
 .bsm{padding:7px 12px;font-size:12px}
 .bxs{padding:5px 9px;font-size:11px;border-radius:8px}
@@ -163,13 +179,45 @@ select option{background:var(--paper);color:var(--ink)}
 .linkchip{cursor:pointer}
 .linkchip:hover{border-color:var(--emerald)!important;color:var(--emerald)}
 .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px}
+.course-tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.course-tile{background:rgba(255,255,255,.03);border:1.5px solid var(--line);border-radius:14px;padding:16px 10px;
+  text-align:center;cursor:pointer;transition:all .2s}
+.course-tile:hover{transform:translateY(-3px);box-shadow:0 8px 20px color-mix(in srgb, var(--tc,var(--emerald)) 25%, transparent);border-color:var(--tc,var(--emerald))}
+.course-tile .cticon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;
+  background:color-mix(in srgb, var(--tc,var(--emerald)) 16%, transparent);color:var(--tc,var(--emerald))}
+.course-tile .ctname{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.course-tile .ctpct{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ---- print sheet (Rx preview/PDF) ---- */
+#sheet{display:none}
+.rxp{width:210mm;min-height:297mm;background:#fff;color:#0d2818;font-family:"Inter",sans-serif;margin:0 auto;padding:16mm}
+.rxp-hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0f7a4f;padding-bottom:10px;margin-bottom:14px}
+.rxp-hd .nm{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:#0f7a4f}
+.rxp-hd .sub{font-size:11px;color:#5c6e63;margin-top:2px}
+.rxp-hd .meta{text-align:right;font-size:11px;color:#5c6e63}
+.rxp-row{display:flex;gap:16px;font-size:11.5px;color:#3a5560;margin-bottom:10px;flex-wrap:wrap}
+.rxp-sec{margin-bottom:12px}
+.rxp-sec b{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:#0f7a4f;display:block;margin-bottom:3px}
+.rxp-sec div.v{font-size:12px;line-height:1.5;color:#0d2818}
+.rxp-rx{font-family:"Fraunces",serif;font-style:italic;font-size:26px;color:#0f7a4f;margin:14px 0 6px}
+.rxp-drug{font-size:12.5px;margin-bottom:8px}
+.rxp-drug b{font-size:13px}
+.rxp-drug span{display:block;font-size:10.5px;color:#5c6e63}
+.rxp-foot{margin-top:22px;padding-top:8px;border-top:1px solid #e3ebe2;font-size:9.5px;color:#8a978d;display:flex;justify-content:space-between}
+@media print{
+  body *{visibility:hidden}
+  #sheet,#sheet *{visibility:visible}
+  #sheet{display:block;position:absolute;top:0;left:0}
+  @page{size:A4;margin:0}
+}
 .badge-card{text-align:center;padding:12px 6px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);transition:all .2s}
 .badge-card.on{background:linear-gradient(135deg,var(--gold),#c9962c);border-color:transparent;color:#241900;box-shadow:0 0 14px rgba(255,203,71,.4)}
 .badge-card.off{opacity:.4}
 .badge-card .bic{margin:0 auto 6px;display:flex;justify-content:center}
 .badge-card .bname{font-size:10px;font-weight:700;line-height:1.3}
 .quest-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:7px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
-.quest-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--emerald);flex-shrink:0}
+.quest-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--emerald);flex-shrink:0;cursor:pointer;transition:all .15s}
+.quest-box:hover{box-shadow:0 0 8px rgba(34,255,176,.4);transform:scale(1.08)}
 .quest-box.done{background:var(--emerald);box-shadow:0 0 8px rgba(34,255,176,.6)}
 .fg{margin-bottom:12px}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
@@ -213,6 +261,10 @@ select option{background:var(--paper);color:var(--ink)}
 
 /* rank hero (3D hex) */
 .rankcard{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;perspective:900px}
+.rankstats{display:flex;gap:8px;width:100%;margin-top:2px}
+.rankstat{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:9px 4px}
+.rankstat .rsnum{font-size:16px;font-weight:700;color:var(--emerald)}
+.rankstat .rslabel{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
 .hex3d{width:158px;height:158px;position:relative;display:flex;align-items:center;justify-content:center;
   transform-style:preserve-3d;transition:transform .15s ease-out}
 .hex3d svg{position:absolute;inset:0;filter:drop-shadow(0 10px 18px rgba(0,0,0,.4)) drop-shadow(0 0 22px rgba(34,255,176,.5))}
@@ -306,31 +358,30 @@ select option{background:var(--paper);color:var(--ink)}
 
 <div class="app" id="appShell" style="display:none">
   <div class="rail">
-    <img class="logo" src="icon-192.png" alt="StudyRx" style="object-fit:cover">
-    <button class="railbtn on" data-p="dash" title="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
-    <button class="railbtn" data-p="curric" title="Curriculum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h9a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-9a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h9z"/></svg></button>
-    <button class="railbtn" data-p="routine" title="Routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
-    <button class="railbtn" data-p="pomo" title="Pomodoro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></button>
-    <button class="railbtn" data-p="flash" title="Flashcards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="7" width="14" height="10" rx="2"/><path d="M3 11h2M19 11h2M3 15h2M19 15h2"/></svg></button>
-    <button class="railbtn" data-p="notes" title="Notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></button>
-    <button class="railbtn" data-p="mnem" title="Mnemonics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg></button>
-    <button class="railbtn" data-p="qbank" title="Question Bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></button>
-    <button class="railbtn" data-p="ana" title="Analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
-    <button class="railbtn" data-p="ward" title="Ward Tracker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 8v6M9 11h6"/></svg></button>
-    <button class="railbtn" data-p="case" title="Case Simulator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 15c0-1 .8-1.3 2-1.6l1-.2c1-.2 1.5-.5 1.5-1.1 0-.7-.7-1.1-1.7-1.1s-1.9.4-2.1 1.3"/></svg></button>
-    <button class="railbtn" data-p="osce" title="OSCE / Viva Drill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/><path d="M4.2 5.2l1.5 1.5M19.8 5.2l-1.5 1.5"/></svg></button>
-    <button class="railbtn" data-p="pyq" title="PYQ Tracker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></button>
-    <button class="railbtn" data-p="caselog" title="Case Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.5L19 9l-5.2 1.5L12 16l-1.8-5.5L5 9l5.2-1.5z"/></svg></button>
-    <button class="railbtn" data-p="mock" title="Mock Exam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></button>
-    <button class="railbtn" data-p="drugs" title="Drug Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="6" rx="3"/><path d="M12 9v6"/></svg></button>
-    <button class="railbtn" data-p="invs" title="Investigations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20h6M12 20v-4M7 16h10M9 12a3 3 0 1 1 6 0c0 2-1 3-3 4-2-1-3-2-3-4z"/></svg></button>
-    <button class="railbtn" data-p="rx" title="Rx Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v3a5 5 0 0 0 10 0v-2"/></svg></button>
-    <button class="railbtn" data-p="pdf" title="PDF Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></button>
-    <button class="railbtn" data-p="milestones" title="Milestones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg></button>
-    <button class="railbtn" data-p="ai" title="Ask AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.5L19 9l-5.2 1.5L12 16l-1.8-5.5L5 9l5.2-1.5z"/></svg></button>
+    <div class="railbrand"><img class="logo" src="icon-192.png" alt="StudyRx" style="object-fit:cover;margin:0"><span class="brandfont">StudyRx</span></div>
+    <button class="railbtn on" data-p="dash" title="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l8-7 8 7"/><path d="M6 10v10h12V10"/></svg><span class="raillabel">Dashboard</span></button>
+    <button class="railbtn" data-p="curric" title="Curriculum"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h9a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4z"/><path d="M20 4h-9a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h9z"/></svg><span class="raillabel">Curriculum</span></button>
+    <button class="railbtn" data-p="routine" title="Routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="raillabel">Routine</span></button>
+    <button class="railbtn" data-p="pomo" title="Pomodoro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg><span class="raillabel">Pomodoro</span></button>
+    <button class="railbtn" data-p="ward" title="Ward Tracker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 8v6M9 11h6"/></svg><span class="raillabel">Ward Tracker</span></button>
+    <button class="railbtn" data-p="pdf" title="PDF Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg><span class="raillabel">PDF Library</span></button>
+    <button class="railbtn" data-p="caselog" title="Case Log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.5L19 9l-5.2 1.5L12 16l-1.8-5.5L5 9l5.2-1.5z"/></svg><span class="raillabel">Case Log</span></button>
+    <button class="railbtn" data-p="drugs" title="Drug Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="6" rx="3"/><path d="M12 9v6"/></svg><span class="raillabel">Drug Library</span></button>
+    <button class="railbtn" data-p="invs" title="Investigations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20h6M12 20v-4M7 16h10M9 12a3 3 0 1 1 6 0c0 2-1 3-3 4-2-1-3-2-3-4z"/></svg><span class="raillabel">Investigations</span></button>
+    <button class="railbtn" data-p="rx" title="Rx Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a4 4 0 0 0 8 0V3"/><path d="M10 13v3a5 5 0 0 0 10 0v-2"/></svg><span class="raillabel">Rx Library</span></button>
+    <button class="railbtn" data-p="flash" title="Flashcards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="7" width="14" height="10" rx="2"/><path d="M3 11h2M19 11h2M3 15h2M19 15h2"/></svg><span class="raillabel">Flashcards</span></button>
+    <button class="railbtn" data-p="notes" title="Notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13l3 3v13H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg><span class="raillabel">Notes</span></button>
+    <button class="railbtn" data-p="mnem" title="Mnemonics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.3 1 2.5h6c0-1.2.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg><span class="raillabel">Mnemonic Vault</span></button>
+    <button class="railbtn" data-p="case" title="Case Simulator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 15c0-1 .8-1.3 2-1.6l1-.2c1-.2 1.5-.5 1.5-1.1 0-.7-.7-1.1-1.7-1.1s-1.9.4-2.1 1.3"/></svg><span class="raillabel">Case Simulator</span></button>
+    <button class="railbtn" data-p="osce" title="OSCE / Viva Drill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/><path d="M4.2 5.2l1.5 1.5M19.8 5.2l-1.5 1.5"/></svg><span class="raillabel">OSCE / Viva Drill</span></button>
+    <button class="railbtn" data-p="qbank" title="Question Bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span class="raillabel">Question Bank</span></button>
+    <button class="railbtn" data-p="ana" title="Analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="raillabel">Analytics</span></button>
+    <button class="railbtn" data-p="milestones" title="Milestones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4"/><path d="M5 4h13l-3 4 3 4H5"/></svg><span class="raillabel">Milestones</span></button>
+    <button class="railbtn" data-p="ai" title="Ask AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.5L19 9l-5.2 1.5L12 16l-1.8-5.5L5 9l5.2-1.5z"/></svg><span class="raillabel">Ask AI</span></button>
     <div class="railsep"></div>
-    <button class="railbtn" data-p="set" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
-    <div id="subjRail" style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>
+    <button class="railbtn" data-p="set" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span class="raillabel">Settings</span></button>
+    <div class="railsep"></div>
+    <div id="subjRail" style="display:flex;flex-direction:column;gap:4px"></div>
   </div>
 
   <div class="main">
@@ -368,6 +419,7 @@ select option{background:var(--paper);color:var(--ink)}
             <div class="ranksub" id="rankSub">100 XP to Medical Novice</div>
             <div class="xpbar"><div class="xpfill" id="xpFill" style="width:0%"></div></div>
             <svg class="ecg" viewBox="0 0 300 24"><path d="M0 12 H60 L70 3 L80 21 L90 12 H140 L150 5 L160 19 L170 12 H300"/></svg>
+            <div class="rankstats" id="rankStats"></div>
           </div>
 
           <div class="stack">
@@ -403,6 +455,11 @@ select option{background:var(--paper);color:var(--ink)}
             </div>
           </div>
         </div>
+
+        <div class="card tilt3d c-em" style="margin-top:18px">
+          <div class="cardhd">📚 Your Courses</div>
+          <div class="course-tilegrid" id="courseTiles"></div>
+        </div>
       </div>
 
       <!-- CURRICULUM -->
@@ -425,10 +482,15 @@ select option{background:var(--paper);color:var(--ink)}
             <div><label>Date</label><input id="rt_date" type="date"></div>
             <div><label>Priority</label><select id="rt_pri"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option></select></div>
           </div>
-          <div class="g2" style="margin-bottom:12px">
-            <div><label>Link to topic (optional)</label><select id="rt_topic"><option value="">— none —</option></select></div>
-            <div><label>Time (optional)</label><input id="rt_time" type="time"></div>
+          <div class="fg" style="margin-bottom:10px">
+            <label>Link to topic (optional)</label>
+            <div class="g3">
+              <select id="rt_subj"><option value="">Subject…</option></select>
+              <select id="rt_chap" disabled><option value="">Chapter…</option></select>
+              <select id="rt_top" disabled><option value="">Topic…</option></select>
+            </div>
           </div>
+          <div class="fg" style="max-width:220px;margin-bottom:12px"><label>Time (optional)</label><input id="rt_time" type="time"></div>
           <button class="btn bt" id="rt_add">+ Add task</button>
         </div>
         <div class="card c-sky">
@@ -442,9 +504,16 @@ select option{background:var(--paper);color:var(--ink)}
         <div class="pagehd"><div><h2 class="brandfont">Pomodoro</h2><p>Focused sessions, logged straight to your XP and streak</p></div></div>
         <div class="card c-gold">
           <div class="pomowrap">
-            <div class="g2" style="width:100%;max-width:360px">
-              <div><label>Linked topic (optional)</label><select id="pm_topic"><option value="">— none —</option></select></div>
-              <div><label>Session length</label><select id="pm_len"><option value="25">25 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="15">15 min</option></select></div>
+            <div style="width:100%;max-width:420px;margin-bottom:10px">
+              <label>Linked topic (optional)</label>
+              <div class="g3">
+                <select id="pm_subj"><option value="">Subject…</option></select>
+                <select id="pm_chap" disabled><option value="">Chapter…</option></select>
+                <select id="pm_top" disabled><option value="">Topic…</option></select>
+              </div>
+            </div>
+            <div style="width:100%;max-width:220px">
+              <label>Session length</label><select id="pm_len"><option value="25">25 min</option><option value="45">45 min</option><option value="50">50 min</option><option value="15">15 min</option></select>
             </div>
             <div class="pomoring">
               <svg viewBox="0 0 220 220">
@@ -475,7 +544,13 @@ select option{background:var(--paper);color:var(--ink)}
             <div><label>Front (question)</label><input id="fc_front" placeholder="e.g. Blood supply of the appendix?"></div>
             <div><label>Back (answer)</label><input id="fc_back" placeholder="e.g. Appendicular artery"></div>
           </div>
-          <div class="fg" style="max-width:320px"><label>Link to topic (optional)</label><select id="fc_topic"><option value="">— none —</option></select></div>
+          <div class="fg"><label>Link to topic (optional)</label>
+            <div class="g3">
+              <select id="fc_subj"><option value="">Subject…</option></select>
+              <select id="fc_chap" disabled><option value="">Chapter…</option></select>
+              <select id="fc_top" disabled><option value="">Topic…</option></select>
+            </div>
+          </div>
           <button class="btn bt" id="fc_add">+ Add card</button>
         </div>
         <div class="card c-em" style="margin-bottom:18px" id="fc_reviewCard">
@@ -493,9 +568,14 @@ select option{background:var(--paper);color:var(--ink)}
         <div class="pagehd"><div><h2 class="brandfont">Notes</h2><p>Quick notes, tagged to any topic</p></div></div>
         <div class="card c-sky" style="margin-bottom:18px">
           <div class="cardhd">New note</div>
-          <div class="g2" style="margin-bottom:10px">
-            <div><label>Title</label><input id="nt_title" placeholder="Note title"></div>
-            <div><label>Link to topic (optional)</label><select id="nt_topic"><option value="">— none —</option></select></div>
+          <div class="fg" style="margin-bottom:10px"><label>Title</label><input id="nt_title" placeholder="Note title"></div>
+          <div class="fg" style="margin-bottom:10px">
+            <label>Link to topic (optional)</label>
+            <div class="g3">
+              <select id="nt_subj"><option value="">Subject…</option></select>
+              <select id="nt_chap" disabled><option value="">Chapter…</option></select>
+              <select id="nt_top" disabled><option value="">Topic…</option></select>
+            </div>
           </div>
           <div class="fg"><label>Content</label><textarea id="nt_body" rows="4" placeholder="Write your note..."></textarea></div>
           <button class="btn bt" id="nt_add">+ Save note</button>
@@ -597,6 +677,25 @@ select option{background:var(--paper);color:var(--ink)}
         <div class="pagehd"><div><h2 class="brandfont">Case Simulator</h2><p>Work a scenario step by step — scored out of 20. Starter set, more cases coming.</p></div></div>
         <div class="g2" id="caseList"></div>
         <div class="card c-violet" id="casePlayerCard" style="display:none;margin-top:18px"><div id="casePlayerBox"></div></div>
+        <div class="card c-teal" style="margin-top:18px">
+          <div class="cardhd">Import cases from ChatGPT / Claude</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Ask your AI assistant to write a case in this exact JSON shape (4 steps = scored out of 20), then paste the result below:</p>
+          <pre style="background:rgba(0,0,0,.25);padding:10px;border-radius:8px;font-size:10.5px;overflow-x:auto;margin-bottom:8px;white-space:pre-wrap;line-height:1.5">{
+  "title": "Case title",
+  "specialty": "Medicine",
+  "scenario": "Patient presentation...",
+  "steps": [
+    {"q": "Question 1", "opts": ["A","B","C","D"], "correct": 0, "explain": "Why this is right"},
+    {"q": "Question 2", "opts": ["A","B","C","D"], "correct": 1, "explain": "Why this is right"},
+    {"q": "Question 3", "opts": ["A","B","C","D"], "correct": 2, "explain": "Why this is right"},
+    {"q": "Question 4", "opts": ["A","B","C","D"], "correct": 3, "explain": "Why this is right"}
+  ]
+}</pre>
+          <p style="font-size:11px;color:var(--faint);margin-bottom:10px">You can also paste an array of several cases at once: <code>[{...}, {...}]</code></p>
+          <textarea id="case_import_text" rows="6" placeholder="Paste JSON here..."></textarea>
+          <button class="btn bt bsm" style="margin-top:10px" id="case_import_btn">📥 Import</button>
+          <span id="case_import_status" style="margin-left:10px;font-size:12px;color:var(--muted)"></span>
+        </div>
       </div>
 
       <!-- OSCE / VIVA DRILL -->
@@ -622,25 +721,6 @@ select option{background:var(--paper);color:var(--ink)}
       </div>
 
       <!-- PYQ TRACKER -->
-      <div class="pg" id="pg-pyq">
-        <div class="pagehd"><div><h2 class="brandfont">PYQ Tracker</h2><p>Log exam questions you remember — spot your college's real pattern over time</p></div></div>
-        <div class="card c-em" style="margin-bottom:18px">
-          <div class="cardhd">Add a remembered question</div>
-          <div class="g3" style="margin-bottom:10px">
-            <div><label>Year</label><input id="pq_year" placeholder="e.g. 2024"></div>
-            <div><label>Subject</label><select id="pq_subj"></select></div>
-            <div><label>Exam</label><input id="pq_exam" placeholder="e.g. Final Prof"></div>
-          </div>
-          <div class="fg"><label>Question</label><textarea id="pq_text" rows="2" placeholder="What was asked..."></textarea></div>
-          <button class="btn bt" id="pq_add">+ Add</button>
-        </div>
-        <div class="card c-sky">
-          <div class="cardhd">Logged questions <span class="chip" id="pq_total">0</span></div>
-          <input id="pq_search" placeholder="🔍 Search..." style="margin-bottom:12px">
-          <div id="pq_list"></div>
-        </div>
-      </div>
-
       <!-- CASE LOG -->
       <div class="pg" id="pg-caselog">
         <div class="pagehd"><div><h2 class="brandfont">Case Log</h2><p>Your own real-patient reflections from the ward</p></div></div>
@@ -657,33 +737,25 @@ select option{background:var(--paper);color:var(--ink)}
         <div class="card c-violet"><div class="cardhd">Your cases <span class="chip" id="cl_total">0</span></div><div id="cl_list"></div></div>
       </div>
 
-      <!-- MOCK EXAM -->
-      <div class="pg" id="pg-mock">
-        <div class="pagehd"><div><h2 class="brandfont">Mock Exam</h2><p>Timed practice test — log your score when you're done</p></div></div>
-        <div class="card c-gold" style="margin-bottom:18px">
-          <div class="cardhd">Set up</div>
-          <div class="g3" style="margin-bottom:10px">
-            <div><label>Title</label><input id="mk_title" placeholder="e.g. Surgery mock — chapter 4"></div>
-            <div><label>Duration</label><select id="mk_dur"><option value="30">30 min</option><option value="60" selected>60 min</option><option value="90">90 min</option><option value="120">120 min</option></select></div>
-            <div><label>Total questions</label><input id="mk_total" type="number" placeholder="e.g. 50"></div>
-          </div>
-          <div id="mkIdle"><button class="btn bt" id="mk_start">▶ Start timed mock</button></div>
-          <div id="mkRun" style="display:none;text-align:center">
-            <div class="numfont" id="mkTimer" style="font-size:32px;font-weight:700;margin:10px 0"></div>
-            <button class="btn br" id="mk_finish">⏹ Finish now</button>
-          </div>
-          <div id="mkScoreEntry" style="display:none;margin-top:14px">
-            <div class="fg" style="max-width:220px"><label>How many did you get right?</label><input id="mk_correct" type="number"></div>
-            <button class="btn bt" id="mk_save">Save result</button>
-          </div>
-        </div>
-        <div class="card c-sky"><div class="cardhd">Past mocks</div><div id="mk_list"></div></div>
-      </div>
-
       <!-- DRUG LIBRARY -->
       <div class="pg" id="pg-drugs">
-        <div class="pagehd"><div><h2 class="brandfont">Drug Library</h2><p>Dose, frequency, duration and notes — starter set, expandable</p></div></div>
-        <div class="card c-teal">
+        <div class="pagehd"><div><h2 class="brandfont">Drug Library</h2><p>Dose, frequency, duration and notes — add your own or edit any entry</p></div></div>
+        <div class="card c-teal" style="margin-bottom:18px">
+          <div class="cardhd" id="drugFormHd">Add a drug</div>
+          <div class="g3" style="margin-bottom:10px">
+            <div><label>Generic name</label><input id="dg_generic" placeholder="e.g. Paracetamol"></div>
+            <div><label>Brand name(s)</label><input id="dg_brands" placeholder="e.g. Napa, Ace"></div>
+            <div><label>Category</label><input id="dg_cat" placeholder="e.g. Antipyretic / Analgesic"></div>
+          </div>
+          <div class="g3" style="margin-bottom:10px">
+            <div><label>Dose</label><input id="dg_dose" placeholder="e.g. 500 mg"></div>
+            <div><label>Frequency</label><input id="dg_freq" placeholder="e.g. 1+1+1"></div>
+            <div><label>Duration</label><input id="dg_dur" placeholder="e.g. 5 days"></div>
+          </div>
+          <div class="fg"><label>Before / after meal (or other note)</label><input id="dg_note" placeholder="e.g. After meal"></div>
+          <div class="btn-row"><button class="btn bt" id="dg_save">+ Add drug</button><button class="btn bo" id="dg_cancel" style="display:none">Cancel edit</button></div>
+        </div>
+        <div class="card c-em">
           <div class="g2" style="margin-bottom:12px">
             <input id="dl_search" placeholder="🔍 Search drugs...">
             <select id="dl_cat"><option value="">All categories</option></select>
@@ -694,8 +766,20 @@ select option{background:var(--paper);color:var(--ink)}
 
       <!-- INVESTIGATION LIBRARY -->
       <div class="pg" id="pg-invs">
-        <div class="pagehd"><div><h2 class="brandfont">Investigation Library</h2><p>Quick reference by category</p></div></div>
-        <div class="card c-sky">
+        <div class="pagehd"><div><h2 class="brandfont">Investigation Library</h2><p>Reference range and price — add your own or edit any entry</p></div></div>
+        <div class="card c-sky" style="margin-bottom:18px">
+          <div class="cardhd" id="invFormHd">Add an investigation</div>
+          <div class="g2" style="margin-bottom:10px">
+            <div><label>Investigation name</label><input id="iv_name" placeholder="e.g. Fasting Blood Sugar"></div>
+            <div><label>Category</label><input id="iv_cat" placeholder="e.g. Biochemistry"></div>
+          </div>
+          <div class="g2" style="margin-bottom:10px">
+            <div><label>Reference range</label><input id="iv_range" placeholder="e.g. 70-100 mg/dL"></div>
+            <div><label>Price (BDT)</label><input id="iv_price" placeholder="e.g. 300"></div>
+          </div>
+          <div class="btn-row"><button class="btn bt" id="iv_save">+ Add investigation</button><button class="btn bo" id="iv_cancel" style="display:none">Cancel edit</button></div>
+        </div>
+        <div class="card c-em">
           <div class="g2" style="margin-bottom:12px">
             <input id="il_search" placeholder="🔍 Search investigations...">
             <select id="il_cat"><option value="">All categories</option></select>
@@ -706,24 +790,103 @@ select option{background:var(--paper);color:var(--ink)}
 
       <!-- RX LIBRARY -->
       <div class="pg" id="pg-rx">
-        <div class="pagehd"><div><h2 class="brandfont">Rx Library</h2><p>Your own saved prescriptions, searchable by disease or symptom</p></div></div>
-        <div class="card c-em" style="margin-bottom:18px">
-          <div class="cardhd">Save a prescription</div>
-          <div class="fg"><label>Disease / diagnosis name</label><input id="rx_dx" placeholder="e.g. Community-acquired pneumonia"></div>
-          <div class="g2" style="margin-bottom:10px">
-            <div><label>Signs/Symptoms</label><textarea id="rx_ss" rows="2"></textarea></div>
-            <div><label>On examination</label><textarea id="rx_oe" rows="2"></textarea></div>
+        <div class="pagehd"><div><h2 class="brandfont">Rx Library</h2><p>Full prescription writer — search, edit, print, or save as PDF</p></div></div>
+
+        <div class="card c-em" style="margin-bottom:16px">
+          <div class="cardhd">👤 Patient details</div>
+          <div class="g3" style="margin-bottom:11px">
+            <div><label>Patient name</label><input id="rx_pname" placeholder="Full name"></div>
+            <div><label>Age</label><input id="rx_page" placeholder="35 yrs"></div>
+            <div><label>Sex</label><select id="rx_psex"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
           </div>
-          <div class="g2" style="margin-bottom:10px">
-            <div><label>Investigations</label><textarea id="rx_inv" rows="2"></textarea></div>
-            <div><label>Mx (management/drugs)</label><textarea id="rx_mx" rows="2"></textarea></div>
+          <div class="g3">
+            <div><label>Date</label><input id="rx_pdate" type="date"></div>
+            <div><label>Weight</label><input id="rx_pwt" placeholder="60 kg"></div>
+            <div><label>Height</label><input id="rx_pht" placeholder="165 cm"></div>
           </div>
-          <div class="fg"><label>Advice</label><textarea id="rx_adv" rows="2"></textarea></div>
-          <button class="btn bt" id="rx_add">+ Save</button>
         </div>
-        <div class="card c-rose">
-          <div class="cardhd">Saved Rx <span class="chip" id="rx_total">0</span></div>
-          <input id="rx_search" placeholder="🔍 Search by disease or symptom..." style="margin-bottom:12px">
+
+        <div class="card c-rose" style="margin-bottom:16px">
+          <div class="cardhd">🗣️ Complaints & diagnosis</div>
+          <div class="fg"><label>Chief complaints</label><textarea id="rx_cc" rows="2" placeholder="e.g. Fever for 5 days, headache..."></textarea></div>
+          <div class="g2">
+            <div><label>Diagnosis / disease name</label><input id="rx_dx" placeholder="e.g. Community-acquired pneumonia"></div>
+            <div><label>Differentials</label><input id="rx_dd" placeholder="D/D: ..."></div>
+          </div>
+        </div>
+
+        <div class="card c-gold" style="margin-bottom:16px">
+          <div class="cardhd">📖 History</div>
+          <div class="g2" style="margin-bottom:11px">
+            <div><label>History of present illness</label><textarea id="rx_hpi" rows="2"></textarea></div>
+            <div><label>Past medical & surgical history</label><textarea id="rx_pmh" rows="2"></textarea></div>
+          </div>
+          <div class="g2" style="margin-bottom:11px">
+            <div><label>Drug history & allergies ⚠️</label><textarea id="rx_dhx" rows="2"></textarea></div>
+            <div><label>Family history</label><textarea id="rx_fhx" rows="2"></textarea></div>
+          </div>
+          <div class="g2">
+            <div><label>Personal & social history</label><textarea id="rx_shx" rows="2"></textarea></div>
+            <div><label>Menstrual / obstetric history</label><textarea id="rx_ohx" rows="2"></textarea></div>
+          </div>
+        </div>
+
+        <div class="card c-sky" style="margin-bottom:16px">
+          <div class="cardhd">🩺 Examination</div>
+          <div class="g5" style="margin-bottom:12px">
+            <div><label>Pulse</label><input id="rx_pr" placeholder="—"></div>
+            <div><label>BP</label><input id="rx_bp" placeholder="—"></div>
+            <div><label>Temp</label><input id="rx_tm" placeholder="—"></div>
+            <div><label>Resp rate</label><input id="rx_rr" placeholder="—"></div>
+            <div><label>SpO₂</label><input id="rx_sp" placeholder="—"></div>
+          </div>
+          <div class="fg"><label>Examination findings</label><textarea id="rx_oe" rows="2" placeholder="General and systemic findings..."></textarea></div>
+        </div>
+
+        <div class="card c-teal" style="margin-bottom:16px">
+          <div class="cardhd">💊 Medicines <span class="chip" id="rxMdN">0</span></div>
+          <div class="g3" style="margin-bottom:9px">
+            <div class="ac"><label>Drug</label><input id="rx_dname" placeholder="Search drug library..." autocomplete="off"><div class="ac-drop" id="rx_dAc"></div></div>
+            <div><label>Dose</label><input id="rx_ddose"></div>
+            <div><label>Frequency</label><input id="rx_dfreq" placeholder="1+0+1"></div>
+          </div>
+          <div class="g3" style="margin-bottom:11px">
+            <div><label>Duration</label><input id="rx_ddur"></div>
+            <div><label>Route</label><input id="rx_droute" placeholder="Oral"></div>
+            <div><label>Note</label><input id="rx_dnote"></div>
+          </div>
+          <button class="btn bt bsm" id="rx_dAdd">+ Add medicine</button>
+          <div id="rxMdList" style="margin-top:12px"></div>
+        </div>
+
+        <div class="card c-violet" style="margin-bottom:16px">
+          <div class="cardhd">🔬 Investigations <span class="chip" id="rxIvN">0</span></div>
+          <div class="ac" style="margin-bottom:11px"><input id="rx_iname" placeholder="Search investigation library..." autocomplete="off"><div class="ac-drop" id="rx_iAc"></div></div>
+          <div id="rxIvList"></div>
+        </div>
+
+        <div class="card c-em" style="margin-bottom:16px">
+          <div class="cardhd">📋 Advice & follow-up</div>
+          <div class="fg"><label>Advice to patient</label><textarea id="rx_adv" rows="2"></textarea></div>
+          <div class="g2">
+            <div><label>Follow-up</label><input id="rx_fup" placeholder="After 7 days"></div>
+            <div><label>Referral</label><input id="rx_ref" placeholder="Refer to..."></div>
+          </div>
+        </div>
+
+        <div class="card c-gold" style="margin-bottom:16px">
+          <div class="btn-row">
+            <button class="btn bt" id="rx_save">💾 Save prescription</button>
+            <button class="btn bo" id="rx_dup" style="display:none">⧉ Duplicate as new</button>
+            <button class="btn bs" id="rx_print">🖨️ Preview & print / PDF</button>
+            <button class="btn bo" id="rx_new">🗒️ New / clear</button>
+            <span id="rxStatLine" style="font-size:12px;color:var(--muted);margin-left:auto"></span>
+          </div>
+        </div>
+
+        <div class="card c-sky">
+          <div class="cardhd">Saved prescriptions <span class="chip" id="rx_total">0</span></div>
+          <input id="rx_search" placeholder="🔍 Search by disease, symptom, or drug..." style="margin-bottom:12px">
           <div id="rx_list"></div>
         </div>
       </div>
@@ -784,6 +947,26 @@ select option{background:var(--paper);color:var(--ink)}
           </div>
           <button class="btn bt bsm" id="s_save">Save</button>
         </div>
+        <div class="card c-violet" style="margin-bottom:18px">
+          <div class="cardhd">Prescription letterhead <span class="chip">used when printing an Rx</span></div>
+          <div class="g2" style="margin-bottom:11px">
+            <div><label>Name (printed on Rx)</label><input id="s_rxname" placeholder="Dr. Md. Khalid"></div>
+            <div><label>Degrees</label><input id="s_rxdeg" placeholder="MBBS (SSMC)"></div>
+          </div>
+          <div class="g2" style="margin-bottom:11px">
+            <div><label>Designation</label><input id="s_rxdesig" placeholder="Intern Doctor, Dept. of Medicine"></div>
+            <div><label>Institution</label><input id="s_rxinst" placeholder="Shaheed Suhrawardy Medical College Hospital"></div>
+          </div>
+          <div class="g2" style="margin-bottom:11px">
+            <div><label>Registration no.</label><input id="s_rxreg" placeholder="BMDC Reg. A-XXXXX"></div>
+            <div><label>Mobile</label><input id="s_rxph" placeholder="01XXXXXXXXX"></div>
+          </div>
+          <div class="g2" style="margin-bottom:11px">
+            <div><label>Chamber name</label><input id="s_rxchamber" placeholder="Chamber / clinic name"></div>
+            <div><label>Chamber address</label><input id="s_rxaddr" placeholder="Address"></div>
+          </div>
+          <button class="btn bt bsm" id="s_rxsave">Save letterhead</button>
+        </div>
         <div class="card c-sky" style="margin-bottom:18px">
           <div class="cardhd">Appearance</div>
           <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Use the moon/sun icon in the top bar anytime — this just confirms your current mode.</p>
@@ -817,6 +1000,7 @@ select option{background:var(--paper);color:var(--ink)}
   </div>
 </div>
 
+<div id="sheet"></div>
 <div id="toast"></div>
 <div id="levelup">
   <svg class="badge" viewBox="0 0 160 160">
@@ -932,7 +1116,7 @@ const CASES = [
 
 /* ============ STORAGE (local cache + cloud) ============ */
 const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog",flashcards:"srx_flashcards",notes:"srx_notes",mnemonics:"srx_mnemonics",qbank:"srx_qbank",
-  wards:"srx_wards",procedures:"srx_procedures",caseProgress:"srx_caseprogress",pyq:"srx_pyq",caselog:"srx_caselog",mockexams:"srx_mockexams",rx:"srx_rx",milestones:"srx_milestones"};
+  wards:"srx_wards",procedures:"srx_procedures",caseProgress:"srx_caseprogress",customCases:"srx_customcases",caselog:"srx_caselog",rx:"srx_rx",milestones:"srx_milestones",drugs:"srx_drugs",invs:"srx_invs"};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -942,7 +1126,7 @@ const svLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let USER=null;
 let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[]),
   flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[]),qbank:ld(K.qbank,[]),
-  wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),pyq:ld(K.pyq,[]),caselog:ld(K.caselog,[]),mockexams:ld(K.mockexams,[]),rx:ld(K.rx,[]),milestones:ld(K.milestones,[])};
+  wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),customCases:ld(K.customCases,[]),caselog:ld(K.caselog,[]),rx:ld(K.rx,[]),milestones:ld(K.milestones,[]),drugs:ld(K.drugs,[]),invs:ld(K.invs,[])};
 
 let cloudTimer=null;
 function sv(type,val){
@@ -1011,6 +1195,14 @@ async function onLogin(user){
     }));
     sv("phases",DB.phases);
   }
+  if(!DB.drugs||!DB.drugs.length){
+    DB.drugs = DRUGS.map(d=>Object.assign({id:uid()},d));
+    sv("drugs",DB.drugs);
+  }
+  if(!DB.invs||!DB.invs.length){
+    DB.invs = INVS.map(i=>Object.assign({id:uid()},i));
+    sv("invs",DB.invs);
+  }
   if(!DB.profile.name) DB.profile.name = (user.email||"Student").split("@")[0];
   $("s_email").value=user.email||"";
   renderAll();
@@ -1021,10 +1213,11 @@ $("s_reset").onclick=async()=>{
   if(!confirm("Really sure? This cannot be undone."))return;
   toast("Resetting…");
   const freshName = USER&&USER.email ? USER.email.split("@")[0] : "";
+  const keepDriveFolderId = DB.profile.driveFolderId;
   const empty={
-    phases:[],routine:[],profile:{name:freshName,xp:0,streak:0,lastActive:null},xplog:[],
+    phases:[],routine:[],profile:{name:freshName,xp:0,streak:0,lastActive:null,driveFolderId:keepDriveFolderId},xplog:[],
     flashcards:[],notes:[],mnemonics:[],qbank:[],
-    wards:[],procedures:[],caseProgress:{},pyq:[],caselog:[],mockexams:[],rx:[],milestones:[]
+    wards:[],procedures:[],caseProgress:{},customCases:[],caselog:[],rx:[],milestones:[],drugs:[],invs:[]
   };
   Object.keys(K).forEach(type=>{ DB[type]=empty[type]; svLocal(K[type],DB[type]); });
   DB.phases = DEFAULT_PHASES.map(p=>({
@@ -1032,6 +1225,10 @@ $("s_reset").onclick=async()=>{
     subjects:p.subjects.map((s,i)=>({id:uid(),name:s,color:colorFor(s,i),chapters:[]}))
   }));
   svLocal(K.phases,DB.phases);
+  DB.drugs = DRUGS.map(d=>Object.assign({id:uid()},d));
+  svLocal(K.drugs,DB.drugs);
+  DB.invs = INVS.map(i=>Object.assign({id:uid()},i));
+  svLocal(K.invs,DB.invs);
   activePhase=null; expandedTopics=new Set(); activeCase=null; reviewQueue=[]; osceDeck=[];
   if(sb&&USER){ await Promise.all(Object.keys(K).map(type=>pushType(type))); }
   renderAll();
@@ -1053,21 +1250,19 @@ function renderPage(p){
   if(p==="dash")renderDash();
   if(p==="curric")renderCurric();
   if(p==="routine")renderRoutine();
-  if(p==="pomo")fillTopicSelect($("pm_topic"));
-  if(p==="flash"){fillTopicSelect($("fc_topic"));renderFlashcards()}
-  if(p==="notes"){fillTopicSelect($("nt_topic"));renderNotes()}
+  if(p==="pomo")wireCascade("pm_subj","pm_chap","pm_top");
+  if(p==="flash"){wireCascade("fc_subj","fc_chap","fc_top");renderFlashcards()}
+  if(p==="notes"){wireCascade("nt_subj","nt_chap","nt_top");renderNotes()}
   if(p==="mnem"){fillSubjectSelect($("mn_subj"));renderMnemonics()}
   if(p==="qbank"){fillSubjectSelect($("qb_subj"));fillTopicSelect($("qb_topic"));renderQBank()}
   if(p==="ana")renderAnalytics();
   if(p==="ward")renderWard();
   if(p==="case")renderCaseList();
   if(p==="osce"){ /* idle state only, no render needed until started */ }
-  if(p==="pyq"){fillSubjectSelect($("pq_subj"));renderPYQ()}
   if(p==="caselog")renderCaseLog();
-  if(p==="mock")renderMock();
   if(p==="drugs"){fillDrugCats();renderDrugs()}
   if(p==="invs"){fillInvCats();renderInvs()}
-  if(p==="rx")renderRx();
+  if(p==="rx"){ if(!$("rx_pdate").value) $("rx_pdate").value=todayStr(); renderRx(); }
   if(p==="pdf")renderDriveUI();
   if(p==="milestones")renderMilestones();
   if(p==="ai"){ /* nothing to preload */ }
@@ -1075,7 +1270,7 @@ function renderPage(p){
 }
 function renderAll(){
   renderSidebarSubjects(); renderDash(); renderCurric(); renderRoutine(); updateTopbar();
-  fillTopicSelect($("rt_topic")); fillTopicSelect($("pm_topic")); fillTopicSelect($("fc_topic")); fillTopicSelect($("nt_topic"));
+  wireCascade("rt_subj","rt_chap","rt_top"); wireCascade("pm_subj","pm_chap","pm_top"); wireCascade("fc_subj","fc_chap","fc_top"); wireCascade("nt_subj","nt_chap","nt_top");
   fillSubjectSelect($("mn_subj")); renderFlashcards(); renderNotes(); renderMnemonics();
 }
 function fillSubjectSelect(sel){
@@ -1098,9 +1293,25 @@ function allTopics(){
 }
 function renderSidebarSubjects(){
   const el=$("subjRail");
-  el.innerHTML = allSubjects().slice(0,8).map(s=>
-    `<button class="railsub iconbtn" style="color:${s.color};border-color:${s.color}55" title="${esc(s.name)}">${subjIcon(s.name,19)}</button>`
+  el.innerHTML = allSubjects().map(s=>
+    `<button class="railbtn" style="color:${s.color}" data-gotosubj="${s.id}" title="${esc(s.name)}">${subjIcon(s.name,17)}<span class="raillabel">${esc(s.name)}</span></button>`
   ).join("");
+  el.querySelectorAll("[data-gotosubj]").forEach(b=>b.onclick=()=>goToSubject(b.dataset.gotosubj));
+}
+function goToSubject(subjectId){
+  const ph=(DB.phases||[]).find(p=>(p.subjects||[]).some(s=>s.id===subjectId));
+  if(!ph)return;
+  activePhase=ph.id;
+  document.querySelectorAll(".railbtn[data-p]").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".pg").forEach(x=>x.classList.remove("on","pgslide-l","pgslide-r"));
+  const navBtn=document.querySelector('.railbtn[data-p="curric"]'); if(navBtn)navBtn.classList.add("on");
+  const target=$("pg-curric"); target.classList.add("on","pgslide-r");
+  window.scrollTo({top:0,behavior:"smooth"});
+  renderCurric();
+  setTimeout(()=>{
+    const el=document.querySelector(`[data-subjectblock="${subjectId}"]`);
+    if(el){ el.scrollIntoView({behavior:"smooth",block:"start"}); el.style.outline="2px solid var(--emerald)"; el.style.outlineOffset="2px"; setTimeout(()=>{el.style.outline="";el.style.outlineOffset="";},1800); }
+  },80);
 }
 
 /* ============ 3D TILT ============ */
@@ -1175,6 +1386,13 @@ function renderDash(){
   $("streakBig").textContent=DB.profile.streak||0;
 
   const topics=allTopics();
+  const masteredCount=topics.filter(t=>t.status==="mastered").length;
+  const cardsReviewedCount=(DB.xplog||[]).filter(e=>e.reason==="Reviewed a flashcard").length;
+  $("rankStats").innerHTML = `
+    <div class="rankstat"><div class="rsnum numfont">${xp}</div><div class="rslabel">Total XP</div></div>
+    <div class="rankstat"><div class="rsnum numfont">${masteredCount}</div><div class="rslabel">Mastered</div></div>
+    <div class="rankstat"><div class="rsnum numfont">${cardsReviewedCount}</div><div class="rslabel">Cards Reviewed</div></div>`;
+
   const subs=allSubjects();
   $("subjRings").innerHTML = subs.length ? subs.map(s=>{
     const st=topics.filter(t=>t.subjectId===s.id);
@@ -1211,6 +1429,21 @@ function renderDash(){
   processQuestClaims();
   renderQuestList();
   renderBadges();
+  renderCourseTiles();
+}
+function renderCourseTiles(){
+  const subs=allSubjects(), topics=allTopics();
+  $("courseTiles").innerHTML = subs.length ? subs.map(s=>{
+    const st=topics.filter(t=>t.subjectId===s.id);
+    const done=st.filter(t=>t.status==="mastered"||t.status==="revised").length;
+    const pct=st.length?Math.round(done/st.length*100):0;
+    return `<div class="course-tile" style="--tc:${s.color}" data-tilesubj="${s.id}">
+      <div class="cticon">${subjIcon(s.name,22)}</div>
+      <div class="ctname">${esc(s.name)}</div>
+      <div class="ctpct">${st.length?pct+"% complete":"No topics yet"}</div>
+    </div>`;
+  }).join("") : '<div class="empty">Add subjects in Curriculum to see your courses here</div>';
+  $("courseTiles").querySelectorAll("[data-tilesubj]").forEach(el=>el.onclick=()=>goToSubject(el.dataset.tilesubj));
 }
 
 /* ============ CURRICULUM ============ */
@@ -1263,9 +1496,10 @@ function renderCurric(){
 }
 function subjectBlockHTML(s){
   const chapters=s.chapters||[];
-  return `<div class="card" style="margin-bottom:14px;border-left:3px solid ${s.color}">
+  return `<div class="card" style="margin-bottom:14px;border-left:3px solid ${s.color}" data-subjectblock="${s.id}">
     <div class="cardhd" style="color:${s.color}">${subjIcon(s.name,17)} ${esc(s.name)}
-      <button class="iconbtn" style="margin-left:auto" data-delsubj="${s.id}">🗑</button>
+      <button class="iconbtn" style="margin-left:auto" data-editsubj="${s.id}">✎</button>
+      <button class="iconbtn" data-delsubj="${s.id}">🗑</button>
     </div>
     <div class="fg" style="max-width:220px"><label>Exam date for this subject (optional)</label><input type="date" value="${s.examDate||''}" data-subjexam="${s.id}"></div>
     <div class="btn-row" style="margin-bottom:10px"><input placeholder="New chapter name" id="newChap_${s.id}" style="max-width:220px"><button class="btn bo bsm" data-addchap="${s.id}">+ Add chapter</button></div>
@@ -1277,6 +1511,7 @@ function chapterBlockHTML(s,c){
   return `<div style="margin-bottom:12px;padding-left:2px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
       <b style="font-size:12.5px">${esc(c.name)}</b>
+      <button class="iconbtn bxs" data-editchap="${s.id}|${c.id}" style="width:24px;height:24px">✎</button>
       <button class="iconbtn bxs" data-delchap="${s.id}|${c.id}" style="width:24px;height:24px">🗑</button>
       <div style="flex:1"></div>
       <input placeholder="New topic" id="newTop_${c.id}" style="max-width:170px;padding:6px 10px;font-size:12px">
@@ -1298,6 +1533,7 @@ function topicRowHTML(s,c,t){
       <span class="statpill" data-s="revised" data-topic="${s.id}|${c.id}|${t.id}">Revised</span>
       <span class="statpill" data-s="mastered" data-topic="${s.id}|${c.id}|${t.id}">Mastered</span>
     </div>
+    <button class="iconbtn" data-edittop="${s.id}|${c.id}|${t.id}" style="width:26px;height:26px">✎</button>
     <button class="iconbtn" data-linktoggle="${t.id}" title="Related topics">🔗${related.length?' '+related.length:''}</button>
     <button class="iconbtn" data-deltop="${s.id}|${c.id}|${t.id}" style="width:26px;height:26px">✕</button>
   </div>
@@ -1362,6 +1598,23 @@ function wireSubjectBlocks(ph){
     if(!confirm("Delete this subject and all its chapters/topics?"))return;
     ph.subjects=ph.subjects.filter(s=>s.id!==b.dataset.delsubj); sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
   });
+  $("phaseBody").querySelectorAll("[data-editsubj]").forEach(b=>b.onclick=()=>{
+    const s=ph.subjects.find(x=>x.id===b.dataset.editsubj);
+    const nn=prompt("Rename subject:",s.name); if(!nn||!nn.trim())return;
+    s.name=nn.trim(); sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
+  });
+  $("phaseBody").querySelectorAll("[data-editchap]").forEach(b=>b.onclick=()=>{
+    const [sid,cid]=b.dataset.editchap.split("|");
+    const s=ph.subjects.find(x=>x.id===sid); const c=s.chapters.find(x=>x.id===cid);
+    const nn=prompt("Rename chapter:",c.name); if(!nn||!nn.trim())return;
+    c.name=nn.trim(); sv("phases",DB.phases); renderCurric();
+  });
+  $("phaseBody").querySelectorAll("[data-edittop]").forEach(b=>b.onclick=()=>{
+    const [sid,cid,tid]=b.dataset.edittop.split("|");
+    const {t}=findSCT(sid,cid,tid);
+    const nn=prompt("Rename topic:",t.name); if(!nn||!nn.trim())return;
+    t.name=nn.trim(); sv("phases",DB.phases); renderCurric();
+  });
   $("phaseBody").querySelectorAll("[data-addchap]").forEach(b=>b.onclick=()=>{
     const s=ph.subjects.find(x=>x.id===b.dataset.addchap);
     const inp=$("newChap_"+s.id); const name=inp.value.trim(); if(!name)return;
@@ -1379,7 +1632,8 @@ function wireSubjectBlocks(ph){
     const s=ph.subjects.find(x=>x.id===sid); const c=s.chapters.find(x=>x.id===cid);
     const inp=$("newTop_"+cid); const name=inp.value.trim(); if(!name)return;
     c.topics=c.topics||[]; c.topics.push({id:uid(),name,status:"todo",xpAwarded:0});
-    sv("phases",DB.phases); renderCurric(); fillTopicSelect($("rt_topic")); fillTopicSelect($("pm_topic"));
+    sv("phases",DB.phases); renderCurric();
+    wireCascade("rt_subj","rt_chap","rt_top"); wireCascade("pm_subj","pm_chap","pm_top"); wireCascade("fc_subj","fc_chap","fc_top"); wireCascade("nt_subj","nt_chap","nt_top");
   });
   $("phaseBody").querySelectorAll("[data-deltop]").forEach(b=>b.onclick=()=>{
     const [sid,cid,tid]=b.dataset.deltop.split("|");
@@ -1433,9 +1687,10 @@ $("rt_add").onclick=()=>{
   const title=$("rt_title").value.trim();
   if(!title){toast("Enter a task title");return}
   DB.routine=DB.routine||[];
-  DB.routine.push({id:uid(),title,date:$("rt_date").value||todayStr(),pri:$("rt_pri").value,time:$("rt_time").value,topicId:$("rt_topic").value||null,done:false});
+  DB.routine.push({id:uid(),title,date:$("rt_date").value||todayStr(),pri:$("rt_pri").value,time:$("rt_time").value,topicId:$("rt_top").value||null,done:false});
   sv("routine",DB.routine);
   $("rt_title").value="";$("rt_time").value="";
+  resetCascade("rt_subj","rt_chap","rt_top");
   renderRoutine(); toast("Task added");
 };
 function routineRowHTML(r){
@@ -1461,7 +1716,7 @@ function wireRoutineRows(containerId){
   });
 }
 function renderRoutine(){
-  fillTopicSelect($("rt_topic"));
+  wireCascade("rt_subj","rt_chap","rt_top");
   const list=[...(DB.routine||[])].sort((a,b)=>(a.date+((a.time)||"00:00")).localeCompare(b.date+((b.time)||"00:00")));
   $("routineList").innerHTML = list.length ? list.map(routineRowHTML).join("") : '<div class="empty">No tasks yet — add one above</div>';
   wireRoutineRows("routineList");
@@ -1496,17 +1751,47 @@ $("pm_pause").onclick=()=>{ clearInterval(pmInterval); pmRunning=false; $("pm_st
 $("pm_reset").onclick=()=>{ clearInterval(pmInterval); pmRunning=false; pmSecondsLeft=pmSecondsTotal; $("pm_start").style.display="inline-flex"; $("pm_pause").style.display="none"; $("pmState").textContent="Ready"; pmRender(); };
 pmRender();
 
+/* ============ SUBJECT → CHAPTER → TOPIC CASCADE (reusable) ============ */
+function fillCascadeSubjects(subjId){
+  const sel=$(subjId); if(!sel)return;
+  sel.innerHTML='<option value="">Subject…</option>'+allSubjects().map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+}
+function wireCascade(subjId,chapId,topId){
+  const subjSel=$(subjId), chapSel=$(chapId), topSel=$(topId);
+  if(!subjSel||!chapSel||!topSel)return;
+  fillCascadeSubjects(subjId);
+  chapSel.disabled=true; topSel.disabled=true;
+  subjSel.onchange=()=>{
+    const s=allSubjects().find(x=>x.id===subjSel.value);
+    chapSel.innerHTML='<option value="">Chapter…</option>'+(s?(s.chapters||[]).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join(""):"");
+    chapSel.disabled=!s;
+    topSel.innerHTML='<option value="">Topic…</option>'; topSel.disabled=true;
+  };
+  chapSel.onchange=()=>{
+    const s=allSubjects().find(x=>x.id===subjSel.value);
+    const c=s?(s.chapters||[]).find(x=>x.id===chapSel.value):null;
+    topSel.innerHTML='<option value="">Topic…</option>'+(c?(c.topics||[]).map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join(""):"");
+    topSel.disabled=!c;
+  };
+}
+function resetCascade(subjId,chapId,topId){
+  $(subjId).value="";
+  $(chapId).innerHTML='<option value="">Chapter…</option>'; $(chapId).disabled=true;
+  $(topId).innerHTML='<option value="">Topic…</option>'; $(topId).disabled=true;
+}
+
 /* ============ FLASHCARDS (simplified SM-2) ============ */
 function addDays(dstr,n){const d=new Date(dstr+"T00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
 $("fc_add").onclick=()=>{
   const front=$("fc_front").value.trim(), back=$("fc_back").value.trim();
   if(!front||!back){toast("Fill in both front and back");return}
-  const t=allTopics().find(x=>x.id===$("fc_topic").value);
+  const t=allTopics().find(x=>x.id===$("fc_top").value);
   DB.flashcards=DB.flashcards||[];
   DB.flashcards.push({id:uid(),front,back,topicId:t?t.id:null,topicName:t?t.name:null,subjectColor:t?t.subjectColor:"#22ffb0",
     ease:2.5,interval:1,reps:0,due:todayStr()});
   sv("flashcards",DB.flashcards);
   $("fc_front").value="";$("fc_back").value="";
+  resetCascade("fc_subj","fc_chap","fc_top");
   renderFlashcards(); toast("Card added");
 };
 let reviewQueue=[], reviewShowBack=false, reviewMode="due";
@@ -1577,11 +1862,12 @@ function gradeCard(c,q){
 $("nt_add").onclick=()=>{
   const title=$("nt_title").value.trim(), body=$("nt_body").value.trim();
   if(!title){toast("Give the note a title");return}
-  const t=allTopics().find(x=>x.id===$("nt_topic").value);
+  const t=allTopics().find(x=>x.id===$("nt_top").value);
   DB.notes=DB.notes||[];
   DB.notes.push({id:uid(),title,body,topicId:t?t.id:null,topicName:t?t.name:null,color:t?t.subjectColor:"#22ffb0",ts:Date.now()});
   sv("notes",DB.notes);
   $("nt_title").value="";$("nt_body").value="";
+  resetCascade("nt_subj","nt_chap","nt_top");
   renderNotes(); toast("Note saved");
 };
 function renderNotes(q){
@@ -1716,11 +2002,35 @@ $("wd_add").onclick=()=>{
   const dept=$("wd_dept").value.trim();
   if(!dept){toast("Enter a department name");return}
   DB.wards=DB.wards||[];
-  DB.wards.push({id:uid(),dept,from:$("wd_from").value||todayStr(),to:$("wd_to").value||todayStr(),present:0});
+  DB.wards.push({id:uid(),dept,from:$("wd_from").value||todayStr(),to:$("wd_to").value||todayStr(),present:0,topics:[]});
   sv("wards",DB.wards);
   $("wd_dept").value="";
   renderWard(); toast("Posting added");
 };
+function wardRowHTML(w){
+  const topics=w.topics||[];
+  return `<div class="card" style="border-left:3px solid #38bdf8;margin-bottom:12px;padding:16px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <div><div class="rowtitle">${esc(w.dept)}</div><div class="rowsub">${esc(w.from)} — ${esc(w.to)} · ${w.present||0} day${w.present!==1?'s':''} attended</div></div>
+      <div class="btn-row">
+        <button class="iconbtn" data-wdpresent="${w.id}" title="Log a day attended">+1 day</button>
+        <button class="iconbtn" data-wddel="${w.id}">✕</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Topics to cover in this posting</div>
+      <div style="display:flex;gap:8px;margin-bottom:9px">
+        <input placeholder="e.g. Acute abdomen presentation" id="wdTopicInp_${w.id}">
+        <button class="btn bo bxs" data-addwdtop="${w.id}" style="flex-shrink:0">+ Add</button>
+      </div>
+      ${topics.length ? topics.map(t=>`<div class="quest-row">
+        <div class="quest-box ${t.done?'done':''}" data-wdtoptoggle="${w.id}|${t.id}"></div>
+        <div style="flex:1;font-size:12.5px;${t.done?'text-decoration:line-through;opacity:.6':''}">${esc(t.name)}</div>
+        <button class="iconbtn" data-wdtopdel="${w.id}|${t.id}" style="width:22px;height:22px">✕</button>
+      </div>`).join("") : '<div style="font-size:11.5px;color:var(--faint)">No topics added yet for this posting</div>'}
+    </div>
+  </div>`;
+}
 function renderWard(){
   $("wardFinalDate").value=DB.profile.wardFinalDate||"";
   if(DB.profile.wardFinalDate){
@@ -1731,16 +2041,31 @@ function renderWard(){
   } else { $("wardCdNum").textContent="—"; $("wardCdLabel").textContent="Set a date above"; }
 
   const wards=DB.wards||[];
-  $("wardList").innerHTML = wards.length ? wards.map(w=>`<div class="row" style="--rc:#38bdf8">
-    <div class="rowmain"><div class="rowtitle">${esc(w.dept)}</div><div class="rowsub">${esc(w.from)} — ${esc(w.to)} · ${w.present||0} day${w.present!==1?'s':''} attended</div></div>
-    <button class="iconbtn" data-wdpresent="${w.id}" title="Log a day attended">+1 day</button>
-    <button class="iconbtn" data-wddel="${w.id}">✕</button></div>`).join("") : '<div class="empty">No postings yet — add one above</div>';
+  $("wardList").innerHTML = wards.length ? wards.map(wardRowHTML).join("") : '<div class="empty">No postings yet — add one above</div>';
   $("wardList").querySelectorAll("[data-wdpresent]").forEach(b=>b.onclick=()=>{
     const w=DB.wards.find(x=>x.id===b.dataset.wdpresent); w.present=(w.present||0)+1; sv("wards",DB.wards);
     addXP(2,"Ward attendance logged"); renderWard();
   });
   $("wardList").querySelectorAll("[data-wddel]").forEach(b=>b.onclick=()=>{
     DB.wards=DB.wards.filter(w=>w.id!==b.dataset.wddel); sv("wards",DB.wards); renderWard();
+  });
+  $("wardList").querySelectorAll("[data-addwdtop]").forEach(b=>b.onclick=()=>{
+    const w=DB.wards.find(x=>x.id===b.dataset.addwdtop);
+    const inp=$("wdTopicInp_"+w.id); const name=inp.value.trim(); if(!name)return;
+    w.topics=w.topics||[]; w.topics.push({id:uid(),name,done:false});
+    sv("wards",DB.wards); renderWard();
+  });
+  $("wardList").querySelectorAll("[data-wdtoptoggle]").forEach(b=>b.onclick=()=>{
+    const [wid,tid]=b.dataset.wdtoptoggle.split("|");
+    const w=DB.wards.find(x=>x.id===wid); const t=w.topics.find(x=>x.id===tid);
+    const wasDone=t.done; t.done=!t.done; sv("wards",DB.wards);
+    if(t.done && !wasDone) addXP(2,"Ward topic covered: "+t.name);
+    renderWard();
+  });
+  $("wardList").querySelectorAll("[data-wdtopdel]").forEach(b=>b.onclick=()=>{
+    const [wid,tid]=b.dataset.wdtopdel.split("|");
+    const w=DB.wards.find(x=>x.id===wid); w.topics=(w.topics||[]).filter(t=>t.id!==tid);
+    sv("wards",DB.wards); renderWard();
   });
 
   $("procSuggest").innerHTML = PROC_SUGGEST.map(p=>`<option value="${esc(p)}">`).join("");
@@ -1773,22 +2098,30 @@ $("pr_add").onclick=()=>{
   renderWard(); toast("Procedure added");
 };
 
+function allCases(){ return [...CASES, ...(DB.customCases||[])]; }
 function renderCaseList(){
   DB.caseProgress=DB.caseProgress||{};
-  $("caseList").innerHTML = CASES.map(cs=>{
+  const cases=allCases();
+  $("caseList").innerHTML = cases.map(cs=>{
     const prog=DB.caseProgress[cs.id];
     return `<div class="card" style="border-left:3px solid ${cs.color}">
-      <div class="cardhd" style="color:${cs.color}">${esc(cs.title)}</div>
+      <div class="cardhd" style="color:${cs.color}">${esc(cs.title)}${cs.custom?' <span class="chip" style="margin-left:6px">Imported</span>':''}
+        ${cs.custom?`<button class="iconbtn" style="margin-left:auto" data-delcase="${cs.id}">🗑</button>`:''}</div>
       <div class="chip" style="margin-bottom:10px">${esc(cs.specialty)}</div>
       ${prog?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Best score: ${prog.score}/20</div>`:""}
       <button class="btn bt bsm" data-startcase="${cs.id}">${prog?"Retry case":"Start case"}</button>
     </div>`;
   }).join("");
   $("caseList").querySelectorAll("[data-startcase]").forEach(b=>b.onclick=()=>startCase(b.dataset.startcase));
+  $("caseList").querySelectorAll("[data-delcase]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Remove this imported case?"))return;
+    DB.customCases=(DB.customCases||[]).filter(c=>c.id!==b.dataset.delcase);
+    sv("customCases",DB.customCases); renderCaseList();
+  });
 }
 let activeCase=null, caseStepIdx=0, caseScore=0;
 function startCase(id){
-  activeCase=CASES.find(c=>c.id===id); caseStepIdx=0; caseScore=0;
+  activeCase=allCases().find(c=>c.id===id); caseStepIdx=0; caseScore=0;
   $("casePlayerCard").style.display="block";
   renderCaseStep();
   $("casePlayerCard").scrollIntoView({behavior:"smooth"});
@@ -1834,6 +2167,39 @@ function renderCaseStep(){
   $("caseNextBtn").onclick=()=>{ caseStepIdx++; renderCaseStep(); };
 }
 
+function normalizeImportedCase(raw){
+  if(!raw||!raw.title||!Array.isArray(raw.steps)||!raw.steps.length)return null;
+  const steps=raw.steps.map(s=>({
+    q:String(s.q||s.question||"").trim(),
+    opts:(Array.isArray(s.opts)?s.opts:Array.isArray(s.options)?s.options:[]).map(String),
+    correct:typeof s.correct==="number"?s.correct:(typeof s.correctIndex==="number"?s.correctIndex:0),
+    explain:String(s.explain||s.explanation||"").trim()
+  })).filter(s=>s.q && s.opts.length>=2);
+  if(!steps.length)return null;
+  const specialty=String(raw.specialty||"General").trim();
+  return {
+    id:"custom_"+uid(), title:String(raw.title).trim(), specialty,
+    color:colorFor(specialty,4), scenario:String(raw.scenario||"").trim(), steps, custom:true
+  };
+}
+$("case_import_btn").onclick=()=>{
+  const txt=$("case_import_text").value.trim();
+  if(!txt){toast("Paste some JSON first");return}
+  let parsed;
+  try{ parsed=JSON.parse(txt); }
+  catch(e){ $("case_import_status").textContent="Couldn't parse that as JSON — check for a stray comma or quote."; return }
+  const rawList=Array.isArray(parsed)?parsed:[parsed];
+  const newCases=rawList.map(normalizeImportedCase).filter(Boolean);
+  if(!newCases.length){ $("case_import_status").textContent="No valid cases found — check the format above."; return }
+  DB.customCases=DB.customCases||[];
+  DB.customCases.push(...newCases);
+  sv("customCases",DB.customCases);
+  $("case_import_text").value="";
+  $("case_import_status").textContent="Imported "+newCases.length+" case"+(newCases.length!==1?"s":"")+" ✓";
+  addXP(3,"Imported a custom case");
+  renderCaseList();
+};
+
 /* ============ OSCE / VIVA DRILL ============ */
 let osceTimer=null, osceSecs=0, osceRight=0, osceTotal=0, osceDeck=[];
 $("osce_start").onclick=()=>{
@@ -1869,36 +2235,6 @@ function endOsce(){
   toast("Drill done — "+osceRight+"/"+osceTotal+" correct");
 }
 
-/* ============ PYQ TRACKER ============ */
-$("pq_add").onclick=()=>{
-  const subj=allSubjects().find(x=>x.id===$("pq_subj").value);
-  const text=$("pq_text").value.trim();
-  if(!subj){toast("Choose a subject");return}
-  if(!text){toast("Enter the question");return}
-  DB.pyq=DB.pyq||[];
-  DB.pyq.push({id:uid(),year:$("pq_year").value.trim(),exam:$("pq_exam").value.trim(),
-    subjectId:subj.id,subjectName:subj.name,subjectColor:subj.color,text});
-  sv("pyq",DB.pyq);
-  addXP(2,"Logged a PYQ");
-  $("pq_year").value="";$("pq_exam").value="";$("pq_text").value="";
-  renderPYQ(); toast("Question added");
-};
-function renderPYQ(q){
-  q=(q||$("pq_search").value||"").toLowerCase();
-  let list=[...(DB.pyq||[])].sort((a,b)=>(b.year||"").localeCompare(a.year||""));
-  if(q) list=list.filter(p=>(p.text+" "+p.subjectName+" "+(p.exam||"")).toLowerCase().includes(q));
-  $("pq_total").textContent=(DB.pyq||[]).length;
-  $("pq_list").innerHTML = list.length ? list.map(p=>`<div class="row" style="--rc:${p.subjectColor};align-items:flex-start">
-    <div style="color:${p.subjectColor}">${subjIcon(p.subjectName,15)}</div>
-    <div class="rowmain"><div class="rowtitle">${esc(p.text)}</div>
-    <div class="rowsub">${esc(p.subjectName)}${p.exam?" · "+esc(p.exam):""}${p.year?" · "+esc(p.year):""}</div></div>
-    <button class="iconbtn" data-delpq="${p.id}">✕</button></div>`).join("") : '<div class="empty">No questions logged yet — add one above</div>';
-  $("pq_list").querySelectorAll("[data-delpq]").forEach(b=>b.onclick=()=>{
-    DB.pyq=DB.pyq.filter(p=>p.id!==b.dataset.delpq); sv("pyq",DB.pyq); renderPYQ();
-  });
-}
-$("pq_search").oninput=()=>renderPYQ();
-
 /* ============ CASE LOG ============ */
 $("cl_add").onclick=()=>{
   const dept=$("cl_dept").value.trim(), pres=$("cl_pres").value.trim();
@@ -1921,51 +2257,6 @@ function renderCaseLog(){
     <button class="iconbtn" data-delcl="${c.id}">✕</button></div>`).join("") : '<div class="empty">No cases logged yet — add one above</div>';
   $("cl_list").querySelectorAll("[data-delcl]").forEach(b=>b.onclick=()=>{
     DB.caselog=DB.caselog.filter(c=>c.id!==b.dataset.delcl); sv("caselog",DB.caselog); renderCaseLog();
-  });
-}
-
-/* ============ MOCK EXAM ============ */
-let mkTimer=null, mkSecs=0;
-$("mk_start").onclick=()=>{
-  const title=$("mk_title").value.trim();
-  if(!title){toast("Give the mock a title");return}
-  mkSecs=+$("mk_dur").value*60;
-  $("mkIdle").style.display="none"; $("mkRun").style.display="block"; $("mkScoreEntry").style.display="none";
-  clearInterval(mkTimer);
-  mkTimer=setInterval(()=>{
-    mkSecs--; $("mkTimer").textContent=Math.floor(mkSecs/60)+":"+String(mkSecs%60).padStart(2,"0");
-    if(mkSecs<=0) finishMock();
-  },1000);
-};
-$("mk_finish").onclick=()=>finishMock();
-function finishMock(){
-  clearInterval(mkTimer);
-  $("mkRun").style.display="none"; $("mkScoreEntry").style.display="block";
-}
-$("mk_save").onclick=()=>{
-  const title=$("mk_title").value.trim()||"Mock exam";
-  const total=parseInt($("mk_total").value)||0;
-  const correct=parseInt($("mk_correct").value);
-  if(isNaN(correct)){toast("Enter how many you got right");return}
-  DB.mockexams=DB.mockexams||[];
-  DB.mockexams.push({id:uid(),title,date:todayStr(),durationMin:+$("mk_dur").value,total,correct});
-  sv("mockexams",DB.mockexams);
-  addXP(8,"Completed mock: "+title);
-  $("mk_title").value="";$("mk_total").value="";$("mk_correct").value="";
-  $("mkIdle").style.display="block"; $("mkScoreEntry").style.display="none";
-  renderMock(); toast("Mock result saved");
-};
-function renderMock(){
-  const list=[...(DB.mockexams||[])].sort((a,b)=>b.date.localeCompare(a.date));
-  $("mk_list").innerHTML = list.length ? list.map(m=>{
-    const pct = m.total? Math.round(m.correct/m.total*100) : null;
-    return `<div class="row" style="--rc:#ffcb47">
-    <div class="rowmain"><div class="rowtitle">${esc(m.title)}</div>
-    <div class="rowsub">${esc(m.date)} · ${m.durationMin} min${m.total?" · "+m.correct+"/"+m.total+(pct!=null?" ("+pct+"%)":""):""}</div></div>
-    <button class="iconbtn" data-delmk="${m.id}">✕</button></div>`;
-  }).join("") : '<div class="empty">No mocks completed yet</div>';
-  $("mk_list").querySelectorAll("[data-delmk]").forEach(b=>b.onclick=()=>{
-    DB.mockexams=DB.mockexams.filter(m=>m.id!==b.dataset.delmk); sv("mockexams",DB.mockexams); renderMock();
   });
 }
 
@@ -2070,20 +2361,70 @@ const DRUGS=[
 {n:"Ringer's lactate",brands:[],c:"IV fluid",d:"500-1000 ml",f:"As per chart",u:"As needed",note:"Avoid in liver failure"},
 {n:"5% Dextrose in water",brands:[],c:"IV fluid",d:"500-1000 ml",f:"As per chart",u:"As needed",note:"Avoid in head injury"}
 ];
-const DRUG_CATS=[...new Set(DRUGS.map(d=>d.c))].sort();
-function fillDrugCats(){ $("dl_cat").innerHTML='<option value="">All categories</option>'+DRUG_CATS.map(c=>`<option>${esc(c)}</option>`).join(""); }
+function fillDrugCats(){
+  const cats=[...new Set((DB.drugs||[]).map(d=>d.c).filter(Boolean))].sort();
+  $("dl_cat").innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join("");
+}
+let editingDrugId=null;
 function renderDrugs(){
   const q=($("dl_search").value||"").toLowerCase(), cat=$("dl_cat").value;
-  let list=DRUGS;
+  let list=DB.drugs||[];
   if(cat) list=list.filter(d=>d.c===cat);
-  if(q) list=list.filter(d=>(d.n+" "+(d.brands||[]).join(" ")+" "+d.c).toLowerCase().includes(q));
+  if(q) list=list.filter(d=>(d.n+" "+(d.brands||[]).join(" ")+" "+(d.c||"")).toLowerCase().includes(q));
   $("dl_list").innerHTML = list.length ? list.map(d=>`<div class="libitem" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px">
     <div style="flex:1">
       <div style="font-weight:700;font-size:13.5px">${esc(d.n)} ${(d.brands&&d.brands.length)?d.brands.map(b=>`<span class="chip" style="margin-left:4px;color:var(--emerald);border-color:var(--emerald)">${esc(b)}</span>`).join(""):""}</div>
-      <div style="font-size:11.5px;color:var(--muted);margin-top:3px">${esc(d.c)}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:3px">${esc(d.c||"")}</div>
       <div style="font-size:12px;margin-top:4px">${esc([d.d,d.f,d.u,d.note].filter(Boolean).join("  ·  "))}</div>
+    </div>
+    <div class="btn-row" style="flex-shrink:0">
+      <button class="iconbtn" data-editdrug="${d.id}">✎</button>
+      <button class="iconbtn" data-deldrug="${d.id}">🗑</button>
     </div></div>`).join("") : '<div class="empty">No drugs matched</div>';
+  $("dl_list").querySelectorAll("[data-editdrug]").forEach(b=>b.onclick=()=>startEditDrug(b.dataset.editdrug));
+  $("dl_list").querySelectorAll("[data-deldrug]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Delete this drug from your library?"))return;
+    DB.drugs=DB.drugs.filter(d=>d.id!==b.dataset.deldrug); sv("drugs",DB.drugs);
+    if(editingDrugId===b.dataset.deldrug) cancelEditDrug();
+    fillDrugCats(); renderDrugs();
+  });
 }
+function startEditDrug(id){
+  const d=(DB.drugs||[]).find(x=>x.id===id); if(!d)return;
+  editingDrugId=id;
+  $("dg_generic").value=d.n||""; $("dg_brands").value=(d.brands||[]).join(", ");
+  $("dg_cat").value=d.c||""; $("dg_dose").value=d.d||""; $("dg_freq").value=d.f||"";
+  $("dg_dur").value=d.u||""; $("dg_note").value=d.note||"";
+  $("drugFormHd").textContent="Edit drug"; $("dg_save").textContent="💾 Save changes"; $("dg_cancel").style.display="inline-flex";
+  document.querySelector('.railbtn[data-p="drugs"]')?.scrollIntoView?.();
+  $("dg_generic").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function cancelEditDrug(){
+  editingDrugId=null;
+  ["dg_generic","dg_brands","dg_cat","dg_dose","dg_freq","dg_dur","dg_note"].forEach(id=>$(id).value="");
+  $("drugFormHd").textContent="Add a drug"; $("dg_save").textContent="+ Add drug"; $("dg_cancel").style.display="none";
+}
+$("dg_cancel").onclick=cancelEditDrug;
+$("dg_save").onclick=()=>{
+  const n=$("dg_generic").value.trim();
+  if(!n){toast("Enter the generic name");return}
+  const brands=$("dg_brands").value.split(",").map(s=>s.trim()).filter(Boolean);
+  const entry={n,brands,c:$("dg_cat").value.trim()||"Other",d:$("dg_dose").value.trim(),
+    f:$("dg_freq").value.trim(),u:$("dg_dur").value.trim(),note:$("dg_note").value.trim()};
+  DB.drugs=DB.drugs||[];
+  if(editingDrugId){
+    const idx=DB.drugs.findIndex(x=>x.id===editingDrugId);
+    if(idx>=0) DB.drugs[idx]=Object.assign({id:editingDrugId},entry);
+    toast("Drug updated");
+  } else {
+    DB.drugs.push(Object.assign({id:uid()},entry));
+    addXP(2,"Added a drug to your library");
+    toast("Drug added");
+  }
+  sv("drugs",DB.drugs);
+  cancelEditDrug();
+  fillDrugCats(); renderDrugs();
+};
 $("dl_search").oninput=renderDrugs; $("dl_cat").onchange=renderDrugs;
 
 /* ============ INVESTIGATION LIBRARY ============ */
@@ -2150,49 +2491,246 @@ const INVS=[
 {n:"Echocardiography",c:"Cardiology",range:""},
 {n:"Troponin I",c:"Cardiology",range:"<0.04 ng/mL"}
 ];
-const INV_CATS=[...new Set(INVS.map(i=>i.c))].sort();
-function fillInvCats(){ $("il_cat").innerHTML='<option value="">All categories</option>'+INV_CATS.map(c=>`<option>${esc(c)}</option>`).join(""); }
+function fillInvCats(){
+  const cats=[...new Set((DB.invs||[]).map(i=>i.c).filter(Boolean))].sort();
+  $("il_cat").innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join("");
+}
+let editingInvId=null;
 function renderInvs(){
   const q=($("il_search").value||"").toLowerCase(), cat=$("il_cat").value;
-  let list=INVS;
+  let list=DB.invs||[];
   if(cat) list=list.filter(i=>i.c===cat);
-  if(q) list=list.filter(i=>(i.n+" "+i.c).toLowerCase().includes(q));
-  $("il_list").innerHTML = list.length ? list.map(i=>`<div class="libitem" style="display:flex;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px">
-    <div><div style="font-weight:700;font-size:13.5px">${esc(i.n)}</div><div style="font-size:11.5px;color:var(--muted)">${esc(i.c)}</div></div>
-    ${i.range?`<div class="numfont" style="font-size:12.5px;color:var(--emerald);text-align:right;flex-shrink:0;padding-left:10px">${esc(i.range)}</div>`:""}
-    </div>`).join("") : '<div class="empty">No investigations matched</div>';
+  if(q) list=list.filter(i=>(i.n+" "+(i.c||"")).toLowerCase().includes(q));
+  $("il_list").innerHTML = list.length ? list.map(i=>`<div class="libitem" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px">
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:13.5px">${esc(i.n)}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${esc(i.c||"")}</div>
+      <div style="display:flex;gap:14px;margin-top:4px">
+        ${i.range?`<span class="numfont" style="font-size:12px;color:var(--emerald)">${esc(i.range)}</span>`:""}
+        ${i.price?`<span class="numfont" style="font-size:12px;color:var(--gold)">৳${esc(i.price)}</span>`:""}
+      </div>
+    </div>
+    <div class="btn-row" style="flex-shrink:0">
+      <button class="iconbtn" data-editinv="${i.id}">✎</button>
+      <button class="iconbtn" data-delinv="${i.id}">🗑</button>
+    </div></div>`).join("") : '<div class="empty">No investigations matched</div>';
+  $("il_list").querySelectorAll("[data-editinv]").forEach(b=>b.onclick=()=>startEditInv(b.dataset.editinv));
+  $("il_list").querySelectorAll("[data-delinv]").forEach(b=>b.onclick=()=>{
+    if(!confirm("Delete this investigation from your library?"))return;
+    DB.invs=DB.invs.filter(i=>i.id!==b.dataset.delinv); sv("invs",DB.invs);
+    if(editingInvId===b.dataset.delinv) cancelEditInv();
+    fillInvCats(); renderInvs();
+  });
 }
+function startEditInv(id){
+  const i=(DB.invs||[]).find(x=>x.id===id); if(!i)return;
+  editingInvId=id;
+  $("iv_name").value=i.n||""; $("iv_cat").value=i.c||""; $("iv_range").value=i.range||""; $("iv_price").value=i.price||"";
+  $("invFormHd").textContent="Edit investigation"; $("iv_save").textContent="💾 Save changes"; $("iv_cancel").style.display="inline-flex";
+  $("iv_name").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function cancelEditInv(){
+  editingInvId=null;
+  ["iv_name","iv_cat","iv_range","iv_price"].forEach(id=>$(id).value="");
+  $("invFormHd").textContent="Add an investigation"; $("iv_save").textContent="+ Add investigation"; $("iv_cancel").style.display="none";
+}
+$("iv_cancel").onclick=cancelEditInv;
+$("iv_save").onclick=()=>{
+  const n=$("iv_name").value.trim();
+  if(!n){toast("Enter the investigation name");return}
+  const entry={n,c:$("iv_cat").value.trim()||"Other",range:$("iv_range").value.trim(),price:$("iv_price").value.trim()};
+  DB.invs=DB.invs||[];
+  if(editingInvId){
+    const idx=DB.invs.findIndex(x=>x.id===editingInvId);
+    if(idx>=0) DB.invs[idx]=Object.assign({id:editingInvId},entry);
+    toast("Investigation updated");
+  } else {
+    DB.invs.push(Object.assign({id:uid()},entry));
+    addXP(2,"Added an investigation to your library");
+    toast("Investigation added");
+  }
+  sv("invs",DB.invs);
+  cancelEditInv();
+  fillInvCats(); renderInvs();
+};
 $("il_search").oninput=renderInvs; $("il_cat").onchange=renderInvs;
 
 /* ============ RX LIBRARY ============ */
-$("rx_add").onclick=()=>{
-  const dx=$("rx_dx").value.trim();
-  if(!dx){toast("Enter the disease/diagnosis name");return}
+let RX_MEDS=[], RX_IVS=[], editingRxId=null;
+
+function rxCollect(){
+  return {
+    id: editingRxId || uid(), ts: Date.now(),
+    pname:$("rx_pname").value.trim(), page:$("rx_page").value.trim(), psex:$("rx_psex").value, pdate:$("rx_pdate").value,
+    pwt:$("rx_pwt").value.trim(), pht:$("rx_pht").value.trim(),
+    cc:$("rx_cc").value.trim(), dx:$("rx_dx").value.trim(), dd:$("rx_dd").value.trim(),
+    hpi:$("rx_hpi").value.trim(), pmh:$("rx_pmh").value.trim(), dhx:$("rx_dhx").value.trim(),
+    fhx:$("rx_fhx").value.trim(), shx:$("rx_shx").value.trim(), ohx:$("rx_ohx").value.trim(),
+    pr:$("rx_pr").value.trim(), bp:$("rx_bp").value.trim(), tm:$("rx_tm").value.trim(), rr:$("rx_rr").value.trim(), sp:$("rx_sp").value.trim(),
+    oe:$("rx_oe").value.trim(), meds:[...RX_MEDS], invs:[...RX_IVS],
+    adv:$("rx_adv").value.trim(), fup:$("rx_fup").value.trim(), ref:$("rx_ref").value.trim()
+  };
+}
+function rxLoad(r){
+  editingRxId=r.id;
+  $("rx_pname").value=r.pname||""; $("rx_page").value=r.page||""; $("rx_psex").value=r.psex||""; $("rx_pdate").value=r.pdate||todayStr();
+  $("rx_pwt").value=r.pwt||""; $("rx_pht").value=r.pht||"";
+  $("rx_cc").value=r.cc||""; $("rx_dx").value=r.dx||""; $("rx_dd").value=r.dd||"";
+  $("rx_hpi").value=r.hpi||""; $("rx_pmh").value=r.pmh||""; $("rx_dhx").value=r.dhx||"";
+  $("rx_fhx").value=r.fhx||""; $("rx_shx").value=r.shx||""; $("rx_ohx").value=r.ohx||"";
+  $("rx_pr").value=r.pr||""; $("rx_bp").value=r.bp||""; $("rx_tm").value=r.tm||""; $("rx_rr").value=r.rr||""; $("rx_sp").value=r.sp||"";
+  $("rx_oe").value=r.oe||"";
+  RX_MEDS=[...(r.meds||[])]; RX_IVS=[...(r.invs||[])];
+  $("rx_adv").value=r.adv||""; $("rx_fup").value=r.fup||""; $("rx_ref").value=r.ref||"";
+  renderRxMeds(); renderRxIvs();
+  $("rx_dup").style.display="inline-flex";
+  $("rxStatLine").textContent="Editing: "+(r.dx||r.pname||"saved prescription");
+  document.querySelector('.railbtn[data-p="rx"]');
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function rxClear(){
+  editingRxId=null; RX_MEDS=[]; RX_IVS=[];
+  ["rx_pname","rx_page","rx_pwt","rx_pht","rx_cc","rx_dx","rx_dd","rx_hpi","rx_pmh","rx_dhx","rx_fhx","rx_shx","rx_ohx",
+   "rx_pr","rx_bp","rx_tm","rx_rr","rx_sp","rx_oe","rx_adv","rx_fup","rx_ref"].forEach(id=>$(id).value="");
+  $("rx_psex").value=""; $("rx_pdate").value=todayStr();
+  renderRxMeds(); renderRxIvs();
+  $("rx_dup").style.display="none"; $("rxStatLine").textContent="";
+}
+$("rx_new").onclick=()=>{ rxClear(); toast("Cleared"); };
+
+/* --- medicines (autocomplete against Drug Library) --- */
+$("rx_dname").oninput=()=>{
+  const q=$("rx_dname").value.trim().toLowerCase();
+  const drop=$("rx_dAc");
+  if(!q){drop.classList.remove("on");drop.innerHTML="";return}
+  const list=(DB.drugs&&DB.drugs.length?DB.drugs:DRUGS).filter(d=>(d.n+" "+(d.brands||[]).join(" ")).toLowerCase().includes(q)).slice(0,20);
+  if(!list.length){drop.classList.remove("on");return}
+  drop.innerHTML=list.map((d,i)=>`<div class="ac-i" data-i="${i}">${esc(d.n)}${(d.brands&&d.brands.length)?" — "+esc(d.brands.join(", ")):""}<div class="s">${esc([d.d,d.f,d.u].filter(Boolean).join(" · "))}</div></div>`).join("");
+  drop.classList.add("on");
+  drop.querySelectorAll(".ac-i").forEach(el=>el.onmousedown=e=>{
+    e.preventDefault(); const d=list[+el.dataset.i];
+    $("rx_dname").value=d.n; $("rx_ddose").value=d.d||""; $("rx_dfreq").value=d.f||""; $("rx_ddur").value=d.u||""; $("rx_dnote").value=d.note||"";
+    drop.classList.remove("on");
+  });
+};
+$("rx_dname").onblur=()=>setTimeout(()=>$("rx_dAc").classList.remove("on"),150);
+$("rx_dAdd").onclick=()=>{
+  const n=$("rx_dname").value.trim();
+  if(!n){toast("Enter or pick a drug first");return}
+  RX_MEDS.push({n,d:$("rx_ddose").value.trim(),f:$("rx_dfreq").value.trim(),u:$("rx_ddur").value.trim(),r:$("rx_droute").value.trim(),note:$("rx_dnote").value.trim()});
+  ["rx_dname","rx_ddose","rx_dfreq","rx_ddur","rx_droute","rx_dnote"].forEach(id=>$(id).value="");
+  renderRxMeds();
+};
+function renderRxMeds(){
+  $("rxMdN").textContent=RX_MEDS.length;
+  $("rxMdList").innerHTML = RX_MEDS.length ? RX_MEDS.map((m,i)=>`<div class="row" style="--rc:var(--emerald)">
+    <div class="rowmain"><div class="rowtitle">${i+1}. ${esc(m.n)} ${m.d?esc(m.d):""}</div>
+    <div class="rowsub">${esc([m.f,m.u,m.r,m.note].filter(Boolean).join("  ·  ")||"—")}</div></div>
+    <button class="iconbtn" data-delmed="${i}">✕</button></div>`).join("") : '<div class="empty">No medicines added yet</div>';
+  $("rxMdList").querySelectorAll("[data-delmed]").forEach(b=>b.onclick=()=>{ RX_MEDS.splice(+b.dataset.delmed,1); renderRxMeds(); });
+}
+
+/* --- investigations (autocomplete against Investigation Library) --- */
+$("rx_iname").oninput=()=>{
+  const q=$("rx_iname").value.trim().toLowerCase();
+  const drop=$("rx_iAc");
+  if(!q){drop.classList.remove("on");drop.innerHTML="";return}
+  const list=(DB.invs&&DB.invs.length?DB.invs:INVS).filter(iv=>iv.n.toLowerCase().includes(q)).slice(0,20);
+  if(!list.length){drop.classList.remove("on");return}
+  drop.innerHTML=list.map((iv,i)=>`<div class="ac-i" data-i="${i}">${esc(iv.n)}${iv.range?`<div class="s">${esc(iv.range)}</div>`:""}</div>`).join("");
+  drop.classList.add("on");
+  drop.querySelectorAll(".ac-i").forEach(el=>el.onmousedown=e=>{
+    e.preventDefault(); const iv=list[+el.dataset.i];
+    if(!RX_IVS.some(x=>x.n===iv.n)) RX_IVS.push({n:iv.n});
+    $("rx_iname").value=""; drop.classList.remove("on"); renderRxIvs();
+  });
+};
+$("rx_iname").onblur=()=>setTimeout(()=>$("rx_iAc").classList.remove("on"),150);
+function renderRxIvs(){
+  $("rxIvN").textContent=RX_IVS.length;
+  $("rxIvList").innerHTML = RX_IVS.length ? RX_IVS.map((iv,i)=>`<div class="row" style="--rc:#b490ff">
+    <div class="rowmain"><div class="rowtitle">${i+1}. ${esc(iv.n)}</div></div>
+    <button class="iconbtn" data-deliv="${i}">✕</button></div>`).join("") : '<div class="empty">No investigations added yet</div>';
+  $("rxIvList").querySelectorAll("[data-deliv]").forEach(b=>b.onclick=()=>{ RX_IVS.splice(+b.dataset.deliv,1); renderRxIvs(); });
+}
+
+/* --- save / duplicate / list / print --- */
+$("rx_save").onclick=()=>{
+  const r=rxCollect();
+  if(!r.pname&&!r.dx){toast("Enter at least a patient name or diagnosis");return}
   DB.rx=DB.rx||[];
-  DB.rx.push({id:uid(),dx,ss:$("rx_ss").value.trim(),oe:$("rx_oe").value.trim(),
-    inv:$("rx_inv").value.trim(),mx:$("rx_mx").value.trim(),adv:$("rx_adv").value.trim(),ts:Date.now()});
+  const idx=DB.rx.findIndex(x=>x.id===r.id);
+  if(idx>=0){ DB.rx[idx]=r; toast("Prescription updated"); }
+  else { DB.rx.push(r); addXP(3,"Saved a prescription"); toast("Prescription saved"); }
   sv("rx",DB.rx);
-  ["rx_dx","rx_ss","rx_oe","rx_inv","rx_mx","rx_adv"].forEach(id=>$(id).value="");
-  renderRx(); toast("Prescription saved");
+  editingRxId=r.id; $("rx_dup").style.display="inline-flex";
+  $("rxStatLine").textContent="Saved · "+new Date().toLocaleTimeString();
+  renderRx();
+};
+$("rx_dup").onclick=()=>{
+  const r=rxCollect(); r.id=uid(); r.ts=Date.now();
+  DB.rx=DB.rx||[]; DB.rx.push(r); sv("rx",DB.rx);
+  editingRxId=r.id;
+  toast("Saved as a new copy — original left untouched");
+  renderRx();
 };
 function renderRx(q){
   q=(q||$("rx_search").value||"").toLowerCase();
   let list=[...(DB.rx||[])].sort((a,b)=>b.ts-a.ts);
-  if(q) list=list.filter(r=>(r.dx+" "+r.ss+" "+r.oe).toLowerCase().includes(q));
+  if(q) list=list.filter(r=>(r.dx+" "+r.cc+" "+r.pname+" "+(r.meds||[]).map(m=>m.n).join(" ")).toLowerCase().includes(q));
   $("rx_total").textContent=(DB.rx||[]).length;
-  $("rx_list").innerHTML = list.length ? list.map(r=>`<div class="row" style="--rc:var(--emerald);align-items:flex-start;flex-direction:column;gap:6px">
-    <div style="display:flex;width:100%;justify-content:space-between"><div class="rowtitle">${esc(r.dx)}</div><button class="iconbtn" data-delrx="${r.id}">✕</button></div>
-    ${r.ss?`<div class="rowsub"><b>S/S:</b> ${esc(r.ss)}</div>`:""}
-    ${r.oe?`<div class="rowsub"><b>O/E:</b> ${esc(r.oe)}</div>`:""}
-    ${r.inv?`<div class="rowsub"><b>Ix:</b> ${esc(r.inv)}</div>`:""}
-    ${r.mx?`<div class="rowsub"><b>Mx:</b> ${esc(r.mx)}</div>`:""}
-    ${r.adv?`<div class="rowsub"><b>Advice:</b> ${esc(r.adv)}</div>`:""}
-  </div>`).join("") : '<div class="empty">No prescriptions saved yet</div>';
+  $("rx_list").innerHTML = list.length ? list.map(r=>`<div class="row" style="--rc:var(--emerald);align-items:flex-start">
+    <div class="rowmain"><div class="rowtitle">${esc(r.dx||"(no diagnosis)")}${r.pname?" — "+esc(r.pname):""}</div>
+    <div class="rowsub">${esc(r.pdate||"")}${r.cc?" · "+esc(r.cc.slice(0,60)):""}</div></div>
+    <div class="btn-row" style="flex-shrink:0">
+      <button class="btn bo bxs" data-openrx="${r.id}">Open</button>
+      <button class="btn bs bxs" data-printrx="${r.id}">🖨️</button>
+      <button class="iconbtn" data-delrx="${r.id}">✕</button>
+    </div></div>`).join("") : '<div class="empty">No prescriptions saved yet</div>';
+  $("rx_list").querySelectorAll("[data-openrx]").forEach(b=>b.onclick=()=>{ const r=DB.rx.find(x=>x.id===b.dataset.openrx); if(r) rxLoad(r); });
+  $("rx_list").querySelectorAll("[data-printrx]").forEach(b=>b.onclick=()=>{ const r=DB.rx.find(x=>x.id===b.dataset.printrx); if(r){rxPrintSheet(r);window.print();} });
   $("rx_list").querySelectorAll("[data-delrx]").forEach(b=>b.onclick=()=>{
-    DB.rx=DB.rx.filter(r=>r.id!==b.dataset.delrx); sv("rx",DB.rx); renderRx();
+    if(!confirm("Delete this saved prescription?"))return;
+    DB.rx=DB.rx.filter(r=>r.id!==b.dataset.delrx); sv("rx",DB.rx);
+    if(editingRxId===b.dataset.delrx) rxClear();
+    renderRx();
   });
 }
 $("rx_search").oninput=()=>renderRx();
+$("rx_print").onclick=()=>{
+  const r=rxCollect();
+  if(!r.pname&&!r.dx){toast("Enter at least a patient name or diagnosis before printing");return}
+  rxPrintSheet(r); window.print();
+};
+function rxPrintSheet(r){
+  const meds=(r.meds||[]).map((m,i)=>`<div style="margin-bottom:8px"><b>${i+1}. ${esc(m.n)}</b> ${esc(m.d||"")}<br><span style="font-size:11px;color:#555">${esc([m.f,m.u,m.r,m.note].filter(Boolean).join("  ·  "))}</span></div>`).join("")||"<i>No medicines</i>";
+  const invs=(r.invs||[]).map((iv,i)=>`${i+1}. ${esc(iv.n)}`).join("<br>")||"<i>None</i>";
+  $("sheet").innerHTML=`<div style="width:210mm;min-height:297mm;background:#fff;color:#0d2818;font-family:Georgia,serif;margin:0 auto;padding:16mm">
+    <div style="display:flex;justify-content:space-between;border-bottom:2px solid #0f7a4f;padding-bottom:10px;margin-bottom:14px">
+      <div><div style="font-size:20px;font-weight:700;color:#0f7a4f">StudyRx</div><div style="font-size:10px;color:#666">Prescription record</div></div>
+      <div style="text-align:right;font-size:11px">${esc(r.pdate||"")}</div>
+    </div>
+    <div style="display:flex;gap:18px;font-size:12px;margin-bottom:14px;border-bottom:1px dashed #ccc;padding-bottom:10px">
+      <div><b>Name:</b> ${esc(r.pname||"—")}</div><div><b>Age/Sex:</b> ${esc([r.page,r.psex].filter(Boolean).join(" / "))}</div>
+      <div><b>Wt:</b> ${esc(r.pwt||"—")}</div><div><b>Ht:</b> ${esc(r.pht||"—")}</div>
+    </div>
+    <div style="display:flex;gap:20mm">
+      <div style="width:35%;font-size:11.5px;line-height:1.7">
+        <b>C/C:</b> ${esc(r.cc||"—")}<br><br>
+        <b>Vitals:</b> PR ${esc(r.pr||"-")}, BP ${esc(r.bp||"-")}, Temp ${esc(r.tm||"-")}<br><br>
+        <b>O/E:</b> ${esc(r.oe||"—")}<br><br>
+        <b>Diagnosis:</b> ${esc(r.dx||"—")}${r.dd?"<br><i>D/D: "+esc(r.dd)+"</i>":""}<br><br>
+        <b>Investigations:</b><br>${invs}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:32px;color:#0f7a4f;font-style:italic;margin-bottom:10px">℞</div>
+        ${meds}
+        <div style="margin-top:20px;font-size:11.5px"><b>Advice:</b> ${esc(r.adv||"—")}</div>
+        <div style="margin-top:8px;font-size:11.5px"><b>Follow-up:</b> ${esc(r.fup||"—")}</div>
+      </div>
+    </div>
+  </div>`;
+}
 
 /* ============ QUESTS ============ */
 function todaysLogReasons(){
@@ -2219,13 +2757,26 @@ function processQuestClaims(){
   if(any) sv("profile",DB.profile);
 }
 function renderQuestList(){
-  const reasons=todaysLogReasons();
+  const reasons=todaysLogReasons(); const today=todayStr();
+  DB.profile.questClaims=DB.profile.questClaims||{};
   $("questList").innerHTML = QUESTS.map(q=>{
-    const done=q.check(reasons);
-    return `<div class="quest-row"><div class="quest-box ${done?'done':''}"></div>
+    const key=today+"_"+q.id;
+    const done = q.check(reasons) || !!DB.profile.questClaims[key];
+    return `<div class="quest-row"><div class="quest-box ${done?'done':''}" data-questbox="${q.id}" title="Tap to mark complete"></div>
       <div style="flex:1;font-size:12.5px;${done?'text-decoration:line-through;opacity:.6':''}">${esc(q.title)}</div>
       <div style="font-size:11px;color:var(--gold);font-weight:700">+${q.xp} XP</div></div>`;
   }).join("");
+  $("questList").querySelectorAll("[data-questbox]").forEach(el=>el.onclick=()=>toggleQuest(el.dataset.questbox));
+}
+function toggleQuest(qid){
+  const q=QUESTS.find(x=>x.id===qid); if(!q)return;
+  const today=todayStr(), key=today+"_"+qid;
+  DB.profile.questClaims=DB.profile.questClaims||{};
+  if(DB.profile.questClaims[key]) return;
+  DB.profile.questClaims[key]=true;
+  sv("profile",DB.profile);
+  addXP(q.xp,"Quest complete: "+q.title);
+  renderQuestList();
 }
 
 /* ============ BADGES ============ */
@@ -2278,6 +2829,7 @@ function initGis(){
       driveToken=resp.access_token;
       $("driveStatus").textContent="Connecting…";
       await ensureDriveFolder();
+      DB.profile.driveFolderId=driveFolderId; sv("profile",DB.profile);
       $("drive_connect").textContent="✅ Connected";
       $("drive_upload").style.display="inline-flex";
       $("driveLibCard").style.display="block";
@@ -2285,6 +2837,27 @@ function initGis(){
       listDriveFiles();
     }
   });
+}
+function tryAutoConnectDrive(){
+  if(driveToken || !DB.profile.driveFolderId || !driveReady())return;
+  if(!gisClient) initGis();
+  const originalCallback=gisClient.callback;
+  gisClient.callback=(resp)=>{
+    if(resp.error){
+      gisClient.callback=originalCallback;
+      $("driveStatus").textContent="Couldn't reconnect automatically — tap Connect Google Drive to continue.";
+      return;
+    }
+    driveToken=resp.access_token;
+    driveFolderId=DB.profile.driveFolderId;
+    $("drive_connect").textContent="✅ Connected";
+    $("drive_upload").style.display="inline-flex";
+    $("driveLibCard").style.display="block";
+    $("driveStatus").textContent="Connected — files live in a 'StudyRx Library' folder in your Drive.";
+    listDriveFiles();
+    gisClient.callback=originalCallback;
+  };
+  gisClient.requestAccessToken({prompt:""});
 }
 $("drive_connect").onclick=()=>{
   if(!driveReady()){ toast("Google sign-in script hasn't loaded yet — try again in a moment"); return; }
@@ -2354,6 +2927,9 @@ function renderDriveUI(){
   if(driveToken&&driveFolderId){
     $("drive_connect").textContent="✅ Connected"; $("drive_upload").style.display="inline-flex";
     $("driveLibCard").style.display="block"; listDriveFiles();
+  } else if(DB.profile.driveFolderId){
+    $("driveStatus").textContent="Reconnecting to your Drive…";
+    tryAutoConnectDrive();
   }
   if(driveReady()&&!gisClient) initGis();
 }
