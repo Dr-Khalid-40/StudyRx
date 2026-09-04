@@ -1521,20 +1521,6 @@ const CASES = [
  ]}
 ];
 
-/* ============ STORAGE (local cache + cloud) ============ */
-const K={phases:"srx_phases",routine:"srx_routine",profile:"srx_profile",xplog:"srx_xplog",flashcards:"srx_flashcards",notes:"srx_notes",mnemonics:"srx_mnemonics",qbank:"srx_qbank",
-  wards:"srx_wards",procedures:"srx_procedures",caseProgress:"srx_caseprogress",customCases:"srx_customcases",caselog:"srx_caselog",rx:"srx_rx",milestones:"srx_milestones",drugs:"srx_drugs",invs:"srx_invs"};
-const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
-const svLocal=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-
-let USER=null;
-let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{name:"",xp:0,streak:0,lastActive:null}),xplog:ld(K.xplog,[]),
-  flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[]),qbank:ld(K.qbank,[]),
-  wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),customCases:ld(K.customCases,[]),caselog:ld(K.caselog,[]),rx:ld(K.rx,[]),milestones:ld(K.milestones,[]),drugs:ld(K.drugs,[]),invs:ld(K.invs,[])};
-
 /* ============================================================
    STUDYRX STORAGE
    Local cache + reliable Supabase synchronization
