@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="manifest" href="manifest.json">
@@ -628,7 +627,7 @@ select option{background:var(--paper);color:var(--ink)}
     class="global-search-drop"
   ></div>
 
-</div><div class="search">Search topics, drugs, mnemonics… (coming soon)</div>
+</div>
       <div class="pill"><span class="streakflame" id="topStreakIco">&#9679;</span><span id="topStreak">0-day streak</span></div>
       <div class="pill numfont" id="topXP">Lvl 1 · 0 XP</div>
       <button class="toggle" id="themeToggle">&#9789;</button>
@@ -1536,7 +1535,10 @@ let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{na
   flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[]),qbank:ld(K.qbank,[]),
   wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),customCases:ld(K.customCases,[]),caselog:ld(K.caselog,[]),rx:ld(K.rx,[]),milestones:ld(K.milestones,[]),drugs:ld(K.drugs,[]),invs:ld(K.invs,[])};
 
-/* ============ STORAGE (local cache + reliable cloud sync) ============ */
+/* ============================================================
+   STUDYRX STORAGE
+   Local cache + reliable Supabase synchronization
+   ============================================================ */
 
 const K={
   phases:"srx_phases",
@@ -1568,270 +1570,849 @@ const esc=s=>String(s==null?"":s)
 
 const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
-const ld=(k,d)=>{
-  try{
-    const v=localStorage.getItem(k);
-    return v?JSON.parse(v):d;
-  }catch(e){
-    console.warn("local read failed",k,e);
-    return d;
-  }
-};
 
-const svLocal=(k,v)=>{
+function ld(k,d){
+
   try{
-    localStorage.setItem(k,JSON.stringify(v));
+
+    const v=localStorage.getItem(k);
+
+    return v!==null
+      ? JSON.parse(v)
+      : d;
+
   }catch(e){
-    console.warn("local save failed",k,e);
+
+    console.warn(
+      "StudyRx local read failed:",
+      k,
+      e
+    );
+
+    return d;
+
   }
-};
+
+}
+
+
+function svLocal(k,v){
+
+  try{
+
+    localStorage.setItem(
+      k,
+      JSON.stringify(v)
+    );
+
+  }catch(e){
+
+    console.warn(
+      "StudyRx local save failed:",
+      k,
+      e
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   LOCAL SYNC METADATA
+
+   For every data type we remember the last time the user
+   changed that data locally.
+
+   This prevents an older Supabase copy from overwriting a
+   newer local change during refresh.
+   ============================================================ */
+
+const SYNC_META_KEY="srx_sync_meta";
+
+function loadSyncMeta(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(
+        SYNC_META_KEY
+      );
+
+    if(!raw)return {};
+
+    const parsed=JSON.parse(raw);
+
+    return parsed &&
+      typeof parsed==="object"
+      ? parsed
+      : {};
+
+  }catch(e){
+
+    console.warn(
+      "StudyRx sync metadata read failed",
+      e
+    );
+
+    return {};
+
+  }
+
+}
+
+
+let syncMeta=loadSyncMeta();
+
+
+function saveSyncMeta(){
+
+  try{
+
+    localStorage.setItem(
+      SYNC_META_KEY,
+      JSON.stringify(syncMeta)
+    );
+
+  }catch(e){
+
+    console.warn(
+      "StudyRx sync metadata save failed",
+      e
+    );
+
+  }
+
+}
+
+
+function markLocalChanged(type){
+
+  syncMeta[type]={
+    localChangedAt:Date.now(),
+    cloudUpdatedAt:
+      syncMeta[type]?.cloudUpdatedAt||0
+  };
+
+  saveSyncMeta();
+
+}
+
+
+function markCloudSaved(type,time){
+
+  const previous=
+    syncMeta[type]||{};
+
+  syncMeta[type]={
+    localChangedAt:
+      previous.localChangedAt||0,
+
+    cloudUpdatedAt:
+      Math.max(
+        previous.cloudUpdatedAt||0,
+        time||Date.now()
+      )
+  };
+
+  saveSyncMeta();
+
+}
+
+
+/* ============================================================
+   DATABASE
+   ============================================================ */
 
 let USER=null;
 
 let DB={
+
   phases:ld(K.phases,[]),
+
   routine:ld(K.routine,[]),
-  profile:ld(K.profile,{
-    name:"",
-    xp:0,
-    streak:0,
-    lastActive:null
-  }),
+
+  profile:ld(
+    K.profile,
+    {
+      name:"",
+      xp:0,
+      streak:0,
+      lastActive:null
+    }
+  ),
+
   xplog:ld(K.xplog,[]),
+
   flashcards:ld(K.flashcards,[]),
+
   notes:ld(K.notes,[]),
+
   mnemonics:ld(K.mnemonics,[]),
+
   qbank:ld(K.qbank,[]),
+
   wards:ld(K.wards,[]),
+
   procedures:ld(K.procedures,[]),
-  caseProgress:ld(K.caseProgress,{}),
-  customCases:ld(K.customCases,[]),
-  caselog:ld(K.caselog,[]),
+
+  caseProgress:ld(
+    K.caseProgress,
+    {}
+  ),
+
+  customCases:ld(
+    K.customCases,
+    []
+  ),
+
+  caselog:ld(
+    K.caselog,
+    []
+  ),
+
   rx:ld(K.rx,[]),
-  milestones:ld(K.milestones,[]),
+
+  milestones:ld(
+    K.milestones,
+    []
+  ),
+
   drugs:ld(K.drugs,[]),
+
   invs:ld(K.invs,[])
+
 };
 
-/*
- * CLOUD SYNC
- *
- * Every StudyRx data type gets its own queue.
- *
- * Example:
- *   routine -> its own timer/queue
- *   profile -> its own timer/queue
- *   xplog   -> its own timer/queue
- *   wards   -> its own timer/queue
- *
- * Therefore saving one type can never cancel another type's save.
- *
- * The queue also serializes writes for the same type so rapid changes
- * cannot arrive at Supabase out of order.
- */
+
+/* ============================================================
+   CLOUD SAVE STATE
+
+   Every data type has its own queue.
+
+   Saving routine cannot cancel a profile save.
+   Saving wards cannot cancel a curriculum save.
+   ============================================================ */
 
 const cloudSaveState={};
 
+
 function getCloudState(type){
+
   if(!cloudSaveState[type]){
+
     cloudSaveState[type]={
+
       timer:null,
+
       pending:false,
+
       running:false,
+
       version:0,
-      savedVersion:0,
-      promise:Promise.resolve()
+
+      savedVersion:0
+
     };
+
   }
+
   return cloudSaveState[type];
+
 }
 
+
+/* ============================================================
+   NORMAL SAVE
+
+   1. DB changes immediately.
+   2. localStorage changes immediately.
+   3. local change timestamp is recorded.
+   4. Supabase upload is queued.
+   ============================================================ */
+
 function sv(type,val){
-  /*
-   * 1. Update the in-memory database immediately.
-   * 2. Update localStorage immediately.
-   * 3. Queue the cloud save independently for this type.
-   */
+
+  if(!Object.prototype.hasOwnProperty.call(K,type)){
+
+    console.warn(
+      "StudyRx attempted to save unknown type:",
+      type
+    );
+
+    return;
+
+  }
+
+
   DB[type]=val;
-  svLocal(K[type],val);
 
-  if(!sb||!USER)return;
+  svLocal(
+    K[type],
+    val
+  );
 
-  const state=getCloudState(type);
+
+  /*
+   * This timestamp is intentionally written BEFORE
+   * the cloud request.
+   *
+   * Therefore, if the user refreshes while a cloud request
+   * is still waiting, the app knows that the local copy is
+   * newer than an older cloud copy.
+   */
+  markLocalChanged(type);
+
+
+  if(!sb||!USER){
+
+    return;
+
+  }
+
+
+  const state=
+    getCloudState(type);
 
   state.version++;
   state.pending=true;
 
-  /*
-   * Only debounce this SAME data type.
-   * A routine save cannot cancel a profile save.
-   */
-  if(state.timer)clearTimeout(state.timer);
-
-  state.timer=setTimeout(()=>{
-    state.timer=null;
-    flushCloudType(type);
-  },1200);
-}
-
-async function flushCloudType(type){
-  if(!sb||!USER)return;
-
-  const state=getCloudState(type);
-
-  /*
-   * If another upload of this type is already running, let it finish.
-   * The next version will then be uploaded.
-   */
-  if(state.running){
-    state.pending=true;
-    return;
-  }
-
-  if(!state.pending)return;
-
-  state.running=true;
-  state.pending=false;
-
-  /*
-   * Take a snapshot.
-   *
-   * This is important. We don't want an upload that starts now to
-   * accidentally read a different DB value halfway through the
-   * synchronization process.
-   */
-  const versionAtStart=state.version;
-  const payload=DB[type];
-
-  try{
-    const {error}=await sb
-      .from("studyrx_data")
-      .upsert({
-        id:USER.id+"_"+type,
-        user_id:USER.id,
-        type,
-        payload,
-        updated_at:new Date().toISOString()
-      });
-
-    if(error)throw error;
-
-    state.savedVersion=versionAtStart;
-
-  }catch(e){
-    /*
-     * Keep the change pending if the network request failed.
-     * We retry instead of silently losing the cloud update.
-     */
-    state.pending=true;
-    console.warn("StudyRx sync failed for",type,e);
-
-    if(sb&&USER){
-      clearTimeout(state.timer);
-      state.timer=setTimeout(()=>{
-        state.timer=null;
-        flushCloudType(type);
-      },3000);
-    }
-
-  }finally{
-    state.running=false;
-
-    /*
-     * The user may have changed this same data type while the upload
-     * was running.
-     *
-     * If so, schedule another upload containing the newest value.
-     */
-    if(state.version>versionAtStart){
-      state.pending=true;
-
-      if(!state.timer){
-        state.timer=setTimeout(()=>{
-          state.timer=null;
-          flushCloudType(type);
-        },250);
-      }
-    }
-  }
-}
-
-async function pushType(type){
-  /*
-   * Explicit/immediate cloud save.
-   *
-   * Used by operations that intentionally want to flush a particular
-   * data type rather than wait for the normal 1.2-second debounce.
-   */
-  if(!sb||!USER)return;
-
-  const state=getCloudState(type);
 
   if(state.timer){
-    clearTimeout(state.timer);
-    state.timer=null;
+
+    clearTimeout(
+      state.timer
+    );
+
   }
+
+
+  state.timer=
+    setTimeout(()=>{
+
+      state.timer=null;
+
+      flushCloudType(type);
+
+    },1200);
+
+}
+
+
+/* ============================================================
+   CLOUD FLUSH
+   ============================================================ */
+
+async function flushCloudType(type){
+
+  if(!sb||!USER)return;
+
+  const state=
+    getCloudState(type);
+
+
+  if(state.running){
+
+    state.pending=true;
+
+    return;
+
+  }
+
+
+  if(!state.pending){
+
+    return;
+
+  }
+
+
+  state.running=true;
+
+  state.pending=false;
+
+
+  const versionAtStart=
+    state.version;
+
+
+  /*
+   * Deep-copy the payload so that a later UI mutation cannot
+   * modify the object while the upload is in progress.
+   */
+  let payload;
+
+  try{
+
+    payload=
+      JSON.parse(
+        JSON.stringify(
+          DB[type]
+        )
+      );
+
+  }catch(e){
+
+    payload=DB[type];
+
+  }
+
+
+  try{
+
+    const updatedAt=
+      new Date().toISOString();
+
+
+    const {error}=
+      await sb
+        .from("studyrx_data")
+        .upsert({
+
+          id:
+            USER.id+
+            "_"+
+            type,
+
+          user_id:
+            USER.id,
+
+          type,
+
+          payload,
+
+          updated_at:
+            updatedAt
+
+        });
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    state.savedVersion=
+      versionAtStart;
+
+
+    /*
+     * The cloud now contains the local version that was
+     * uploaded.
+     */
+    markCloudSaved(
+      type,
+      Date.now()
+    );
+
+
+  }catch(e){
+
+    /*
+     * Never discard the user's change just because the
+     * network failed.
+     */
+    state.pending=true;
+
+    console.warn(
+      "StudyRx cloud sync failed for",
+      type,
+      e
+    );
+
+
+    if(
+      sb &&
+      USER &&
+      !state.timer
+    ){
+
+      state.timer=
+        setTimeout(()=>{
+
+          state.timer=null;
+
+          flushCloudType(type);
+
+        },3000);
+
+    }
+
+
+  }finally{
+
+    state.running=false;
+
+
+    /*
+     * If the user changed this same data while the previous
+     * upload was running, immediately schedule the newer
+     * version.
+     */
+    if(
+      state.version>
+      versionAtStart
+    ){
+
+      state.pending=true;
+
+
+      if(!state.timer){
+
+        state.timer=
+          setTimeout(()=>{
+
+            state.timer=null;
+
+            flushCloudType(type);
+
+          },250);
+
+      }
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   FORCE SAVE ONE TYPE
+   ============================================================ */
+
+async function pushType(type){
+
+  if(!sb||!USER)return;
+
+  const state=
+    getCloudState(type);
+
+
+  if(state.timer){
+
+    clearTimeout(
+      state.timer
+    );
+
+    state.timer=null;
+
+  }
+
 
   state.pending=true;
 
-  /*
-   * If another upload is already running, it will notice the newer
-   * version when it finishes.
-   */
-  if(state.running)return;
+
+  if(state.running){
+
+    return;
+
+  }
+
 
   await flushCloudType(type);
+
 }
+
+
+/* ============================================================
+   FORCE SAVE EVERYTHING
+
+   Used for explicit operations such as reset.
+   ============================================================ */
 
 async function pushAllTypes(){
+
   if(!sb||!USER)return;
 
-  /*
-   * Flush every existing data type independently.
-   * Promise.all means routine/profile/wards/etc. don't cancel one another.
-   */
+
   await Promise.all(
-    Object.keys(K).map(type=>pushType(type))
+
+    Object.keys(K).map(
+      type=>pushType(type)
+    )
+
   );
+
 }
 
+
+/* ============================================================
+   CLOUD PULL
+
+   IMPORTANT:
+
+   Cloud data is NOT automatically allowed to overwrite a
+   locally newer copy.
+
+   If local data changed more recently than the cloud copy,
+   local data is retained and uploaded.
+
+   This is the critical fix for the "works until refresh"
+   problem.
+   ============================================================ */
+
 async function pullAll(){
+
   if(!sb||!USER)return;
 
+
   try{
-    const {data,error}=await sb
-      .from("studyrx_data")
-      .select("type,payload,updated_at")
-      .eq("user_id",USER.id);
 
-    if(error)throw error;
+    const {data,error}=
+      await sb
+        .from("studyrx_data")
+        .select(
+          "type,payload,updated_at"
+        )
+        .eq(
+          "user_id",
+          USER.id
+        );
 
-    if(!data)return;
 
-    data.forEach(row=>{
+    if(error){
+
+      throw error;
+
+    }
+
+
+    if(!data){
+
+      return;
+
+    }
+
+
+    const cloudTypes=
+      new Set();
+
+
+    for(
+      const row of data
+    ){
+
+      const type=row.type;
+
+
       /*
-       * Only accept data types known to StudyRx.
-       * This prevents an unexpected database row from creating an
-       * accidental DB property.
+       * Ignore unknown database rows.
        */
-      if(!Object.prototype.hasOwnProperty.call(K,row.type))return;
+      if(
+        !Object.prototype.hasOwnProperty.call(
+          K,
+          type
+        )
+      ){
 
-      DB[row.type]=row.payload;
-      svLocal(K[row.type],row.payload);
+        continue;
+
+      }
+
+
+      cloudTypes.add(type);
+
+
+      const cloudTime=
+        row.updated_at
+          ? Date.parse(
+              row.updated_at
+            )
+          : 0;
+
+
+      const meta=
+        syncMeta[type]||{};
+
+
+      const localTime=
+        Number(
+          meta.localChangedAt||0
+        );
+
 
       /*
-       * Mark this version as the currently cloud-loaded state.
-       * No upload is triggered merely because data was pulled.
+       * LOCAL COPY IS NEWER
+       *
+       * Keep it.
+       *
+       * Do NOT overwrite the user's recent progress.
        */
-      const state=getCloudState(row.type);
+      if(
+        localTime>
+        cloudTime
+      ){
+
+        DB[type]=
+          ld(
+            K[type],
+            DB[type]
+          );
+
+
+        /*
+         * Schedule this local version for upload.
+         */
+        const state=
+          getCloudState(type);
+
+        state.version++;
+        state.pending=true;
+
+
+        if(
+          !state.timer
+        ){
+
+          state.timer=
+            setTimeout(()=>{
+
+              state.timer=null;
+
+              flushCloudType(type);
+
+            },250);
+
+        }
+
+
+        continue;
+
+      }
+
+
+      /*
+       * CLOUD COPY IS NEWER OR SAME AGE
+       *
+       * It is safe to restore it.
+       */
+      DB[type]=row.payload;
+
+      svLocal(
+        K[type],
+        row.payload
+      );
+
+
+      const state=
+        getCloudState(type);
+
       state.pending=false;
+
       state.version++;
-      state.savedVersion=state.version;
-    });
+
+      state.savedVersion=
+        state.version;
+
+
+      markCloudSaved(
+        type,
+        cloudTime||Date.now()
+      );
+
+    }
+
+
+    /*
+     * There may be a local data type that has no row in
+     * Supabase yet.
+     *
+     * If the local copy contains actual data, don't lose it.
+     */
+    for(
+      const type of Object.keys(K)
+    ){
+
+      if(
+        cloudTypes.has(type)
+      ){
+
+        continue;
+
+      }
+
+
+      const localValue=
+        DB[type];
+
+
+      const hasLocalData=
+        Array.isArray(localValue)
+          ? localValue.length>0
+          : localValue &&
+            typeof localValue==="object"
+            ? Object.keys(localValue).length>0
+            : localValue!=null;
+
+
+      if(!hasLocalData){
+
+        continue;
+
+      }
+
+
+      const meta=
+        syncMeta[type]||{};
+
+
+      /*
+       * Existing local data without a cloud row must be
+       * uploaded instead of being replaced with an empty
+       * default.
+       */
+      if(
+        !meta.localChangedAt
+      ){
+
+        markLocalChanged(type);
+
+      }
+
+
+      const state=
+        getCloudState(type);
+
+      state.version++;
+      state.pending=true;
+
+
+      if(!state.timer){
+
+        state.timer=
+          setTimeout(()=>{
+
+            state.timer=null;
+
+            flushCloudType(type);
+
+          },250);
+
+      }
+
+    }
+
 
   }catch(e){
-    console.warn("StudyRx cloud pull failed",e);
+
+    /*
+     * If cloud loading fails, KEEP the local database.
+     *
+     * This is extremely important.
+     *
+     * A temporary Supabase/network problem must never turn
+     * into apparent data loss.
+     */
+    console.warn(
+      "StudyRx cloud pull failed; keeping local data",
+      e
+    );
+
   }
+
 }
 
 /* ============ TOAST ============ */
