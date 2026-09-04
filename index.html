@@ -166,6 +166,11 @@ select option{background:var(--paper);color:var(--ink)}
 .flashcard{background:var(--glass);border:1.5px solid var(--line);border-radius:18px;padding:38px 24px;min-height:180px;
   display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;cursor:pointer;
   box-shadow:var(--shadow-md);transition:transform .2s}
+.flashcard{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  text-align:center;
+}
 .flashcard:hover{box-shadow:var(--shadow-md),var(--shadow-glow)}
 .flashmeta{font-size:11px;color:var(--faint);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px}
 .heatmap{display:flex;gap:3px;overflow-x:auto;padding-bottom:4px}
@@ -335,6 +340,211 @@ select option{background:var(--paper);color:var(--ink)}
 .cfgwarn{background:rgba(255,93,143,.12);border:1px solid rgba(255,93,143,.4);color:#ff5d8f;border-radius:12px;
   padding:12px 16px;font-size:12.5px;margin-bottom:16px;line-height:1.6}
 .cfgwarn code{background:rgba(0,0,0,.25);padding:1px 6px;border-radius:5px;font-size:11.5px}
+/* ============================================================
+   GLOBAL STUDYRX SEARCH
+   ============================================================ */
+
+.global-search{
+  position:relative;
+  width:min(560px,48vw);
+  z-index:1000;
+}
+
+.global-search-input-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.global-search-icon{
+  position:absolute;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  font-size:21px;
+  line-height:1;
+  pointer-events:none;
+  z-index:2;
+}
+
+.global-search-input{
+  width:100%;
+  height:40px;
+  padding:0 38px 0 38px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--glass);
+  color:var(--text);
+  outline:none;
+  font:inherit;
+  font-size:12.5px;
+  transition:
+    border-color .18s,
+    box-shadow .18s,
+    background .18s;
+}
+
+.global-search-input::placeholder{
+  color:var(--muted);
+}
+
+.global-search-input:focus{
+  border-color:var(--emerald);
+  background:rgba(255,255,255,.055);
+  box-shadow:
+    0 0 0 3px rgba(34,255,176,.08);
+}
+
+.global-search-clear{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:25px;
+  height:25px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+}
+
+.global-search-clear:hover{
+  background:rgba(255,255,255,.07);
+  color:var(--text);
+}
+
+.global-search-drop{
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(100% + 8px);
+  max-height:min(620px,75vh);
+  overflow:auto;
+  padding:7px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--panel);
+  box-shadow:var(--shadow-lg);
+  backdrop-filter:blur(20px);
+  display:none;
+}
+
+.global-search-drop.on{
+  display:block;
+}
+
+.global-search-section{
+  padding:7px 8px 5px;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+
+.global-search-result{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  width:100%;
+  padding:9px 10px;
+  border:0;
+  border-radius:10px;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  cursor:pointer;
+}
+
+.global-search-result:hover,
+.global-search-result.active{
+  background:rgba(34,255,176,.08);
+}
+
+.global-search-result-icon{
+  width:27px;
+  height:27px;
+  flex:0 0 27px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  background:rgba(255,255,255,.05);
+  font-size:14px;
+}
+
+.global-search-result-main{
+  min-width:0;
+  flex:1;
+}
+
+.global-search-result-title{
+  font-size:12px;
+  font-weight:700;
+  line-height:1.35;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.global-search-result-sub{
+  margin-top:2px;
+  font-size:10px;
+  color:var(--muted);
+  line-height:1.4;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.global-search-result-type{
+  flex:0 0 auto;
+  padding:3px 6px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:var(--muted);
+  font-size:8px;
+  font-weight:700;
+  text-transform:uppercase;
+}
+
+.global-search-empty{
+  padding:20px 12px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.global-search-footer{
+  margin-top:4px;
+  padding:8px;
+  border-top:1px solid var(--line);
+  color:var(--faint);
+  font-size:9px;
+  text-align:center;
+}
+
+@media(max-width:800px){
+
+  .global-search{
+    width:100%;
+    max-width:none;
+  }
+
+  .global-search-input{
+    height:38px;
+  }
+
+  .global-search-drop{
+    position:fixed;
+    left:10px;
+    right:10px;
+    top:58px;
+    max-height:70vh;
+  }
+}
 </style>
 </head>
 <body>
@@ -386,7 +596,39 @@ select option{background:var(--paper);color:var(--ink)}
 
   <div class="main">
     <div class="topbar">
-      <div class="search">Search topics, drugs, mnemonics… (coming soon)</div>
+      <div class="global-search" id="globalSearchWrap">
+
+  <div class="global-search-input-wrap">
+
+    <span class="global-search-icon">⌕</span>
+
+    <input
+      id="globalSearch"
+      class="global-search-input"
+      type="search"
+      placeholder="Search anything — topics, notes, flashcards, drugs…"
+      autocomplete="off"
+      spellcheck="false"
+    >
+
+    <button
+      id="globalSearchClear"
+      class="global-search-clear"
+      type="button"
+      aria-label="Clear search"
+      style="display:none"
+    >
+      ✕
+    </button>
+
+  </div>
+
+  <div
+    id="globalSearchDrop"
+    class="global-search-drop"
+  ></div>
+
+</div><div class="search">Search topics, drugs, mnemonics… (coming soon)</div>
       <div class="pill"><span class="streakflame" id="topStreakIco">&#9679;</span><span id="topStreak">0-day streak</span></div>
       <div class="pill numfont" id="topXP">Lvl 1 · 0 XP</div>
       <button class="toggle" id="themeToggle">&#9789;</button>
@@ -465,11 +707,43 @@ select option{background:var(--paper);color:var(--ink)}
       <!-- CURRICULUM -->
       <div class="pg" id="pg-curric">
         <div class="pagehd">
-          <div><h2 class="brandfont">Curriculum</h2><p>Phase → Subject → Chapter → Topic — fully yours to edit</p></div>
-          <button class="btn bt bsm" id="addPhaseBtn">+ Add phase</button>
-        </div>
-        <div class="tabs" id="phaseTabs"></div>
-        <div id="phaseBody"></div>
+  <div>
+    <h2 class="brandfont">Curriculum</h2>
+    <p>Phase → Subject → Chapter → Topic — fully yours to edit</p>
+  </div>
+  <button class="btn bt bsm" id="addPhaseBtn">+ Add phase</button>
+</div>
+
+<div class="tabs" id="phaseTabs"></div>
+
+<div class="card c-em" style="margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div style="font-size:18px">🔎</div>
+
+    <input
+      id="curricSearch"
+      type="search"
+      placeholder="Search chapters and topics in this curriculum…"
+      autocomplete="off"
+      style="flex:1;min-width:220px"
+    >
+
+    <button class="btn bo bsm" id="curricExpandAll" type="button">
+      Expand all
+    </button>
+
+    <button class="btn bo bsm" id="curricCollapseAll" type="button">
+      Collapse all
+    </button>
+  </div>
+
+  <div id="curricSearchInfo"
+       style="font-size:11px;color:var(--muted);margin-top:8px">
+    Browse your curriculum as a collapsible tree.
+  </div>
+</div>
+
+<div id="phaseBody"></div>
       </div>
 
       <!-- ROUTINE -->
@@ -541,9 +815,30 @@ select option{background:var(--paper);color:var(--ink)}
         <div class="card c-teal" style="margin-bottom:18px">
           <div class="cardhd">Add a card</div>
           <div class="g2" style="margin-bottom:10px">
-            <div><label>Front (question)</label><input id="fc_front" placeholder="e.g. Blood supply of the appendix?"></div>
-            <div><label>Back (answer)</label><input id="fc_back" placeholder="e.g. Appendicular artery"></div>
-          </div>
+
+  <div>
+    <label>Front (question)</label>
+
+    <textarea
+      id="fc_front"
+      rows="4"
+      placeholder="e.g. What is the blood supply of the appendix?"
+      style="resize:vertical"
+    ></textarea>
+  </div>
+
+  <div>
+    <label>Back (answer)</label>
+
+    <textarea
+      id="fc_back"
+      rows="4"
+      placeholder="e.g. Appendicular artery&#10;&#10;It is usually a branch of the inferior division of the ileocolic artery."
+      style="resize:vertical"
+    ></textarea>
+  </div>
+
+</div>
           <div class="fg"><label>Link to topic (optional)</label>
             <div class="g3">
               <select id="fc_subj"><option value="">Subject…</option></select>
@@ -552,9 +847,119 @@ select option{background:var(--paper);color:var(--ink)}
             </div>
           </div>
           <button class="btn bt" id="fc_add">+ Add card</button>
+          <div
+  class="card c-em"
+  style="margin-top:18px"
+>
+
+  <div
+    class="cardhd"
+    style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    "
+  >
+    <span>📚 Card Library</span>
+
+    <span
+      class="chip"
+      id="fc_filterCount"
+      style="margin-left:auto"
+    >
+      0 cards
+    </span>
+  </div>
+
+  <!-- SEARCH -->
+  <div
+    style="
+      display:flex;
+      gap:9px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    "
+  >
+
+    <input
+      id="fc_search"
+      type="search"
+      placeholder="Search questions and answers…"
+      autocomplete="off"
+      style="flex:1;min-width:220px"
+    >
+
+    <button
+      class="btn bo bsm"
+      id="fc_clearFilters"
+      type="button"
+    >
+      Clear filters
+    </button>
+
+  </div>
+
+  <!-- FILTERS -->
+  <div
+    class="g3"
+    style="margin-bottom:10px"
+  >
+
+    <div>
+      <label>Subject</label>
+
+      <select id="fc_filterSubj">
+        <option value="">All subjects</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Chapter</label>
+
+      <select
+        id="fc_filterChap"
+        disabled
+      >
+        <option value="">All chapters</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Topic</label>
+
+      <select
+        id="fc_filterTop"
+        disabled
+      >
+        <option value="">All topics</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div
+    id="fc_filterInfo"
+    style="
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:10px;
+    "
+  >
+    Showing all flashcards.
+  </div>
+
+  <div id="fc_list"></div>
+
+</div>
         </div>
         <div class="card c-em" style="margin-bottom:18px" id="fc_reviewCard">
           <div class="cardhd">Review <span class="n" id="fc_reviewMode">Due today</span></div>
+          <div
+  class="card c-violet"
+  id="fc_detailBox"
+  style="display:none;margin-bottom:18px"
+></div>
           <div class="flashwrap" id="fc_reviewBox"></div>
         </div>
         <div class="card c-violet">
@@ -1131,26 +1536,302 @@ let DB={phases:ld(K.phases,[]),routine:ld(K.routine,[]),profile:ld(K.profile,{na
   flashcards:ld(K.flashcards,[]),notes:ld(K.notes,[]),mnemonics:ld(K.mnemonics,[]),qbank:ld(K.qbank,[]),
   wards:ld(K.wards,[]),procedures:ld(K.procedures,[]),caseProgress:ld(K.caseProgress,{}),customCases:ld(K.customCases,[]),caselog:ld(K.caselog,[]),rx:ld(K.rx,[]),milestones:ld(K.milestones,[]),drugs:ld(K.drugs,[]),invs:ld(K.invs,[])};
 
-let cloudTimer=null;
-function sv(type,val){
-  DB[type]=val; svLocal(K[type],val);
-  if(!sb||!USER)return;
-  clearTimeout(cloudTimer);
-  cloudTimer=setTimeout(()=>pushType(type),1200);
-}
-async function pushType(type){
-  if(!sb||!USER)return;
+/* ============ STORAGE (local cache + reliable cloud sync) ============ */
+
+const K={
+  phases:"srx_phases",
+  routine:"srx_routine",
+  profile:"srx_profile",
+  xplog:"srx_xplog",
+  flashcards:"srx_flashcards",
+  notes:"srx_notes",
+  mnemonics:"srx_mnemonics",
+  qbank:"srx_qbank",
+  wards:"srx_wards",
+  procedures:"srx_procedures",
+  caseProgress:"srx_caseprogress",
+  customCases:"srx_customcases",
+  caselog:"srx_caselog",
+  rx:"srx_rx",
+  milestones:"srx_milestones",
+  drugs:"srx_drugs",
+  invs:"srx_invs"
+};
+
+const $=id=>document.getElementById(id);
+
+const esc=s=>String(s==null?"":s)
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;");
+
+const uid=()=>"id_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+const ld=(k,d)=>{
   try{
-    await sb.from("studyrx_data").upsert({id:USER.id+"_"+type,user_id:USER.id,type,payload:DB[type],updated_at:new Date().toISOString()});
-  }catch(e){console.warn("sync failed",e)}
+    const v=localStorage.getItem(k);
+    return v?JSON.parse(v):d;
+  }catch(e){
+    console.warn("local read failed",k,e);
+    return d;
+  }
+};
+
+const svLocal=(k,v)=>{
+  try{
+    localStorage.setItem(k,JSON.stringify(v));
+  }catch(e){
+    console.warn("local save failed",k,e);
+  }
+};
+
+let USER=null;
+
+let DB={
+  phases:ld(K.phases,[]),
+  routine:ld(K.routine,[]),
+  profile:ld(K.profile,{
+    name:"",
+    xp:0,
+    streak:0,
+    lastActive:null
+  }),
+  xplog:ld(K.xplog,[]),
+  flashcards:ld(K.flashcards,[]),
+  notes:ld(K.notes,[]),
+  mnemonics:ld(K.mnemonics,[]),
+  qbank:ld(K.qbank,[]),
+  wards:ld(K.wards,[]),
+  procedures:ld(K.procedures,[]),
+  caseProgress:ld(K.caseProgress,{}),
+  customCases:ld(K.customCases,[]),
+  caselog:ld(K.caselog,[]),
+  rx:ld(K.rx,[]),
+  milestones:ld(K.milestones,[]),
+  drugs:ld(K.drugs,[]),
+  invs:ld(K.invs,[])
+};
+
+/*
+ * CLOUD SYNC
+ *
+ * Every StudyRx data type gets its own queue.
+ *
+ * Example:
+ *   routine -> its own timer/queue
+ *   profile -> its own timer/queue
+ *   xplog   -> its own timer/queue
+ *   wards   -> its own timer/queue
+ *
+ * Therefore saving one type can never cancel another type's save.
+ *
+ * The queue also serializes writes for the same type so rapid changes
+ * cannot arrive at Supabase out of order.
+ */
+
+const cloudSaveState={};
+
+function getCloudState(type){
+  if(!cloudSaveState[type]){
+    cloudSaveState[type]={
+      timer:null,
+      pending:false,
+      running:false,
+      version:0,
+      savedVersion:0,
+      promise:Promise.resolve()
+    };
+  }
+  return cloudSaveState[type];
 }
+
+function sv(type,val){
+  /*
+   * 1. Update the in-memory database immediately.
+   * 2. Update localStorage immediately.
+   * 3. Queue the cloud save independently for this type.
+   */
+  DB[type]=val;
+  svLocal(K[type],val);
+
+  if(!sb||!USER)return;
+
+  const state=getCloudState(type);
+
+  state.version++;
+  state.pending=true;
+
+  /*
+   * Only debounce this SAME data type.
+   * A routine save cannot cancel a profile save.
+   */
+  if(state.timer)clearTimeout(state.timer);
+
+  state.timer=setTimeout(()=>{
+    state.timer=null;
+    flushCloudType(type);
+  },1200);
+}
+
+async function flushCloudType(type){
+  if(!sb||!USER)return;
+
+  const state=getCloudState(type);
+
+  /*
+   * If another upload of this type is already running, let it finish.
+   * The next version will then be uploaded.
+   */
+  if(state.running){
+    state.pending=true;
+    return;
+  }
+
+  if(!state.pending)return;
+
+  state.running=true;
+  state.pending=false;
+
+  /*
+   * Take a snapshot.
+   *
+   * This is important. We don't want an upload that starts now to
+   * accidentally read a different DB value halfway through the
+   * synchronization process.
+   */
+  const versionAtStart=state.version;
+  const payload=DB[type];
+
+  try{
+    const {error}=await sb
+      .from("studyrx_data")
+      .upsert({
+        id:USER.id+"_"+type,
+        user_id:USER.id,
+        type,
+        payload,
+        updated_at:new Date().toISOString()
+      });
+
+    if(error)throw error;
+
+    state.savedVersion=versionAtStart;
+
+  }catch(e){
+    /*
+     * Keep the change pending if the network request failed.
+     * We retry instead of silently losing the cloud update.
+     */
+    state.pending=true;
+    console.warn("StudyRx sync failed for",type,e);
+
+    if(sb&&USER){
+      clearTimeout(state.timer);
+      state.timer=setTimeout(()=>{
+        state.timer=null;
+        flushCloudType(type);
+      },3000);
+    }
+
+  }finally{
+    state.running=false;
+
+    /*
+     * The user may have changed this same data type while the upload
+     * was running.
+     *
+     * If so, schedule another upload containing the newest value.
+     */
+    if(state.version>versionAtStart){
+      state.pending=true;
+
+      if(!state.timer){
+        state.timer=setTimeout(()=>{
+          state.timer=null;
+          flushCloudType(type);
+        },250);
+      }
+    }
+  }
+}
+
+async function pushType(type){
+  /*
+   * Explicit/immediate cloud save.
+   *
+   * Used by operations that intentionally want to flush a particular
+   * data type rather than wait for the normal 1.2-second debounce.
+   */
+  if(!sb||!USER)return;
+
+  const state=getCloudState(type);
+
+  if(state.timer){
+    clearTimeout(state.timer);
+    state.timer=null;
+  }
+
+  state.pending=true;
+
+  /*
+   * If another upload is already running, it will notice the newer
+   * version when it finishes.
+   */
+  if(state.running)return;
+
+  await flushCloudType(type);
+}
+
+async function pushAllTypes(){
+  if(!sb||!USER)return;
+
+  /*
+   * Flush every existing data type independently.
+   * Promise.all means routine/profile/wards/etc. don't cancel one another.
+   */
+  await Promise.all(
+    Object.keys(K).map(type=>pushType(type))
+  );
+}
+
 async function pullAll(){
   if(!sb||!USER)return;
+
   try{
-    const {data,error} = await sb.from("studyrx_data").select("type,payload").eq("user_id",USER.id);
-    if(error||!data)return;
-    data.forEach(row=>{ DB[row.type]=row.payload; svLocal(K[row.type],row.payload) });
-  }catch(e){console.warn("pull failed",e)}
+    const {data,error}=await sb
+      .from("studyrx_data")
+      .select("type,payload,updated_at")
+      .eq("user_id",USER.id);
+
+    if(error)throw error;
+
+    if(!data)return;
+
+    data.forEach(row=>{
+      /*
+       * Only accept data types known to StudyRx.
+       * This prevents an unexpected database row from creating an
+       * accidental DB property.
+       */
+      if(!Object.prototype.hasOwnProperty.call(K,row.type))return;
+
+      DB[row.type]=row.payload;
+      svLocal(K[row.type],row.payload);
+
+      /*
+       * Mark this version as the currently cloud-loaded state.
+       * No upload is triggered merely because data was pulled.
+       */
+      const state=getCloudState(row.type);
+      state.pending=false;
+      state.version++;
+      state.savedVersion=state.version;
+    });
+
+  }catch(e){
+    console.warn("StudyRx cloud pull failed",e);
+  }
 }
 
 /* ============ TOAST ============ */
@@ -1269,7 +1950,21 @@ function renderPage(p){
   if(p==="pdf")renderDriveUI();
   if(p==="milestones")renderMilestones();
   if(p==="ai"){ /* nothing to preload */ }
-  if(p==="set"){$("s_name").value=DB.profile.name||"";$("s_key").value=DB.profile.aiKey||"";$("s_model").value=DB.profile.aiModel||"claude-sonnet-5"}
+  if(p==="set"){
+  $("s_name").value=DB.profile.name||"";
+  $("s_key").value=DB.profile.aiKey||"";
+  $("s_model").value=DB.profile.aiModel||"claude-sonnet-5";
+
+  const h=DB.profile.rxLetterhead||{};
+  $("s_rxname").value=h.name||"";
+  $("s_rxdeg").value=h.degrees||"";
+  $("s_rxdesig").value=h.designation||"";
+  $("s_rxinst").value=h.institution||"";
+  $("s_rxreg").value=h.registration||"";
+  $("s_rxph").value=h.mobile||"";
+  $("s_rxchamber").value=h.chamber||"";
+  $("s_rxaddr").value=h.address||"";
+}
 }
 function renderAll(){
   renderSidebarSubjects(); renderDash(); renderCurric(); renderRoutine(); updateTopbar();
@@ -1293,6 +1988,1590 @@ function allTopics(){
     out.push(Object.assign({subjectId:s.id,subjectName:s.name,subjectColor:s.color,chapterId:c.id,chapterName:c.name},t))
   ))));
   return out;
+}
+/* ============================================================
+   GLOBAL STUDYRX SEARCH
+   Searches the user's complete study database.
+
+   IMPORTANT:
+   - Read-only.
+   - Does not modify DB data.
+   - Does not create database records.
+   - Does not require SQL changes.
+   ============================================================ */
+
+let globalSearchTimer=null;
+let globalSearchResults=[];
+let globalSearchActiveIndex=-1;
+
+
+function normalizeSearch(value){
+  return String(value||"")
+    .toLowerCase()
+    .trim();
+}
+
+
+function searchTextMatch(text,q){
+  return normalizeSearch(text).includes(q);
+}
+
+
+function makeSearchResult({
+  type,
+  icon,
+  title,
+  subtitle,
+  searchText,
+  action,
+  color
+}){
+
+  return {
+    type,
+    icon,
+    title:title||"",
+    subtitle:subtitle||"",
+    searchText:normalizeSearch(searchText||title||""),
+    action,
+    color:color||"var(--emerald)"
+  };
+}
+
+
+/* ============================================================
+   BUILD COMPLETE SEARCH INDEX
+   ============================================================ */
+
+function buildGlobalSearchIndex(){
+
+  const results=[];
+
+
+  /* ----------------------------------------------------------
+     CURRICULUM
+     Phase → Subject → Chapter → Topic
+     ---------------------------------------------------------- */
+
+  (DB.phases||[]).forEach(ph=>{
+
+    (ph.subjects||[]).forEach(s=>{
+
+      (s.chapters||[]).forEach(c=>{
+
+        /*
+         * Chapter result
+         */
+        results.push(
+          makeSearchResult({
+            type:"Chapter",
+            icon:"📖",
+            title:c.name,
+            subtitle:
+              `${s.name} · ${ph.name}`,
+            searchText:[
+              c.name,
+              s.name,
+              ph.name
+            ].join(" "),
+            color:s.color,
+            action:()=>{
+
+              openCurriculumChapter(
+                ph.id,
+                s.id,
+                c.id
+              );
+
+            }
+          })
+        );
+
+
+        /*
+         * Topic results
+         */
+        (c.topics||[]).forEach(t=>{
+
+          results.push(
+            makeSearchResult({
+              type:"Topic",
+              icon:"📚",
+              title:t.name,
+              subtitle:
+                `${s.name} · ${c.name}`,
+              searchText:[
+                t.name,
+                c.name,
+                s.name,
+                ph.name
+              ].join(" "),
+              color:s.color,
+              action:()=>{
+
+                openCurriculumTopic(
+                  ph.id,
+                  s.id,
+                  c.id,
+                  t.id
+                );
+
+              }
+            })
+          );
+
+        });
+
+      });
+
+    });
+
+  });
+
+
+  /* ----------------------------------------------------------
+     FLASHCARDS
+     ---------------------------------------------------------- */
+
+  (DB.flashcards||[]).forEach(c=>{
+
+    const ctx=getGlobalFlashcardContext(c);
+
+    results.push(
+      makeSearchResult({
+
+        type:"Flashcard",
+        icon:"🗂️",
+
+        title:c.front,
+
+        subtitle:[
+          ctx?.subjectName,
+          ctx?.chapterName,
+          ctx?.topicName||c.topicName
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          c.front,
+          c.back,
+          c.topicName,
+          ctx?.subjectName,
+          ctx?.chapterName,
+          ctx?.topicName
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        color:c.subjectColor,
+
+        action:()=>{
+
+          openFlashcardFromGlobalSearch(c.id);
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     NOTES
+     ---------------------------------------------------------- */
+
+  (DB.notes||[]).forEach(n=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Note",
+        icon:"📝",
+
+        title:n.title,
+
+        subtitle:
+          n.topicName||
+          "Study note",
+
+        searchText:[
+          n.title,
+          n.body,
+          n.topicName
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        color:n.color,
+
+        action:()=>{
+
+          openNoteFromGlobalSearch(n.id);
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     MNEMONICS
+     ---------------------------------------------------------- */
+
+  (DB.mnemonics||[]).forEach(m=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Mnemonic",
+        icon:"🧠",
+
+        title:m.term,
+
+        subtitle:
+          m.subjectName||
+          "Mnemonic vault",
+
+        searchText:[
+          m.term,
+          m.text,
+          m.subjectName
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        color:m.color,
+
+        action:()=>{
+
+          openMnemonicFromGlobalSearch(m.id);
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     DRUG LIBRARY
+     ---------------------------------------------------------- */
+
+  (DB.drugs||[]).forEach(d=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Drug",
+        icon:"💊",
+
+        title:d.n,
+
+        subtitle:[
+          d.c,
+          ...(d.brands||[]),
+          d.d,
+          d.f
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          d.n,
+          ...(d.brands||[]),
+          d.c,
+          d.d,
+          d.f,
+          d.u,
+          d.note
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        action:()=>{
+
+          openDrugFromGlobalSearch(d.id);
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     INVESTIGATION LIBRARY
+     ---------------------------------------------------------- */
+
+  (DB.invs||[]).forEach(i=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Investigation",
+        icon:"🔬",
+
+        title:i.n,
+
+        subtitle:[
+          i.c,
+          i.range
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          i.n,
+          i.c,
+          i.range
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        action:()=>{
+
+          openInvestigationFromGlobalSearch(i.id);
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     QUESTION BANK
+     ---------------------------------------------------------- */
+
+  (DB.qbank||[]).forEach(q=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Question Bank",
+        icon:"❓",
+
+        title:
+          q.topicName||
+          q.subjectName||
+          "Question-bank session",
+
+        subtitle:[
+          q.subjectName,
+          q.date,
+          `${q.correct||0}/${q.total||0} correct`
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          q.topicName,
+          q.subjectName,
+          q.date
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        action:()=>{
+
+          openPageFromGlobalSearch(
+            "qbank"
+          );
+
+        }
+
+      })
+
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     WARD TRACKER
+     ---------------------------------------------------------- */
+
+  (DB.wards||[]).forEach(w=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Ward",
+        icon:"🏥",
+
+        title:w.dept,
+
+        subtitle:[
+          w.from,
+          w.to,
+          `${w.present||0} days attended`
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          w.dept,
+          ...(w.topics||[]).map(t=>t.name||"")
+        ].join(" "),
+
+        action:()=>{
+
+          openPageFromGlobalSearch(
+            "ward"
+          );
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     CASE LOG
+     ---------------------------------------------------------- */
+
+  (DB.caselog||[]).forEach(c=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Case Log",
+        icon:"🩺",
+
+        title:c.pres||c.dept,
+
+        subtitle:[
+          c.dept,
+          c.date
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          c.dept,
+          c.pres,
+          c.learn,
+          c.date
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        action:()=>{
+
+          openPageFromGlobalSearch(
+            "caselog"
+          );
+
+        }
+
+      })
+    );
+
+  });
+
+
+  /* ----------------------------------------------------------
+     PRESCRIPTIONS
+     ---------------------------------------------------------- */
+
+  (DB.rx||[]).forEach(r=>{
+
+    results.push(
+      makeSearchResult({
+
+        type:"Prescription",
+        icon:"📋",
+
+        title:
+          r.dx||
+          r.pname||
+          "Saved prescription",
+
+        subtitle:[
+          r.pname,
+          r.pdate,
+          r.cc
+        ]
+          .filter(Boolean)
+          .join(" · "),
+
+        searchText:[
+          r.pname,
+          r.dx,
+          r.cc,
+          r.dd,
+          r.hpi,
+          r.dhx,
+          r.fhx,
+          r.shx,
+          r.ohx,
+          ...(r.meds||[]).map(m=>m.n||""),
+          ...(r.invs||[]).map(i=>i.n||"")
+        ]
+          .filter(Boolean)
+          .join(" "),
+
+        action:()=>{
+
+          openPrescriptionFromGlobalSearch(
+            r.id
+          );
+
+        }
+
+      })
+
+    );
+
+  });
+
+
+  return results;
+}
+
+
+/* ============================================================
+   FLASHCARD CONTEXT
+   ============================================================ */
+
+function getGlobalFlashcardContext(card){
+
+  if(!card)return null;
+
+  for(const ph of DB.phases||[]){
+
+    for(const s of ph.subjects||[]){
+
+      for(const c of s.chapters||[]){
+
+        for(const t of c.topics||[]){
+
+          if(
+            card.topicId &&
+            t.id===card.topicId
+          ){
+
+            return {
+              phaseId:ph.id,
+              phaseName:ph.name,
+              subjectId:s.id,
+              subjectName:s.name,
+              subjectColor:s.color,
+              chapterId:c.id,
+              chapterName:c.name,
+              topicId:t.id,
+              topicName:t.name
+            };
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return null;
+}
+
+
+/* ============================================================
+   SEARCH RESULTS
+   ============================================================ */
+
+function performGlobalSearch(){
+
+  const input=$("globalSearch");
+
+  if(!input)return;
+
+  const q=normalizeSearch(input.value);
+
+  const drop=$("globalSearchDrop");
+
+  const clear=$("globalSearchClear");
+
+  if(clear){
+    clear.style.display=q
+      ? "block"
+      : "none";
+  }
+
+  globalSearchActiveIndex=-1;
+
+  if(!q){
+
+    drop.classList.remove("on");
+    drop.innerHTML="";
+    globalSearchResults=[];
+
+    return;
+  }
+
+
+  const index=buildGlobalSearchIndex();
+
+  /*
+   * Score results.
+   *
+   * Exact title match gets highest priority.
+   * Title starts-with gets next priority.
+   * Otherwise general content match.
+   */
+
+  globalSearchResults=
+    index
+      .map((r,index)=>{
+
+        const title=
+          normalizeSearch(r.title);
+
+        const text=
+          normalizeSearch(r.searchText);
+
+        let score=0;
+
+        if(title===q){
+          score+=1000;
+        }
+
+        if(title.startsWith(q)){
+          score+=500;
+        }
+
+        if(title.includes(q)){
+          score+=250;
+        }
+
+        if(text.includes(q)){
+          score+=100;
+        }
+
+        /*
+         * Slightly prefer shorter titles when scores
+         * are otherwise similar.
+         */
+        score+=Math.max(
+          0,
+          40-Math.min(title.length,40)
+        );
+
+        return {
+          ...r,
+          score,
+          originalIndex:index
+        };
+
+      })
+      .filter(r=>r.score>0)
+      .sort((a,b)=>{
+
+        if(b.score!==a.score){
+          return b.score-a.score;
+        }
+
+        return a.title.localeCompare(
+          b.title
+        );
+
+      })
+      .slice(0,30);
+
+
+  renderGlobalSearchResults();
+}
+
+
+/* ============================================================
+   RENDER RESULTS
+   ============================================================ */
+
+function renderGlobalSearchResults(){
+
+  const drop=$("globalSearchDrop");
+
+  if(!drop)return;
+
+  if(!globalSearchResults.length){
+
+    drop.innerHTML=`
+      <div class="global-search-empty">
+        No results found for
+        <strong>${esc($("globalSearch").value)}</strong>
+      </div>
+
+      <div class="global-search-footer">
+        Search includes your curriculum, notes, flashcards,
+        mnemonics, drugs, investigations and more.
+      </div>
+    `;
+
+    drop.classList.add("on");
+
+    return;
+  }
+
+
+  const grouped={};
+
+  globalSearchResults.forEach((r,i)=>{
+
+    if(!grouped[r.type]){
+      grouped[r.type]=[];
+    }
+
+    grouped[r.type].push({
+      ...r,
+      resultIndex:i
+    });
+
+  });
+
+
+  const typeOrder=[
+    "Topic",
+    "Chapter",
+    "Flashcard",
+    "Note",
+    "Mnemonic",
+    "Drug",
+    "Investigation",
+    "Question Bank",
+    "Ward",
+    "Case Log",
+    "Prescription"
+  ];
+
+
+  let html="";
+
+
+  typeOrder.forEach(type=>{
+
+    const group=grouped[type];
+
+    if(!group||!group.length){
+      return;
+    }
+
+    html+=`
+      <div class="global-search-section">
+        ${esc(type)}
+      </div>
+    `;
+
+
+    group.forEach(r=>{
+
+      html+=`
+        <button
+          type="button"
+          class="global-search-result"
+          data-global-result="${r.resultIndex}"
+          style="--result-color:${r.color||"var(--emerald)"}"
+        >
+
+          <div
+            class="global-search-result-icon"
+            style="
+              color:${r.color||"var(--emerald)"};
+            "
+          >
+            ${r.icon}
+          </div>
+
+          <div class="global-search-result-main">
+
+            <div class="global-search-result-title">
+              ${esc(r.title)}
+            </div>
+
+            <div class="global-search-result-sub">
+              ${esc(r.subtitle||"")}
+            </div>
+
+          </div>
+
+          <div class="global-search-result-type">
+            ${esc(r.type)}
+          </div>
+
+        </button>
+      `;
+
+    });
+
+  });
+
+
+  html+=`
+    <div class="global-search-footer">
+      ${globalSearchResults.length}
+      result${globalSearchResults.length!==1?"s":""}
+      · press Enter to open the first result
+    </div>
+  `;
+
+
+  drop.innerHTML=html;
+
+  drop.classList.add("on");
+
+
+  drop
+    .querySelectorAll("[data-global-result]")
+    .forEach(el=>{
+
+      el.onclick=()=>{
+
+        const index=
+          Number(el.dataset.globalResult);
+
+        const result=
+          globalSearchResults[index];
+
+        if(!result)return;
+
+        closeGlobalSearch();
+
+        result.action();
+
+      };
+
+    });
+
+}
+
+
+/* ============================================================
+   KEYBOARD NAVIGATION
+   ============================================================ */
+
+$("globalSearch").onkeydown=e=>{
+
+  if(e.key==="ArrowDown"){
+
+    e.preventDefault();
+
+    if(!globalSearchResults.length){
+      return;
+    }
+
+    globalSearchActiveIndex=
+      Math.min(
+        globalSearchActiveIndex+1,
+        globalSearchResults.length-1
+      );
+
+    updateGlobalSearchActive();
+
+    return;
+  }
+
+
+  if(e.key==="ArrowUp"){
+
+    e.preventDefault();
+
+    if(!globalSearchResults.length){
+      return;
+    }
+
+    globalSearchActiveIndex=
+      Math.max(
+        globalSearchActiveIndex-1,
+        0
+      );
+
+    updateGlobalSearchActive();
+
+    return;
+  }
+
+
+  if(e.key==="Enter"){
+
+    e.preventDefault();
+
+    const index=
+      globalSearchActiveIndex>=0
+        ? globalSearchActiveIndex
+        : 0;
+
+    const result=
+      globalSearchResults[index];
+
+    if(result){
+
+      closeGlobalSearch();
+
+      result.action();
+
+    }
+
+    return;
+  }
+
+
+  if(e.key==="Escape"){
+
+    e.preventDefault();
+
+    closeGlobalSearch();
+
+  }
+
+};
+
+
+$("globalSearch").oninput=()=>{
+
+  clearTimeout(globalSearchTimer);
+
+  globalSearchTimer=
+    setTimeout(
+      performGlobalSearch,
+      70
+    );
+
+};
+
+
+$("globalSearch").onfocus=()=>{
+
+  if(
+    $("globalSearch").value.trim()
+  ){
+    performGlobalSearch();
+  }
+
+};
+
+
+function updateGlobalSearchActive(){
+
+  const items=
+    $("globalSearchDrop")
+      ?.querySelectorAll(
+        "[data-global-result]"
+      )||[];
+
+  items.forEach((el,i)=>{
+
+    el.classList.toggle(
+      "active",
+      i===globalSearchActiveIndex
+    );
+
+  });
+
+  const active=
+    items[globalSearchActiveIndex];
+
+  if(active){
+
+    active.scrollIntoView({
+      block:"nearest"
+    });
+
+  }
+
+}
+
+
+$("globalSearchClear").onclick=()=>{
+
+  $("globalSearch").value="";
+
+  closeGlobalSearch();
+
+  $("globalSearch").focus();
+
+};
+
+
+function closeGlobalSearch(){
+
+  const drop=$("globalSearchDrop");
+
+  if(drop){
+
+    drop.classList.remove("on");
+
+    drop.innerHTML="";
+
+  }
+
+  globalSearchResults=[];
+
+  globalSearchActiveIndex=-1;
+
+  const clear=$("globalSearchClear");
+
+  if(clear){
+    clear.style.display="none";
+  }
+
+}
+
+
+/* ============================================================
+   CLICK OUTSIDE
+   ============================================================ */
+
+document.addEventListener("click",e=>{
+
+  const wrap=$("globalSearchWrap");
+
+  if(
+    wrap &&
+    !wrap.contains(e.target)
+  ){
+
+    closeGlobalSearch();
+
+  }
+
+});
+
+
+/* ============================================================
+   GENERIC PAGE NAVIGATION
+   ============================================================ */
+
+function openPageFromGlobalSearch(page){
+
+  const btn=
+    document.querySelector(
+      `.railbtn[data-p="${page}"]`
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+}
+
+
+/* ============================================================
+   CURRICULUM CHAPTER
+   ============================================================ */
+
+function openCurriculumChapter(
+  phaseId,
+  subjectId,
+  chapterId
+){
+
+  activePhase=phaseId;
+
+  /*
+   * Open Curriculum.
+   */
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="curric"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }else{
+
+    renderCurric();
+
+  }
+
+
+  /*
+   * Open the chapter in the tree.
+   */
+  if(
+    typeof expandedChapters!=="undefined"
+  ){
+
+    expandedChapters.add(
+      chapterTreeKey(
+        subjectId,
+        chapterId
+      )
+    );
+
+  }
+
+
+  renderCurric();
+
+
+  /*
+   * Scroll to chapter after DOM update.
+   */
+  setTimeout(()=>{
+
+    const el=
+      document.querySelector(
+        `[data-chaptertree="${subjectId}|${chapterId}"]`
+      ) ||
+      document.querySelector(
+        `[data-chapter="${chapterId}"]`
+      );
+
+    if(el){
+
+      el.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
+
+      el.style.outline=
+        "2px solid var(--emerald)";
+
+      el.style.outlineOffset="3px";
+
+      setTimeout(()=>{
+
+        el.style.outline="";
+        el.style.outlineOffset="";
+
+      },1800);
+
+    }
+
+  },100);
+
+}
+
+
+/* ============================================================
+   CURRICULUM TOPIC
+   ============================================================ */
+
+function openCurriculumTopic(
+  phaseId,
+  subjectId,
+  chapterId,
+  topicId
+){
+
+  activePhase=phaseId;
+
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="curric"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  /*
+   * Open chapter.
+   */
+  if(
+    typeof expandedChapters!=="undefined"
+  ){
+
+    expandedChapters.add(
+      chapterTreeKey(
+        subjectId,
+        chapterId
+      )
+    );
+
+  }
+
+
+  /*
+   * If your tree implementation also uses expandedTopics,
+   * open the topic container too.
+   */
+  if(
+    typeof expandedTopics!=="undefined"
+  ){
+
+    expandedTopics.add(topicId);
+
+  }
+
+
+  renderCurric();
+
+
+  setTimeout(()=>{
+
+    const selectors=[
+      `[data-topictree="${subjectId}|${chapterId}|${topicId}"]`,
+      `[data-topic="${topicId}"]`,
+      `[data-edittop="${subjectId}|${chapterId}|${topicId}"]`
+    ];
+
+
+    let el=null;
+
+    for(
+      const selector of selectors
+    ){
+
+      el=
+        document.querySelector(
+          selector
+        );
+
+      if(el)break;
+
+    }
+
+
+    if(el){
+
+      el.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
+
+      el.style.outline=
+        "2px solid var(--emerald)";
+
+      el.style.outlineOffset="3px";
+
+      setTimeout(()=>{
+
+        el.style.outline="";
+        el.style.outlineOffset="";
+
+      },1800);
+
+    }
+
+  },120);
+
+}
+
+
+/* ============================================================
+   FLASHCARD
+   ============================================================ */
+
+function openFlashcardFromGlobalSearch(id){
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="flash"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  setTimeout(()=>{
+
+    if(
+      typeof openFlashcard==="function"
+    ){
+
+      openFlashcard(id);
+
+    }
+
+  },80);
+
+}
+
+
+/* ============================================================
+   NOTE
+   ============================================================ */
+
+function openNoteFromGlobalSearch(id){
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="notes"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  setTimeout(()=>{
+
+    const el=
+      document.querySelector(
+        `[data-delnote="${id}"]`
+      );
+
+
+    if(el){
+
+      const row=
+        el.closest(".row");
+
+      if(row){
+
+        row.scrollIntoView({
+          behavior:"smooth",
+          block:"center"
+        });
+
+        row.style.outline=
+          "2px solid var(--emerald)";
+
+        row.style.outlineOffset="3px";
+
+        setTimeout(()=>{
+
+          row.style.outline="";
+          row.style.outlineOffset="";
+
+        },1800);
+
+      }
+
+    }
+
+  },100);
+
+}
+
+
+/* ============================================================
+   MNEMONIC
+   ============================================================ */
+
+function openMnemonicFromGlobalSearch(id){
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="mnem"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  setTimeout(()=>{
+
+    const el=
+      document.querySelector(
+        `[data-delmn="${id}"]`
+      );
+
+
+    if(el){
+
+      const row=
+        el.closest(".row");
+
+      if(row){
+
+        row.scrollIntoView({
+          behavior:"smooth",
+          block:"center"
+        });
+
+        row.style.outline=
+          "2px solid var(--gold)";
+
+        row.style.outlineOffset="3px";
+
+        setTimeout(()=>{
+
+          row.style.outline="";
+          row.style.outlineOffset="";
+
+        },1800);
+
+      }
+
+    }
+
+  },100);
+
+}
+
+
+/* ============================================================
+   DRUG
+   ============================================================ */
+
+function openDrugFromGlobalSearch(id){
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="drugs"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  setTimeout(()=>{
+
+    const el=
+      document.querySelector(
+        `[data-editdrug="${id}"]`
+      );
+
+    if(el){
+
+      const row=
+        el.closest(".libitem");
+
+      if(row){
+
+        row.scrollIntoView({
+          behavior:"smooth",
+          block:"center"
+        });
+
+        row.style.outline=
+          "2px solid var(--emerald)";
+
+        row.style.outlineOffset="3px";
+
+        setTimeout(()=>{
+
+          row.style.outline="";
+          row.style.outlineOffset="";
+
+        },1800);
+
+      }
+
+    }
+
+  },100);
+
+}
+
+
+/* ============================================================
+   INVESTIGATION
+   ============================================================ */
+
+function openInvestigationFromGlobalSearch(id){
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="invs"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  setTimeout(()=>{
+
+    const el=
+      document.querySelector(
+        `[data-editinv="${id}"]`
+      );
+
+    if(el){
+
+      const row=
+        el.closest(".libitem");
+
+      if(row){
+
+        row.scrollIntoView({
+          behavior:"smooth",
+          block:"center"
+        });
+
+        row.style.outline=
+          "2px solid #a78bfa";
+
+        row.style.outlineOffset="3px";
+
+        setTimeout(()=>{
+
+          row.style.outline="";
+          row.style.outlineOffset="";
+
+        },1800);
+
+      }
+
+    }
+
+  },100);
+
+}
+
+
+/* ============================================================
+   PRESCRIPTION
+   ============================================================ */
+
+function openPrescriptionFromGlobalSearch(id){
+
+  const btn=
+    document.querySelector(
+      '.railbtn[data-p="rx"]'
+    );
+
+  if(btn){
+
+    btn.click();
+
+  }
+
+
+  setTimeout(()=>{
+
+    if(
+      typeof rxLoad==="function"
+    ){
+
+      const prescription=
+        (DB.rx||[]).find(
+          r=>r.id===id
+        );
+
+      if(prescription){
+
+        rxLoad(prescription);
+
+      }
+
+    }
+
+  },100);
+
 }
 function renderSidebarSubjects(){
   const el=$("subjRail");
@@ -1460,74 +3739,714 @@ $("addPhaseBtn").onclick=()=>{
 };
 function renderCurric(){
   const phases=DB.phases||[];
-  if(!activePhase && phases.length) activePhase=phases[0].id;
-  $("phaseTabs").innerHTML = phases.map(p=>`<button class="tab ${p.id===activePhase?'on':''}" data-id="${p.id}">${esc(p.name)}</button>`).join("");
-  $("phaseTabs").querySelectorAll(".tab").forEach(b=>b.onclick=()=>{activePhase=b.dataset.id;renderCurric()});
-  const ph=phases.find(p=>p.id===activePhase);
-  if(!ph){ $("phaseBody").innerHTML='<div class="empty">No phases yet — click "Add phase" to start.</div>'; return }
-  let html=`<div class="card c-em" style="margin-bottom:16px">
-    <div class="cardhd">${esc(ph.name)}
-      <button class="iconbtn" style="margin-left:auto" data-editphase="${ph.id}">✎</button>
-      <button class="iconbtn" data-delphase="${ph.id}">🗑</button>
-    </div>
-    <div class="g2" style="margin-bottom:12px">
-      <div><label>Exam date (optional)</label><input type="date" value="${ph.examDate||''}" data-examdate="${ph.id}"></div>
-    </div>
-    <div class="btn-row" style="margin-bottom:6px"><input placeholder="New subject name" id="newSubjName_${ph.id}" style="max-width:220px"><button class="btn bt bsm" data-addsubj="${ph.id}">+ Add subject</button></div>
-  </div>`;
-  (ph.subjects||[]).forEach(s=>{ html += subjectBlockHTML(s); });
-  $("phaseBody").innerHTML = html;
 
-  $("phaseBody").querySelectorAll("[data-examdate]").forEach(inp=>inp.onchange=()=>{
-    ph.examDate=inp.value; sv("phases",DB.phases); toast("Exam date saved");
+  if(!activePhase && phases.length){
+    activePhase=phases[0].id;
+  }
+
+  $("phaseTabs").innerHTML=phases.map(p=>
+    `<button class="tab ${p.id===activePhase?'on':''}" data-id="${p.id}">
+      ${esc(p.name)}
+    </button>`
+  ).join("");
+
+  $("phaseTabs").querySelectorAll(".tab").forEach(b=>{
+    b.onclick=()=>{
+      activePhase=b.dataset.id;
+      curricSearchQuery="";
+      expandedChapters.clear();
+      renderCurric();
+    };
   });
-  $("phaseBody").querySelectorAll("[data-addsubj]").forEach(b=>b.onclick=()=>{
-    const inp=$("newSubjName_"+b.dataset.addsubj); const name=inp.value.trim(); if(!name)return;
-    ph.subjects=ph.subjects||[]; ph.subjects.push({id:uid(),name,color:colorFor(name,ph.subjects.length),chapters:[]});
-    sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
+
+  const ph=phases.find(p=>p.id===activePhase);
+
+  if(!ph){
+    $("phaseBody").innerHTML=
+      '<div class="empty">No phases yet — click "Add phase" to start.</div>';
+
+    const info=$("curricSearchInfo");
+    if(info){
+      info.textContent=
+        "Browse your curriculum as a collapsible tree.";
+    }
+
+    return;
+  }
+
+  let html=`
+    <div class="card c-em" style="margin-bottom:16px">
+
+      <div class="cardhd">
+        ${esc(ph.name)}
+
+        <button
+          class="iconbtn"
+          style="margin-left:auto"
+          data-editphase="${ph.id}"
+        >✎</button>
+
+        <button
+          class="iconbtn"
+          data-delphase="${ph.id}"
+        >🗑</button>
+      </div>
+
+      <div class="g2" style="margin-bottom:12px">
+        <div>
+          <label>Exam date (optional)</label>
+          <input
+            type="date"
+            value="${esc(ph.examDate||'')}"
+            data-examdate="${ph.id}"
+          >
+        </div>
+      </div>
+
+      <div
+        class="btn-row"
+        style="margin-bottom:6px"
+      >
+        <input
+          placeholder="New subject name"
+          id="newSubjName_${ph.id}"
+          style="max-width:220px"
+        >
+
+        <button
+          class="btn bt bsm"
+          data-addsubj="${ph.id}"
+        >
+          + Add subject
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  (ph.subjects||[]).forEach(s=>{
+    html+=subjectBlockHTML(s);
   });
-  $("phaseBody").querySelectorAll("[data-delphase]").forEach(b=>b.onclick=()=>{
-    if(!confirm("Delete this whole phase and everything in it?"))return;
-    DB.phases=DB.phases.filter(p=>p.id!==b.dataset.delphase); if(activePhase===b.dataset.delphase)activePhase=null;
-    sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
-  });
-  $("phaseBody").querySelectorAll("[data-editphase]").forEach(b=>b.onclick=()=>{
-    const nn=prompt("Rename phase:",ph.name); if(!nn||!nn.trim())return;
-    ph.name=nn.trim(); sv("phases",DB.phases); renderCurric();
-  });
+
+  $("phaseBody").innerHTML=html;
+
+
+  /* =========================================================
+     CURRICULUM SEARCH
+     ========================================================= */
+
+  const curricSearch=$("curricSearch");
+
+  if(curricSearch){
+
+    curricSearch.value=curricSearchQuery||"";
+
+    curricSearch.oninput=()=>{
+
+      const value=curricSearch.value;
+
+      curricSearchQuery=value;
+
+      const cursorPosition=
+        curricSearch.selectionStart||value.length;
+
+      renderCurric();
+
+      const newSearch=$("curricSearch");
+
+      if(newSearch){
+
+        newSearch.focus();
+
+        const position=Math.min(
+          cursorPosition,
+          newSearch.value.length
+        );
+
+        newSearch.setSelectionRange(
+          position,
+          position
+        );
+      }
+    };
+  }
+
+
+  /* =========================================================
+     SEARCH RESULT COUNT
+     ========================================================= */
+
+  const info=$("curricSearchInfo");
+
+  if(info){
+
+    const q=(curricSearchQuery||"")
+      .trim()
+      .toLowerCase();
+
+    if(!q){
+
+      info.textContent=
+        "Browse your curriculum as a collapsible tree.";
+
+    }else{
+
+      let chapterMatches=0;
+      let topicMatches=0;
+
+      (ph.subjects||[]).forEach(s=>{
+
+        (s.chapters||[]).forEach(c=>{
+
+          if(
+            (c.name||"")
+              .toLowerCase()
+              .includes(q)
+          ){
+            chapterMatches++;
+          }
+
+          topicMatches+=
+            (c.topics||[]).filter(t=>
+              (t.name||"")
+                .toLowerCase()
+                .includes(q)
+            ).length;
+
+        });
+
+      });
+
+      info.textContent=
+        `${chapterMatches} chapter match${chapterMatches!==1?"es":""} · `+
+        `${topicMatches} topic match${topicMatches!==1?"es":""}`;
+    }
+  }
+
+
+  /* =========================================================
+     EXPAND ALL
+     ========================================================= */
+
+  const expandBtn=$("curricExpandAll");
+
+  if(expandBtn){
+
+    expandBtn.onclick=()=>{
+
+      expandedChapters.clear();
+
+      (ph.subjects||[]).forEach(s=>{
+
+        (s.chapters||[]).forEach(c=>{
+
+          expandedChapters.add(
+            chapterTreeKey(s.id,c.id)
+          );
+
+        });
+
+      });
+
+      renderCurric();
+    };
+  }
+
+
+  /* =========================================================
+     COLLAPSE ALL
+     ========================================================= */
+
+  const collapseBtn=$("curricCollapseAll");
+
+  if(collapseBtn){
+
+    collapseBtn.onclick=()=>{
+
+      expandedChapters.clear();
+
+      renderCurric();
+    };
+  }
+
+
+  /* =========================================================
+     EXISTING PHASE EXAM DATE
+     ========================================================= */
+
+  $("phaseBody")
+    .querySelectorAll("[data-examdate]")
+    .forEach(inp=>{
+
+      inp.onchange=()=>{
+
+        ph.examDate=inp.value;
+
+        sv("phases",DB.phases);
+
+        toast("Exam date saved");
+      };
+
+    });
+
+
+  /* =========================================================
+     EXISTING ADD SUBJECT
+     ========================================================= */
+
+  $("phaseBody")
+    .querySelectorAll("[data-addsubj]")
+    .forEach(b=>{
+
+      b.onclick=()=>{
+
+        const inp=$(
+          "newSubjName_"+b.dataset.addsubj
+        );
+
+        const name=inp.value.trim();
+
+        if(!name)return;
+
+        ph.subjects=ph.subjects||[];
+
+        ph.subjects.push({
+          id:uid(),
+          name,
+          color:colorFor(
+            name,
+            ph.subjects.length
+          ),
+          chapters:[]
+        });
+
+        sv("phases",DB.phases);
+
+        renderCurric();
+
+        renderSidebarSubjects();
+      };
+
+    });
+
+
+  /* =========================================================
+     EXISTING DELETE PHASE
+     ========================================================= */
+
+  $("phaseBody")
+    .querySelectorAll("[data-delphase]")
+    .forEach(b=>{
+
+      b.onclick=()=>{
+
+        if(!confirm(
+          "Delete this whole phase and everything in it?"
+        ))return;
+
+        DB.phases=DB.phases.filter(
+          p=>p.id!==b.dataset.delphase
+        );
+
+        if(
+          activePhase===b.dataset.delphase
+        ){
+          activePhase=null;
+        }
+
+        sv("phases",DB.phases);
+
+        renderCurric();
+
+        renderSidebarSubjects();
+      };
+
+    });
+
+
+  /* =========================================================
+     EXISTING RENAME PHASE
+     ========================================================= */
+
+  $("phaseBody")
+    .querySelectorAll("[data-editphase]")
+    .forEach(b=>{
+
+      b.onclick=()=>{
+
+        const nn=prompt(
+          "Rename phase:",
+          ph.name
+        );
+
+        if(!nn||!nn.trim())return;
+
+        ph.name=nn.trim();
+
+        sv("phases",DB.phases);
+
+        renderCurric();
+      };
+
+    });
+
+
+  /* =========================================================
+     EXISTING SUBJECT / CHAPTER / TOPIC HANDLERS
+     ========================================================= */
+
   wireSubjectBlocks(ph);
 }
 function subjectBlockHTML(s){
   const chapters=s.chapters||[];
-  return `<div class="card" style="margin-bottom:14px;border-left:3px solid ${s.color}" data-subjectblock="${s.id}">
-    <div class="cardhd" style="color:${s.color}">${subjIcon(s.name,17)} ${esc(s.name)}
-      <button class="iconbtn" style="margin-left:auto" data-editsubj="${s.id}">✎</button>
-      <button class="iconbtn" data-delsubj="${s.id}">🗑</button>
+
+  const totalTopics=chapters.reduce(
+    (total,c)=>total+(c.topics||[]).length,
+    0
+  );
+
+  const completedTopics=chapters.reduce(
+    (total,c)=>total+(c.topics||[]).filter(
+      t=>t.status==="mastered"||t.status==="revised"
+    ).length,
+    0
+  );
+
+  const pct=totalTopics
+    ? Math.round(completedTopics/totalTopics*100)
+    : 0;
+
+  return `
+    <div
+      class="card curriculum-subject"
+      style="margin-bottom:14px;border-left:3px solid ${s.color}"
+      data-subjectblock="${s.id}"
+    >
+
+      <!-- SUBJECT HEADER -->
+      <div
+        class="cardhd"
+        style="
+          color:${s.color};
+          display:flex;
+          align-items:center;
+          gap:8px;
+        "
+      >
+
+        <span>${subjIcon(s.name,17)}</span>
+
+        <span style="flex:1">
+          ${esc(s.name)}
+        </span>
+
+        <span
+          class="chip"
+          style="
+            border-color:${s.color}55;
+            color:${s.color};
+          "
+          title="${completedTopics} of ${totalTopics} topics completed"
+        >
+          ${totalTopics} topics · ${pct}%
+        </span>
+
+        <button
+          class="iconbtn"
+          data-editsubj="${s.id}"
+          title="Rename subject"
+        >✎</button>
+
+        <button
+          class="iconbtn"
+          data-delsubj="${s.id}"
+          title="Delete subject"
+        >🗑</button>
+
+      </div>
+
+      <!-- SUBJECT EXAM DATE -->
+      <div
+        class="fg"
+        style="max-width:220px;margin-top:10px"
+      >
+        <label>Exam date for this subject (optional)</label>
+
+        <input
+          type="date"
+          value="${esc(s.examDate||"")}"
+          data-subjexam="${s.id}"
+        >
+      </div>
+
+      <!-- ADD CHAPTER -->
+      <div
+        class="btn-row"
+        style="margin:12px 0 10px"
+      >
+        <input
+          placeholder="New chapter name"
+          id="newChap_${s.id}"
+          style="max-width:220px"
+        >
+
+        <button
+          class="btn bo bsm"
+          data-addchap="${s.id}"
+        >
+          + Add chapter
+        </button>
+      </div>
+
+      <!-- CHAPTER TREE -->
+      <div class="curriculum-tree">
+
+        ${
+          chapters.length
+            ? chapters.map(c=>chapterBlockHTML(s,c)).join("")
+            : `
+              <div
+                class="empty"
+                style="padding:14px"
+              >
+                No chapters yet — add your first chapter above.
+              </div>
+            `
+        }
+
+      </div>
+
     </div>
-    <div class="fg" style="max-width:220px"><label>Exam date for this subject (optional)</label><input type="date" value="${s.examDate||''}" data-subjexam="${s.id}"></div>
-    <div class="btn-row" style="margin-bottom:10px"><input placeholder="New chapter name" id="newChap_${s.id}" style="max-width:220px"><button class="btn bo bsm" data-addchap="${s.id}">+ Add chapter</button></div>
-    ${chapters.map(c=>chapterBlockHTML(s,c)).join("") || '<div class="empty" style="padding:14px">No chapters yet</div>'}
-  </div>`;
+  `;
 }
 function chapterBlockHTML(s,c){
   const topics=c.topics||[];
-  return `<div style="margin-bottom:12px;padding-left:2px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-      <b style="font-size:12.5px">${esc(c.name)}</b>
-      <button class="iconbtn bxs" data-editchap="${s.id}|${c.id}" style="width:24px;height:24px">✎</button>
-      <button class="iconbtn bxs" data-delchap="${s.id}|${c.id}" style="width:24px;height:24px">🗑</button>
-      <div style="flex:1"></div>
-      <input placeholder="New topic" id="newTop_${c.id}" style="max-width:170px;padding:6px 10px;font-size:12px">
-      <button class="btn bo bxs" data-addtop="${s.id}|${c.id}">+ Topic</button>
+  const key=chapterTreeKey(s.id,c.id);
+  const expanded=expandedChapters.has(key);
+
+  const completed=topics.filter(
+    t=>t.status==="mastered"||t.status==="revised"
+  ).length;
+
+  const topicCount=topics.length;
+
+  /*
+   * Search behavior:
+   *
+   * If the user searches for a topic/chapter, matching chapters
+   * are automatically opened so the result becomes visible.
+   */
+  const q=curricSearchQuery.trim().toLowerCase();
+
+  const chapterMatches=q &&
+    (c.name||"").toLowerCase().includes(q);
+
+  const matchingTopics=q
+    ? topics.filter(t=>
+        (t.name||"").toLowerCase().includes(q)
+      )
+    : [];
+
+  const searchMatch=!!(chapterMatches||matchingTopics.length);
+
+  /*
+   * When searching, matching chapters are visually/openly displayed.
+   */
+  const shouldShowTopics=expanded||searchMatch;
+
+  return `
+    <div
+      class="curric-chapter"
+      data-chapter="${c.id}"
+      data-subject="${s.id}"
+      data-chapter-search="${esc((c.name||"").toLowerCase())}"
+    >
+
+      <!-- CHAPTER ROW -->
+      <div
+        class="curric-chapter-head"
+        style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+          padding:9px 10px;
+          border-radius:10px;
+          background:rgba(255,255,255,.025);
+          border:1px solid ${searchMatch ? s.color+"88" : "var(--line)"};
+          margin-bottom:${shouldShowTopics?"7px":"6px"};
+          cursor:pointer;
+          transition:all .15s ease;
+        "
+        data-chaptertoggle="${s.id}|${c.id}"
+        title="${expanded ? "Collapse chapter" : "Expand chapter"}"
+      >
+
+        <!-- TREE CHEVRON -->
+        <span
+          class="curric-chevron"
+          style="
+            width:18px;
+            min-width:18px;
+            height:18px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:${s.color};
+            font-size:12px;
+            transition:transform .15s ease;
+            transform:rotate(${shouldShowTopics?"90deg":"0deg"});
+          "
+        >▶</span>
+
+        <!-- CHAPTER ICON -->
+        <span
+          style="
+            color:${s.color};
+            font-size:15px;
+          "
+        >📁</span>
+
+        <!-- CHAPTER NAME -->
+        <div
+          style="
+            flex:1;
+            min-width:0;
+          "
+        >
+          <div
+            style="
+              font-size:12.5px;
+              font-weight:700;
+              color:var(--ink);
+            "
+          >
+            ${esc(c.name)}
+          </div>
+
+          <div
+            style="
+              font-size:10.5px;
+              color:var(--muted);
+              margin-top:2px;
+            "
+          >
+            ${topicCount}
+            ${topicCount===1?"topic":"topics"}
+            ${topicCount ? " · "+completed+" completed" : ""}
+          </div>
+        </div>
+
+        <!-- EDIT / DELETE -->
+        <button
+          class="iconbtn bxs"
+          data-editchap="${s.id}|${c.id}"
+          title="Rename chapter"
+          style="width:26px;height:26px"
+        >✎</button>
+
+        <button
+          class="iconbtn bxs"
+          data-delchap="${s.id}|${c.id}"
+          title="Delete chapter"
+          style="width:26px;height:26px"
+        >🗑</button>
+
+      </div>
+
+      ${
+        shouldShowTopics
+          ? `
+            <!-- CHAPTER CONTENT -->
+            <div
+              class="curric-chapter-body"
+              style="
+                margin-left:18px;
+                padding-left:14px;
+                border-left:2px solid ${s.color}44;
+                margin-bottom:10px;
+              "
+            >
+
+              <!-- ADD TOPIC -->
+              <div
+                class="btn-row"
+                style="
+                  margin:0 0 8px;
+                  padding:4px 0 4px 2px;
+                "
+              >
+                <input
+                  placeholder="New topic"
+                  id="newTop_${c.id}"
+                  style="
+                    max-width:190px;
+                    padding:7px 10px;
+                    font-size:12px;
+                  "
+                >
+
+                <button
+                  class="btn bo bxs"
+                  data-addtop="${s.id}|${c.id}"
+                >
+                  + Topic
+                </button>
+              </div>
+
+              <!-- TOPICS -->
+              ${
+                topics.length
+                  ? topics
+                      .map(t=>{
+                        const topicMatchesSearch=
+                          q &&
+                          (t.name||"")
+                            .toLowerCase()
+                            .includes(q);
+
+                        return topicRowHTML(
+                          s,
+                          c,
+                          t,
+                          topicMatchesSearch
+                        );
+                      })
+                      .join("")
+                  : `
+                    <div
+                      class="empty"
+                      style="
+                        padding:10px;
+                        font-size:11.5px;
+                      "
+                    >
+                      No topics yet — add one above.
+                    </div>
+                  `
+              }
+
+            </div>
+          `
+          : ""
+      }
+
     </div>
-    ${topics.map(t=>topicRowHTML(s,c,t)).join("")}
-  </div>`;
+  `;
 }
-function topicRowHTML(s,c,t){
+function topicRowHTML(s,c,t,searchMatch=false){
   const st=t.status||"todo";
   const expanded=expandedTopics.has(t.id);
   const related=(t.relatedIds||[]).map(rid=>allTopics().find(x=>x.id===rid)).filter(Boolean);
-  return `<div class="row" style="--rc:${s.color}" data-static="1">
+  return `<div
+  class="row"
+  style="
+    --rc:${s.color};
+    ${searchMatch
+      ? `border-color:${s.color};box-shadow:0 0 0 2px ${s.color}22;`
+      : ""}
+  "
+  data-static="1"
+>
     <div style="color:${s.color}">${subjIcon(s.name,15)}</div>
     <div class="rowmain"><div class="rowtitle">${esc(t.name)}</div></div>
     <div class="btn-row" style="gap:5px">
@@ -1591,6 +4510,39 @@ function suggestRelated(t,others){
   return others.filter(o=>{ const on=o.name.toLowerCase(); return words.some(w=>on.includes(w)); }).slice(0,5);
 }
 let expandedTopics=new Set();
+/* ============ CURRICULUM TREE STATE ============ */
+
+/*
+ * Stores which chapters are currently open.
+ *
+ * IMPORTANT:
+ * This is UI state only.
+ * It is NOT written to Supabase and does NOT modify DB.phases.
+ *
+ * Therefore expanding/collapsing a chapter can never alter
+ * the user's saved curriculum data.
+ */
+let expandedChapters=new Set();
+
+let curricSearchQuery="";
+
+function chapterTreeKey(subjectId,chapterId){
+  return subjectId+"::"+chapterId;
+}
+
+function isChapterExpanded(subjectId,chapterId){
+  return expandedChapters.has(chapterTreeKey(subjectId,chapterId));
+}
+
+function setChapterExpanded(subjectId,chapterId,expanded){
+  const key=chapterTreeKey(subjectId,chapterId);
+
+  if(expanded){
+    expandedChapters.add(key);
+  }else{
+    expandedChapters.delete(key);
+  }
+}
 function wireSubjectBlocks(ph){
   $("phaseBody").querySelectorAll("[data-subjexam]").forEach(inp=>inp.onchange=()=>{
     const s=ph.subjects.find(x=>x.id===inp.dataset.subjexam);
@@ -1606,6 +4558,29 @@ function wireSubjectBlocks(ph){
     const nn=prompt("Rename subject:",s.name); if(!nn||!nn.trim())return;
     s.name=nn.trim(); sv("phases",DB.phases); renderCurric(); renderSidebarSubjects();
   });
+  $("phaseBody").querySelectorAll("[data-chaptertoggle]").forEach(b=>{
+  b.onclick=e=>{
+    /*
+     * Do not toggle the tree when the user clicked one of the
+     * chapter action buttons.
+     */
+    if(e.target.closest("[data-editchap]") ||
+       e.target.closest("[data-delchap]")){
+      return;
+    }
+
+    const [sid,cid]=b.dataset.chaptertoggle.split("|");
+    const key=chapterTreeKey(sid,cid);
+
+    if(expandedChapters.has(key)){
+      expandedChapters.delete(key);
+    }else{
+      expandedChapters.add(key);
+    }
+
+    renderCurric();
+  };
+});
   $("phaseBody").querySelectorAll("[data-editchap]").forEach(b=>b.onclick=()=>{
     const [sid,cid]=b.dataset.editchap.split("|");
     const s=ph.subjects.find(x=>x.id===sid); const c=s.chapters.find(x=>x.id===cid);
@@ -1797,24 +4772,789 @@ $("fc_add").onclick=()=>{
   resetCascade("fc_subj","fc_chap","fc_top");
   renderFlashcards(); toast("Card added");
 };
-let reviewQueue=[], reviewShowBack=false, reviewMode="due";
+let reviewQueue=[];
+let reviewShowBack=false;
+let reviewMode="due";
+
+/* ============ FLASHCARD LIBRARY STATE ============ */
+
+let fcSearchQuery="";
+let fcFilterSubject="";
+let fcFilterChapter="";
+let fcFilterTopic="";
+let fcSelectedId=null;
+
+function getFlashcardContext(card){
+
+  if(!card)return null;
+
+  /*
+   * New cards already store topicId/topicName.
+   *
+   * Existing cards therefore work immediately.
+   *
+   * We additionally walk the current curriculum to recover
+   * subject/chapter information from topicId.
+   */
+  for(const ph of DB.phases||[]){
+
+    for(const s of ph.subjects||[]){
+
+      for(const c of s.chapters||[]){
+
+        for(const t of c.topics||[]){
+
+          if(
+            card.topicId &&
+            t.id===card.topicId
+          ){
+
+            return {
+              phaseId:ph.id,
+              phaseName:ph.name,
+              subjectId:s.id,
+              subjectName:s.name,
+              subjectColor:s.color,
+              chapterId:c.id,
+              chapterName:c.name,
+              topicId:t.id,
+              topicName:t.name
+            };
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  /*
+   * If an old card no longer points to a topic, retain whatever
+   * topicName information was originally saved with it.
+   */
+  return {
+    phaseId:null,
+    phaseName:null,
+    subjectId:null,
+    subjectName:null,
+    subjectColor:card.subjectColor||"#22ffb0",
+    chapterId:null,
+    chapterName:null,
+    topicId:card.topicId||null,
+    topicName:card.topicName||null
+  };
+}
 function renderFlashcards(){
+
   const cards=DB.flashcards||[];
+
   $("fc_total").textContent=cards.length;
+
   const today=todayStr();
-  const due=cards.filter(c=>c.due<=today);
-  $("dueCountPill").textContent=due.length+" due today";
-  if(reviewMode==="due") reviewQueue=due.slice(); else reviewQueue=cards.slice();
-  $("fc_reviewMode").textContent = reviewMode==="due" ? "Due today" : "Studying all cards";
+
+  const due=cards.filter(
+    c=>c.due<=today
+  );
+
+  $("dueCountPill").textContent=
+    due.length+" due today";
+
+
+  /*
+   * Review deck remains independent from the library filters.
+   *
+   * This is deliberate:
+   *
+   * - The library is for finding individual cards.
+   * - The review box is still the spaced-repetition system.
+   */
+  if(reviewMode==="due"){
+    reviewQueue=due.slice();
+  }else{
+    reviewQueue=cards.slice();
+  }
+
+  $("fc_reviewMode").textContent=
+    reviewMode==="due"
+      ? "Due today"
+      : "Studying all cards";
+
   renderReviewCard();
-  $("fc_list").innerHTML = cards.length ? cards.map(c=>`<div class="row" style="--rc:${c.subjectColor||'#22ffb0'}">
-    <div class="rowmain"><div class="rowtitle">${esc(c.front)}</div>
-    <div class="rowsub">${c.topicName?esc(c.topicName)+" · ":""}due ${esc(c.due)} · ${c.reps} review${c.reps!==1?'s':''}</div></div>
-    <button class="iconbtn" data-delcard="${c.id}">✕</button></div>`).join("") : '<div class="empty">No cards yet — add one above. Everything you add is stored permanently in your account, on every device.</div>';
-  $("fc_list").querySelectorAll("[data-delcard]").forEach(b=>b.onclick=()=>{
-    DB.flashcards=DB.flashcards.filter(c=>c.id!==b.dataset.delcard); sv("flashcards",DB.flashcards); renderFlashcards();
+
+
+  /* ============================================================
+     BUILD FILTERED LIBRARY
+     ============================================================ */
+
+  let list=cards.slice();
+
+  const q=(fcSearchQuery||"")
+    .trim()
+    .toLowerCase();
+
+
+  /*
+   * Search front + back + topic.
+   */
+  if(q){
+
+    list=list.filter(c=>{
+
+      const ctx=getFlashcardContext(c);
+
+      const haystack=[
+        c.front||"",
+        c.back||"",
+        c.topicName||"",
+        ctx?.subjectName||"",
+        ctx?.chapterName||"",
+        ctx?.topicName||""
+      ]
+      .join(" ")
+      .toLowerCase();
+
+      return haystack.includes(q);
+    });
+  }
+
+
+  /*
+   * Subject filter.
+   */
+  if(fcFilterSubject){
+
+    list=list.filter(c=>{
+
+      const ctx=getFlashcardContext(c);
+
+      return ctx &&
+        ctx.subjectId===fcFilterSubject;
+    });
+  }
+
+
+  /*
+   * Chapter filter.
+   */
+  if(fcFilterChapter){
+
+    list=list.filter(c=>{
+
+      const ctx=getFlashcardContext(c);
+
+      return ctx &&
+        ctx.chapterId===fcFilterChapter;
+    });
+  }
+
+
+  /*
+   * Topic filter.
+   */
+  if(fcFilterTopic){
+
+    list=list.filter(c=>{
+
+      const ctx=getFlashcardContext(c);
+
+      return ctx &&
+        ctx.topicId===fcFilterTopic;
+    });
+  }
+
+
+  $("fc_filterCount").textContent=
+    list.length+" card"+(list.length!==1?"s":"");
+
+
+  const info=$("fc_filterInfo");
+
+  if(info){
+
+    const filters=[];
+
+    if(fcFilterSubject){
+
+      const s=allSubjects().find(
+        x=>x.id===fcFilterSubject
+      );
+
+      if(s)filters.push(s.name);
+    }
+
+    if(fcFilterChapter){
+
+      const s=allSubjects().find(
+        x=>(x.chapters||[]).some(
+          c=>c.id===fcFilterChapter
+        )
+      );
+
+      const c=s?.chapters?.find(
+        x=>x.id===fcFilterChapter
+      );
+
+      if(c)filters.push(c.name);
+    }
+
+    if(fcFilterTopic){
+
+      const t=allTopics().find(
+        x=>x.id===fcFilterTopic
+      );
+
+      if(t)filters.push(t.name);
+    }
+
+    if(q)filters.push(`"${fcSearchQuery}"`);
+
+    info.textContent=
+      filters.length
+        ? "Filtered by "+filters.join(" · ")
+        : "Showing all flashcards.";
+  }
+
+
+  /* ============================================================
+     RENDER LIBRARY
+     ============================================================ */
+
+  if(!list.length){
+
+    $("fc_list").innerHTML=`
+      <div class="empty">
+        ${
+          cards.length
+            ? "No flashcards match your search/filter."
+            : "No cards yet — add one above."
+        }
+      </div>
+    `;
+
+  }else{
+
+    $("fc_list").innerHTML=
+      list.map(c=>{
+
+        const ctx=getFlashcardContext(c);
+
+        const topicLine=ctx?.topicName
+          ? esc(ctx.topicName)
+          : (c.topicName
+            ? esc(c.topicName)
+            : "Unlinked");
+
+        const chapterLine=ctx?.chapterName
+          ? esc(ctx.chapterName)
+          : "";
+
+        const subjectLine=ctx?.subjectName
+          ? esc(ctx.subjectName)
+          : "";
+
+        const location=[
+          subjectLine,
+          chapterLine,
+          topicLine
+        ].filter(Boolean).join(" · ");
+
+        return `
+          <div
+            class="row fc-library-row"
+            style="
+              --rc:${c.subjectColor||"#22ffb0"};
+              cursor:pointer;
+            "
+            data-viewcard="${c.id}"
+            title="Open this flashcard"
+          >
+
+            <div
+              class="rowmain"
+              style="min-width:0"
+            >
+
+              <div
+                class="rowtitle"
+                style="
+                  overflow:hidden;
+                  text-overflow:ellipsis;
+                  white-space:nowrap;
+                "
+              >
+                ${esc(c.front)}
+              </div>
+
+              <div class="rowsub">
+                ${location}
+                ${location?" · ":""}
+                due ${esc(c.due)}
+                · ${c.reps||0}
+                review${(c.reps||0)!==1?"s":""}
+              </div>
+
+            </div>
+
+            <button
+              class="btn bo bxs"
+              data-viewcard="${c.id}"
+              type="button"
+            >
+              View
+            </button>
+
+            <button
+              class="iconbtn"
+              data-delcard="${c.id}"
+              title="Delete flashcard"
+              type="button"
+            >
+              ✕
+            </button>
+
+          </div>
+        `;
+
+      }).join("");
+  }
+
+
+  /* ============================================================
+     OPEN INDIVIDUAL CARD
+     ============================================================ */
+
+  $("fc_list")
+    .querySelectorAll("[data-viewcard]")
+    .forEach(el=>{
+
+      el.onclick=e=>{
+
+        /*
+         * If the user clicked Delete, don't open the card.
+         */
+        if(
+          e.target.closest("[data-delcard]")
+        ){
+          return;
+        }
+
+        const id=el.dataset.viewcard;
+
+        openFlashcard(id);
+      };
+
+    });
+
+
+  /* ============================================================
+     DELETE CARD
+     ============================================================ */
+
+  $("fc_list")
+    .querySelectorAll("[data-delcard]")
+    .forEach(b=>{
+
+      b.onclick=e=>{
+
+        e.stopPropagation();
+
+        const id=b.dataset.delcard;
+
+        const card=cards.find(
+          c=>c.id===id
+        );
+
+        if(!card)return;
+
+        if(!confirm(
+          "Delete this flashcard permanently?"
+        )){
+          return;
+        }
+
+        DB.flashcards=
+          DB.flashcards.filter(
+            c=>c.id!==id
+          );
+
+        if(fcSelectedId===id){
+
+          fcSelectedId=null;
+
+          const detail=$("fc_detailBox");
+
+          if(detail){
+            detail.style.display="none";
+            detail.innerHTML="";
+          }
+        }
+
+        sv(
+          "flashcards",
+          DB.flashcards
+        );
+
+        renderFlashcards();
+      };
+
+    });
+
+
+  renderFlashcardFilters();
+}
+
+function openFlashcard(id){
+
+  const card=(DB.flashcards||[])
+    .find(c=>c.id===id);
+
+  if(!card)return;
+
+  fcSelectedId=id;
+
+  const box=$("fc_detailBox");
+
+  if(!box)return;
+
+  const ctx=getFlashcardContext(card);
+
+  const location=[
+    ctx?.subjectName,
+    ctx?.chapterName,
+    ctx?.topicName||card.topicName
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  box.style.display="block";
+
+  box.innerHTML=`
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:10px;
+        margin-bottom:12px;
+      "
+    >
+
+      <div>
+
+        <div
+          class="cardhd"
+          style="margin-bottom:4px"
+        >
+          Flashcard
+        </div>
+
+        ${
+          location
+            ? `
+              <div
+                style="
+                  font-size:11px;
+                  color:var(--muted);
+                "
+              >
+                ${esc(location)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+      <button
+        class="iconbtn"
+        id="fc_closeDetail"
+        title="Close card"
+        type="button"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <!-- QUESTION -->
+
+    <div
+      style="
+        font-size:10px;
+        font-weight:700;
+        text-transform:uppercase;
+        letter-spacing:.7px;
+        color:var(--muted);
+        margin-bottom:6px;
+      "
+    >
+      Question
+    </div>
+
+    <div
+      style="
+        background:rgba(255,255,255,.035);
+        border:1px solid var(--line);
+        border-radius:14px;
+        padding:16px;
+        font-size:15px;
+        line-height:1.6;
+        white-space:pre-wrap;
+        overflow-wrap:anywhere;
+      "
+    >
+      ${esc(card.front)}
+    </div>
+
+
+    <!-- ANSWER -->
+
+    <div
+      style="
+        font-size:10px;
+        font-weight:700;
+        text-transform:uppercase;
+        letter-spacing:.7px;
+        color:var(--muted);
+        margin:16px 0 6px;
+      "
+    >
+      Answer
+    </div>
+
+    <div
+      style="
+        background:rgba(34,255,176,.045);
+        border:1px solid rgba(34,255,176,.22);
+        border-radius:14px;
+        padding:16px;
+        font-size:14px;
+        line-height:1.7;
+        white-space:pre-wrap;
+        overflow-wrap:anywhere;
+      "
+    >
+      ${esc(card.back)}
+    </div>
+
+
+    <!-- CARD META -->
+
+    <div
+      style="
+        display:flex;
+        flex-wrap:wrap;
+        gap:7px;
+        margin-top:14px;
+      "
+    >
+
+      <span class="chip">
+        Due: ${esc(card.due||"—")}
+      </span>
+
+      <span class="chip">
+        Reviews: ${card.reps||0}
+      </span>
+
+      <span class="chip">
+        Ease: ${(card.ease||2.5).toFixed(2)}
+      </span>
+
+    </div>
+
+  `;
+
+
+  $("fc_closeDetail").onclick=()=>{
+    closeFlashcard();
+  };
+
+
+  /*
+   * Scroll the selected card into view.
+   */
+  box.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
   });
 }
+
+
+function closeFlashcard(){
+
+  fcSelectedId=null;
+
+  const box=$("fc_detailBox");
+
+  if(!box)return;
+
+  box.style.display="none";
+  box.innerHTML="";
+}
+
+function renderFlashcardFilters(){
+
+  const subj=$("fc_filterSubj");
+  const chap=$("fc_filterChap");
+  const top=$("fc_filterTop");
+
+  if(!subj||!chap||!top)return;
+
+
+  /*
+   * SUBJECT
+   */
+
+  const currentSubject=fcFilterSubject;
+
+  subj.innerHTML=
+    '<option value="">All subjects</option>'+
+    allSubjects()
+      .map(s=>
+        `<option value="${s.id}">
+          ${esc(s.name)}
+        </option>`
+      )
+      .join("");
+
+  subj.value=currentSubject;
+
+
+  /*
+   * CHAPTERS
+   */
+
+  const selectedSubject=
+    allSubjects().find(
+      s=>s.id===fcFilterSubject
+    );
+
+  const chapters=
+    selectedSubject?.chapters||[];
+
+  chap.innerHTML=
+    '<option value="">All chapters</option>'+
+    chapters
+      .map(c=>
+        `<option value="${c.id}">
+          ${esc(c.name)}
+        </option>`
+      )
+      .join("");
+
+  chap.disabled=!selectedSubject;
+
+  if(
+    chapters.some(
+      c=>c.id===fcFilterChapter
+    )
+  ){
+
+    chap.value=fcFilterChapter;
+
+  }else{
+
+    fcFilterChapter="";
+    chap.value="";
+  }
+
+
+  /*
+   * TOPICS
+   */
+
+  const selectedChapter=
+    chapters.find(
+      c=>c.id===fcFilterChapter
+    );
+
+  const topics=
+    selectedChapter?.topics||[];
+
+  top.innerHTML=
+    '<option value="">All topics</option>'+
+    topics
+      .map(t=>
+        `<option value="${t.id}">
+          ${esc(t.name)}
+        </option>`
+      )
+      .join("");
+
+  top.disabled=!selectedChapter;
+
+  if(
+    topics.some(
+      t=>t.id===fcFilterTopic
+    )
+  ){
+
+    top.value=fcFilterTopic;
+
+  }else{
+
+    fcFilterTopic="";
+    top.value="";
+  }
+}
+$("fc_filterSubj").onchange=()=>{
+
+  fcFilterSubject=
+    $("fc_filterSubj").value;
+
+  fcFilterChapter="";
+  fcFilterTopic="";
+
+  renderFlashcards();
+};
+
+
+$("fc_filterChap").onchange=()=>{
+
+  fcFilterChapter=
+    $("fc_filterChap").value;
+
+  fcFilterTopic="";
+
+  renderFlashcards();
+};
+
+
+$("fc_filterTop").onchange=()=>{
+
+  fcFilterTopic=
+    $("fc_filterTop").value;
+
+  renderFlashcards();
+};
+
+
+$("fc_search").oninput=()=>{
+
+  fcSearchQuery=
+    $("fc_search").value;
+
+  renderFlashcards();
+};
+
+
+$("fc_clearFilters").onclick=()=>{
+
+  fcSearchQuery="";
+  fcFilterSubject="";
+  fcFilterChapter="";
+  fcFilterTopic="";
+
+  $("fc_search").value="";
+
+  renderFlashcards();
+};
+
 function renderReviewCard(){
   if(!reviewQueue.length){
     $("fc_reviewBox").innerHTML = (DB.flashcards||[]).length
@@ -2722,33 +6462,252 @@ $("rx_print").onclick=()=>{
   rxPrintSheet(r); window.print();
 };
 function rxPrintSheet(r){
-  const meds=(r.meds||[]).map((m,i)=>`<div style="margin-bottom:8px"><b>${i+1}. ${esc(m.n)}</b> ${esc(m.d||"")}<br><span style="font-size:11px;color:#555">${esc([m.f,m.u,m.r,m.note].filter(Boolean).join("  ·  "))}</span></div>`).join("")||"<i>No medicines</i>";
-  const invs=(r.invs||[]).map((iv,i)=>`${i+1}. ${esc(iv.n)}`).join("<br>")||"<i>None</i>";
-  $("sheet").innerHTML=`<div style="width:210mm;min-height:297mm;background:#fff;color:#0d2818;font-family:Georgia,serif;margin:0 auto;padding:16mm">
-    <div style="display:flex;justify-content:space-between;border-bottom:2px solid #0f7a4f;padding-bottom:10px;margin-bottom:14px">
-      <div><div style="font-size:20px;font-weight:700;color:#0f7a4f">StudyRx</div><div style="font-size:10px;color:#666">Prescription record</div></div>
-      <div style="text-align:right;font-size:11px">${esc(r.pdate||"")}</div>
-    </div>
-    <div style="display:flex;gap:18px;font-size:12px;margin-bottom:14px;border-bottom:1px dashed #ccc;padding-bottom:10px">
-      <div><b>Name:</b> ${esc(r.pname||"—")}</div><div><b>Age/Sex:</b> ${esc([r.page,r.psex].filter(Boolean).join(" / "))}</div>
-      <div><b>Wt:</b> ${esc(r.pwt||"—")}</div><div><b>Ht:</b> ${esc(r.pht||"—")}</div>
-    </div>
-    <div style="display:flex;gap:20mm">
-      <div style="width:35%;font-size:11.5px;line-height:1.7">
-        <b>C/C:</b> ${esc(r.cc||"—")}<br><br>
-        <b>Vitals:</b> PR ${esc(r.pr||"-")}, BP ${esc(r.bp||"-")}, Temp ${esc(r.tm||"-")}<br><br>
-        <b>O/E:</b> ${esc(r.oe||"—")}<br><br>
-        <b>Diagnosis:</b> ${esc(r.dx||"—")}${r.dd?"<br><i>D/D: "+esc(r.dd)+"</i>":""}<br><br>
-        <b>Investigations:</b><br>${invs}
+  const meds=(r.meds||[])
+    .map((m,i)=>`
+      <div style="margin-bottom:8px">
+        <b>${i+1}. ${esc(m.n)}</b> ${esc(m.d||"")}
+        <br>
+        <span style="font-size:11px;color:#555">
+          ${esc([m.f,m.u,m.r,m.note].filter(Boolean).join("  ·  "))}
+        </span>
       </div>
-      <div style="flex:1">
-        <div style="font-size:32px;color:#0f7a4f;font-style:italic;margin-bottom:10px">℞</div>
-        ${meds}
-        <div style="margin-top:20px;font-size:11.5px"><b>Advice:</b> ${esc(r.adv||"—")}</div>
-        <div style="margin-top:8px;font-size:11.5px"><b>Follow-up:</b> ${esc(r.fup||"—")}</div>
+    `)
+    .join("")||"<i>No medicines</i>";
+
+  const invs=(r.invs||[])
+    .map((iv,i)=>`${i+1}. ${esc(iv.n)}`)
+    .join("<br>")||"<i>None</i>";
+
+  /*
+   * Letterhead is stored in the user's profile.
+   *
+   * Old prescriptions that were created before the letterhead
+   * feature existed remain completely valid because rxPrintSheet()
+   * simply falls back to blank values when no letterhead exists.
+   */
+  const h=DB.profile.rxLetterhead||{};
+
+  const doctorName=h.name||"";
+  const degrees=h.degrees||"";
+  const designation=h.designation||"";
+  const institution=h.institution||"";
+  const registration=h.registration||"";
+  const mobile=h.mobile||"";
+  const chamber=h.chamber||"";
+  const address=h.address||"";
+
+  const doctorLines=[
+    doctorName ? `<div style="font-size:21px;font-weight:700;color:#0f7a4f">${esc(doctorName)}</div>` : "",
+    degrees ? `<div style="font-size:12.5px;font-weight:700;color:#333">${esc(degrees)}</div>` : "",
+    designation ? `<div style="font-size:11.5px;color:#444">${esc(designation)}</div>` : "",
+    institution ? `<div style="font-size:11.5px;color:#444">${esc(institution)}</div>` : ""
+  ].filter(Boolean).join("");
+
+  const contactLines=[
+    registration ? `<div><b>Reg:</b> ${esc(registration)}</div>` : "",
+    mobile ? `<div><b>Mobile:</b> ${esc(mobile)}</div>` : "",
+    chamber ? `<div><b>Chamber:</b> ${esc(chamber)}</div>` : "",
+    address ? `<div>${esc(address)}</div>` : ""
+  ].filter(Boolean).join("");
+
+  $("sheet").innerHTML=`
+    <div style="
+      width:210mm;
+      min-height:297mm;
+      background:#fff;
+      color:#0d2818;
+      font-family:Georgia,serif;
+      margin:0 auto;
+      padding:16mm;
+    ">
+
+      <!-- PROFESSIONAL LETTERHEAD -->
+      <div style="
+        border-bottom:2px solid #0f7a4f;
+        padding-bottom:10px;
+        margin-bottom:14px;
+        display:flex;
+        justify-content:space-between;
+        gap:20px;
+      ">
+
+        <div style="flex:1">
+          ${doctorLines || `
+            <div style="font-size:20px;font-weight:700;color:#0f7a4f">
+              StudyRx
+            </div>
+            <div style="font-size:10px;color:#666">
+              Prescription record
+            </div>
+          `}
+        </div>
+
+        <div style="
+          text-align:right;
+          font-size:10.5px;
+          line-height:1.55;
+          color:#555;
+          max-width:45%;
+        ">
+          ${contactLines}
+        </div>
+
       </div>
+
+      <!-- PRESCRIPTION TITLE -->
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:12px;
+      ">
+        <div style="
+          font-size:16px;
+          font-weight:700;
+          color:#0f7a4f;
+          letter-spacing:.5px;
+        ">
+          PRESCRIPTION
+        </div>
+
+        <div style="
+          text-align:right;
+          font-size:11px;
+          color:#555;
+        ">
+          ${esc(r.pdate||"")}
+        </div>
+      </div>
+
+      <!-- PATIENT INFORMATION -->
+      <div style="
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px 18px;
+        font-size:12px;
+        margin-bottom:14px;
+        border-bottom:1px dashed #ccc;
+        padding-bottom:10px;
+      ">
+        <div><b>Name:</b> ${esc(r.pname||"—")}</div>
+        <div><b>Age/Sex:</b> ${esc([r.page,r.psex].filter(Boolean).join(" / ")||"—")}</div>
+        <div><b>Wt:</b> ${esc(r.pwt||"—")}</div>
+        <div><b>Ht:</b> ${esc(r.pht||"—")}</div>
+      </div>
+
+      <!-- CLINICAL INFORMATION + MEDICINES -->
+      <div style="
+        display:flex;
+        gap:20mm;
+      ">
+
+        <div style="
+          width:35%;
+          font-size:11.5px;
+          line-height:1.7;
+        ">
+
+          <b>C/C:</b>
+          ${esc(r.cc||"—")}
+          <br><br>
+
+          <b>Vitals:</b>
+          PR ${esc(r.pr||"-")},
+          BP ${esc(r.bp||"-")},
+          Temp ${esc(r.tm||"-")}
+          <br><br>
+
+          ${r.rr?`<b>RR:</b> ${esc(r.rr)}<br><br>`:""}
+          ${r.sp?`<b>SpO₂:</b> ${esc(r.sp)}<br><br>`:""}
+
+          <b>O/E:</b>
+          ${esc(r.oe||"—")}
+          <br><br>
+
+          <b>Diagnosis:</b>
+          ${esc(r.dx||"—")}
+
+          ${r.dd
+            ? `<br><i>D/D: ${esc(r.dd)}</i>`
+            : ""
+          }
+
+          <br><br>
+
+          <b>Investigations:</b>
+          <br>
+          ${invs}
+
+        </div>
+
+        <div style="flex:1">
+
+          <div style="
+            font-size:32px;
+            color:#0f7a4f;
+            font-style:italic;
+            margin-bottom:10px;
+          ">
+            ℞
+          </div>
+
+          ${meds}
+
+          <div style="
+            margin-top:20px;
+            font-size:11.5px;
+          ">
+            <b>Advice:</b>
+            ${esc(r.adv||"—")}
+          </div>
+
+          <div style="
+            margin-top:8px;
+            font-size:11.5px;
+          ">
+            <b>Follow-up:</b>
+            ${esc(r.fup||"—")}
+          </div>
+
+          ${r.ref
+            ? `
+              <div style="
+                margin-top:8px;
+                font-size:11.5px;
+              ">
+                <b>Referral:</b>
+                ${esc(r.ref)}
+              </div>
+            `
+            : ""
+          }
+
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div style="
+        margin-top:28px;
+        padding-top:9px;
+        border-top:1px solid #ddd;
+        display:flex;
+        justify-content:space-between;
+        gap:15px;
+        font-size:9.5px;
+        color:#777;
+      ">
+        <div>
+          ${chamber ? esc(chamber) : "StudyRx"}
+        </div>
+
+        <div style="text-align:right">
+          ${mobile ? "Mobile: "+esc(mobile) : ""}
+        </div>
+      </div>
+
     </div>
-  </div>`;
+  `;
 }
 
 /* ============ QUESTS ============ */
@@ -3054,8 +7013,35 @@ $("s_save").onclick=()=>{
   DB.profile.name=$("s_name").value.trim()||DB.profile.name;
   DB.profile.aiKey=$("s_key").value.trim();
   DB.profile.aiModel=$("s_model").value;
-  sv("profile",DB.profile); updateTopbar(); toast("Saved");
+
+  sv("profile",DB.profile);
+  updateTopbar();
+  toast("Profile saved");
 };
+
+$("s_rxsave").onclick=()=>{
+  /*
+   * Preserve the rest of DB.profile.
+   *
+   * We only add/update the rxLetterhead property.
+   * Existing XP, streak, AI settings, Drive information,
+   * quest claims, etc. remain untouched.
+   */
+  DB.profile.rxLetterhead={
+    name:$("s_rxname").value.trim(),
+    degrees:$("s_rxdeg").value.trim(),
+    designation:$("s_rxdesig").value.trim(),
+    institution:$("s_rxinst").value.trim(),
+    registration:$("s_rxreg").value.trim(),
+    mobile:$("s_rxph").value.trim(),
+    chamber:$("s_rxchamber").value.trim(),
+    address:$("s_rxaddr").value.trim()
+  };
+
+  sv("profile",DB.profile);
+  toast("Prescription letterhead saved");
+};
+
 $("s_dark").onclick=()=>applyTheme("dark");
 $("s_light").onclick=()=>applyTheme("light");
 
