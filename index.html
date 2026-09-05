@@ -2478,7 +2478,24 @@ async function onLogin(user){
     DB.invs = INVS.map(i=>Object.assign({id:uid()},i));
     sv("invs",DB.invs);
   }
-  if(!DB.profile.name) DB.profile.name = (user.email||"Student").split("@")[0];
+  if(!DB.profile || typeof DB.profile !== "object"){
+  DB.profile={
+    name:"",
+    xp:0,
+    streak:0,
+    lastActive:null
+  };
+}
+
+if(!DB.profile.name){
+  DB.profile.name=(user.email||"Student").split("@")[0];
+
+  /*
+   * Persist the automatically-created profile name.
+   * Do not replace or reset any existing profile data.
+   */
+  sv("profile",DB.profile);
+}
   $("s_email").value=user.email||"";
   renderAll();
 }
@@ -4299,24 +4316,128 @@ function renderDash(){
     '<div class="empty">Nothing scheduled for today — add a task in Routine</div>';
   wireRoutineRows("dashRoutine");
 
-  processQuestClaims();
+/*
+ * Process quests first.
+ * The individual dashboard sections are then rendered
+ * independently so one section cannot prevent another
+ * from appearing.
+ */
+processQuestClaims();
+
+if($("questList")){
   renderQuestList();
-  renderBadges();
-  renderCourseTiles();
+}
+
+renderBadges();
+renderCourseTiles();
 }
 function renderCourseTiles(){
-  const subs=allSubjects(), topics=allTopics();
-  $("courseTiles").innerHTML = subs.length ? subs.map(s=>{
-    const st=topics.filter(t=>t.subjectId===s.id);
-    const done=st.filter(t=>t.status==="mastered"||t.status==="revised").length;
-    const pct=st.length?Math.round(done/st.length*100):0;
-    return `<div class="course-tile" style="--tc:${s.color}" data-tilesubj="${s.id}">
-      <div class="cticon">${subjIcon(s.name,22)}</div>
-      <div class="ctname">${esc(s.name)}</div>
-      <div class="ctpct">${st.length?pct+"% complete":"No topics yet"}</div>
-    </div>`;
-  }).join("") : '<div class="empty">Add subjects in Curriculum to see your courses here</div>';
-  $("courseTiles").querySelectorAll("[data-tilesubj]").forEach(el=>el.onclick=()=>goToSubject(el.dataset.tilesubj));
+
+  const el=$("courseTiles");
+
+  if(!el){
+    return;
+  }
+
+  try{
+
+    const subs=
+      Array.isArray(DB.phases)
+        ? allSubjects()
+        : [];
+
+    const topics=
+      Array.isArray(DB.phases)
+        ? allTopics()
+        : [];
+
+    if(!subs.length){
+
+      el.innerHTML=
+        '<div class="empty">Add subjects in Curriculum to see your courses here</div>';
+
+      return;
+    }
+
+    el.innerHTML=subs.map(s=>{
+
+      const subjectTopics=
+        topics.filter(
+          t=>t.subjectId===s.id
+        );
+
+      const done=
+        subjectTopics.filter(
+          t=>
+            t.status==="mastered" ||
+            t.status==="revised"
+        ).length;
+
+      const pct=
+        subjectTopics.length
+          ? Math.round(
+              done/subjectTopics.length*100
+            )
+          : 0;
+
+      const color=
+        s.color||"var(--emerald)";
+
+      return `
+        <div
+          class="course-tile"
+          style="--tc:${color}"
+          data-tilesubj="${esc(s.id)}"
+        >
+
+          <div class="cticon">
+            ${subjIcon(s.name,22)}
+          </div>
+
+          <div class="ctname">
+            ${esc(s.name)}
+          </div>
+
+          <div class="ctpct">
+            ${
+              subjectTopics.length
+                ? pct+"% complete"
+                : "No topics yet"
+            }
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+    el
+      .querySelectorAll("[data-tilesubj]")
+      .forEach(tile=>{
+
+        tile.onclick=()=>{
+
+          const subjectId=
+            tile.dataset.tilesubj;
+
+          if(subjectId){
+            goToSubject(subjectId);
+          }
+
+        };
+
+      });
+
+  }catch(e){
+
+    console.warn(
+      "StudyRx course rendering failed:",
+      e
+    );
+
+    el.innerHTML=
+      '<div class="empty">Courses are temporarily unavailable.</div>';
+  }
 }
 
 /* ============ CURRICULUM ============ */
@@ -7773,9 +7894,62 @@ function computeBadges(){
   ];
 }
 function renderBadges(){
-  $("badgeGrid").innerHTML = computeBadges().map(b=>
-    `<div class="badge-card ${b.on?'on':'off'}"><div class="bic">${badgeIcon(b.ic,24)}</div><div class="bname">${esc(b.name)}</div></div>`
-  ).join("");
+
+  const el=$("badgeGrid");
+
+  if(!el){
+    return;
+  }
+
+  try{
+
+    const badges=computeBadges();
+
+    if(!Array.isArray(badges) || !badges.length){
+
+      el.innerHTML=
+        '<div class="empty">No badges available yet.</div>';
+
+      return;
+    }
+
+    el.innerHTML=badges.map(b=>{
+
+      const earned=!!b.on;
+
+      return `
+        <div
+          class="badge-card ${earned?"on":"off"}"
+          title="${esc(
+            earned
+              ? "Badge earned"
+              : "Keep studying to unlock this badge"
+          )}"
+        >
+
+          <div class="bic">
+            ${badgeIcon(b.ic,24)}
+          </div>
+
+          <div class="bname">
+            ${esc(b.name)}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+  }catch(e){
+
+    console.warn(
+      "StudyRx badge rendering failed:",
+      e
+    );
+
+    el.innerHTML=
+      '<div class="empty">Badges are temporarily unavailable.</div>';
+  }
 }
 
 /* ============ GOOGLE DRIVE PDF LIBRARY ============ */
@@ -7993,13 +8167,33 @@ $("pm_ambient").onclick=()=>{
 };
 
 /* ============ SETTINGS ============ */
-$("s_save").onclick=()=>{
-  DB.profile.name=$("s_name").value.trim()||DB.profile.name;
+$("s_save").onclick=async()=>{
+  DB.profile=DB.profile||{};
+
+  const enteredName=$("s_name").value.trim();
+
+  if(enteredName){
+    DB.profile.name=enteredName;
+  }
+
   DB.profile.aiKey=$("s_key").value.trim();
   DB.profile.aiModel=$("s_model").value;
 
+  /*
+   * Save locally and queue the normal cloud synchronization.
+   */
   sv("profile",DB.profile);
+
+  /*
+   * Explicitly flush the profile immediately.
+   * This prevents a refresh immediately after pressing Save
+   * from racing the normal 1.2-second debounce.
+   */
+  await pushType("profile");
+
   updateTopbar();
+  renderDash();
+
   toast("Profile saved");
 };
 
