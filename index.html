@@ -2496,6 +2496,9 @@ if(!DB.profile.name){
    */
   sv("profile",DB.profile);
 }
+/* Repair streak from existing XP history without resetting data. */
+repairStreakFromHistory();
+sv("profile",DB.profile);
   $("s_email").value=user.email||"";
   renderAll();
 }
@@ -4222,44 +4225,477 @@ document.addEventListener("pointerleave",()=>{
 },true);
 
 /* ============ XP / RANK / STREAK ENGINE ============ */
-function todayStr(){return new Date().toISOString().slice(0,10)}
-function addXP(amount,reason){
-  const prevXP=DB.profile.xp||0;
-  const prevRank=rankFor(prevXP);
-  let bonus=0;
-  const today=todayStr();
-  if(DB.profile.lastActive!==today){
-    const y=new Date();y.setDate(y.getDate()-1);
-    const yStr=y.toISOString().slice(0,10);
-    DB.profile.streak = (DB.profile.lastActive===yStr) ? (DB.profile.streak||0)+1 : 1;
-    DB.profile.lastActive=today;
-    bonus=5;
-  }
-  const total=amount+bonus;
-  DB.profile.xp=prevXP+total;
-  DB.xplog=DB.xplog||[];
-  DB.xplog.unshift({id:uid(),amount:total,reason,ts:Date.now()});
-  DB.xplog=DB.xplog.slice(0,200);
-  sv("profile",DB.profile); sv("xplog",DB.xplog);
-  const newRank=rankFor(DB.profile.xp);
-  updateTopbar();
-  if(newRank.n!==prevRank.n){
-    $("luTitle").textContent="Rank up!";
-    $("luSub").textContent="You are now a "+newRank.n;
-    $("levelup").classList.add("on");
-  } else {
-    toast("+"+total+" XP — "+reason);
-  }
-  if($("pg-dash").classList.contains("on")) renderDash();
+
+/*
+ * StudyRx uses the user's LOCAL calendar date for streaks.
+ *
+ * We intentionally do NOT use:
+ *
+ *   new Date().toISOString().slice(0,10)
+ *
+ * because ISO strings are UTC-based and can produce the wrong
+ * calendar day for users in other time zones.
+ */
+
+function todayStr(){
+
+  const d=new Date();
+
+  const y=d.getFullYear();
+
+  const m=String(
+    d.getMonth()+1
+  ).padStart(2,"0");
+
+  const day=String(
+    d.getDate()
+  ).padStart(2,"0");
+
+  return `${y}-${m}-${day}`;
 }
 
+
+/*
+ * Convert an activity timestamp into the user's LOCAL date.
+ */
+function localDateFromTs(ts){
+
+  const d=new Date(ts);
+
+  if(Number.isNaN(d.getTime())){
+    return null;
+  }
+
+  const y=d.getFullYear();
+
+  const m=String(
+    d.getMonth()+1
+  ).padStart(2,"0");
+
+  const day=String(
+    d.getDate()
+  ).padStart(2,"0");
+
+  return `${y}-${m}-${day}`;
+}
+
+
+/*
+ * Return the previous calendar day.
+ *
+ * This avoids timezone/UTC problems when determining whether
+ * yesterday was an active day.
+ */
+function previousDateStr(dateStr){
+
+  const parts=
+    String(dateStr).split("-").map(Number);
+
+  if(parts.length!==3 ||
+     parts.some(Number.isNaN)){
+    return null;
+  }
+
+  const d=new Date(
+    parts[0],
+    parts[1]-1,
+    parts[2]
+  );
+
+  d.setDate(
+    d.getDate()-1
+  );
+
+  const y=d.getFullYear();
+
+  const m=String(
+    d.getMonth()+1
+  ).padStart(2,"0");
+
+  const day=String(
+    d.getDate()
+  ).padStart(2,"0");
+
+  return `${y}-${m}-${day}`;
+}
+
+
+/*
+ * Build a set of calendar dates on which the user earned XP.
+ *
+ * xplog already contains timestamps for XP events, so we can
+ * use the existing history to repair the streak without
+ * deleting or modifying old data.
+ */
+function getXPActivityDates(){
+
+  const dates=new Set();
+
+  (DB.xplog||[]).forEach(entry=>{
+
+    if(!entry || !entry.ts){
+      return;
+    }
+
+    const date=
+      localDateFromTs(entry.ts);
+
+    if(date){
+      dates.add(date);
+    }
+
+  });
+
+  return dates;
+}
+
+
+/*
+ * Calculate the consecutive streak from existing XP history.
+ *
+ * Example:
+ *
+ * Sept 2  ✓
+ * Sept 3  ✓
+ * Sept 4  ✓
+ * Sept 5  ✓
+ *
+ * returns 4.
+ *
+ * If today has no activity yet, we calculate the streak ending
+ * with the most recent active day. The current streak is only
+ * advanced when the user performs an actual XP activity.
+ */
+function calculateStreakFromHistory(){
+
+  const dates=
+    getXPActivityDates();
+
+  if(!dates.size){
+    return 0;
+  }
+
+
+  const today=
+    todayStr();
+
+
+  /*
+   * If today is active, count backwards from today.
+   */
+  let cursor;
+
+  if(dates.has(today)){
+
+    cursor=today;
+
+  }else{
+
+    /*
+     * No activity today yet.
+     *
+     * Find the most recent active date.
+     */
+    const sorted=
+      Array.from(dates).sort();
+
+    cursor=
+      sorted[sorted.length-1];
+
+  }
+
+
+  let streak=0;
+
+  while(cursor && dates.has(cursor)){
+
+    streak++;
+
+    cursor=
+      previousDateStr(cursor);
+
+  }
+
+  return streak;
+}
+
+
+/*
+ * Repair an existing streak from the activity history.
+ *
+ * IMPORTANT:
+ * This does NOT erase XP.
+ * It does NOT erase xplog.
+ * It does NOT reset curriculum, flashcards, wards, etc.
+ *
+ * It only corrects the streak value when the existing XP
+ * history proves that the current value is wrong.
+ */
+function repairStreakFromHistory(){
+
+  DB.profile=
+    DB.profile||{};
+
+  DB.xplog=
+    Array.isArray(DB.xplog)
+      ? DB.xplog
+      : [];
+
+
+  const historyStreak=
+    calculateStreakFromHistory();
+
+
+  if(historyStreak<=0){
+    return;
+  }
+
+
+  /*
+   * Preserve a larger existing streak if one exists.
+   *
+   * This prevents an incomplete xplog history from accidentally
+   * lowering a valid streak.
+   */
+  const current=
+    Number(DB.profile.streak)||0;
+
+
+  if(historyStreak>current){
+
+    DB.profile.streak=
+      historyStreak;
+
+  }
+
+
+  /*
+   * If today appears in XP history, make lastActive today.
+   */
+  const today=
+    todayStr();
+
+  const dates=
+    getXPActivityDates();
+
+  if(dates.has(today)){
+
+    DB.profile.lastActive=
+      today;
+
+  }
+
+}
+
+
+/*
+ * Award XP and register today's activity.
+ *
+ * The streak bonus is awarded ONCE per calendar day.
+ */
+function addXP(amount,reason){
+
+  DB.profile=
+    DB.profile||{};
+
+
+  const prevXP=
+    Number(DB.profile.xp)||0;
+
+
+  const prevRank=
+    rankFor(prevXP);
+
+
+  let bonus=0;
+
+
+  const today=
+    todayStr();
+
+
+  const lastActive=
+    DB.profile.lastActive||null;
+
+
+  /*
+   * A new calendar day has started.
+   */
+  if(lastActive!==today){
+
+    const yesterday=
+      previousDateStr(today);
+
+
+    if(lastActive===yesterday){
+
+      /*
+       * Consecutive day.
+       */
+      DB.profile.streak=
+        (Number(DB.profile.streak)||0)+1;
+
+    }else{
+
+      /*
+       * A day was missed, or this is the first activity.
+       */
+      DB.profile.streak=1;
+
+    }
+
+
+    DB.profile.lastActive=
+      today;
+
+
+    /*
+     * Daily streak bonus.
+     *
+     * Only awarded once per calendar day.
+     */
+    bonus=5;
+
+  }
+
+
+  const total=
+    Number(amount||0)+bonus;
+
+
+  DB.profile.xp=
+    prevXP+total;
+
+
+  DB.xplog=
+    Array.isArray(DB.xplog)
+      ? DB.xplog
+      : [];
+
+
+  DB.xplog.unshift({
+
+    id:uid(),
+
+    amount:total,
+
+    reason:String(
+      reason||"Study activity"
+    ),
+
+    ts:Date.now()
+
+  });
+
+
+  /*
+   * Keep the existing history limit.
+   */
+  DB.xplog=
+    DB.xplog.slice(0,200);
+
+
+  /*
+   * Save immediately to local storage and queue cloud sync.
+   */
+  sv(
+    "profile",
+    DB.profile
+  );
+
+
+  sv(
+    "xplog",
+    DB.xplog
+  );
+
+
+  const newRank=
+    rankFor(DB.profile.xp);
+
+
+  updateTopbar();
+
+
+  if(
+    newRank.n!==prevRank.n
+  ){
+
+    $("luTitle").textContent=
+      "Rank up!";
+
+    $("luSub").textContent=
+      "You are now a "+newRank.n;
+
+    $("levelup").classList.add("on");
+
+  }else{
+
+    toast(
+      "+"+total+
+      " XP — "+
+      reason
+    );
+
+  }
+
+
+  if(
+    $("pg-dash").classList.contains("on")
+  ){
+
+    renderDash();
+
+  }
+
+}
+
+
+/*
+ * Update the top navigation.
+ */
 function updateTopbar(){
-  const xp=DB.profile.xp||0, lvl=levelFor(xp), rank=rankFor(xp);
-  $("topXP").textContent="Lvl "+lvl+" · "+xp+" XP";
-  $("topStreak").textContent=(DB.profile.streak||0)+"-day streak";
-  $("profName").textContent=DB.profile.name||"Student";
-  $("profRankSm").textContent=rank.n;
-  $("profAvatar").textContent=(DB.profile.name||"S").slice(0,1).toUpperCase();
+
+  const xp=
+    Number(DB.profile.xp)||0;
+
+
+  const lvl=
+    levelFor(xp);
+
+
+  const rank=
+    rankFor(xp);
+
+
+  $("topXP").textContent=
+    "Lvl "+lvl+
+    " · "+xp+
+    " XP";
+
+
+  $("topStreak").textContent=
+    (Number(DB.profile.streak)||0)+
+    "-day streak";
+
+
+  $("profName").textContent=
+    DB.profile.name||
+    "Student";
+
+
+  $("profRankSm").textContent=
+    rank.n;
+
+
+  $("profAvatar").textContent=
+    (
+      DB.profile.name||
+      "S"
+    )
+    .slice(0,1)
+    .toUpperCase();
+
 }
 
 /* ============ DASHBOARD ============ */
